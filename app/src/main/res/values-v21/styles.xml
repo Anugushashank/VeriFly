@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="MaterialTheme" parent="ParentMaterialTheme">
+
+    </style>
+
+    <style name="MateralThemeNewNoActionBar" parent="ParentThemeNoActionBar">
+
+    </style>
+    <style name="RadioThemeUse" parent="@style/RadioTheme"></style>
+
+    <style name="TextViewThemeUse" parent="@style/TextViewTheme"></style>
+
+</resources>

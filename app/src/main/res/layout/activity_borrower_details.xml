@@ -1,0 +1,570 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:id="@+id/rootLayoutMain">
+
+    <android.support.design.widget.AppBarLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <include
+            android:id="@+id/borrower_details_tool_bar"
+            layout="@layout/toolbar" />
+
+    </android.support.design.widget.AppBarLayout>
+
+    <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_height="match_parent"
+        android:layout_width="match_parent">
+        <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:tools="http://schemas.android.com/tools"
+            android:layout_width="match_parent"
+            android:background="@color/cardColor"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:id="@+id/borrowerLinearBase"
+            tools:context=".BorrowerDetailsActivity"
+            android:focusableInTouchMode="true">
+
+
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:id="@+id/borrowerLinear1"
+                android:layout_marginTop="18dp">
+                <com.github.siyamed.shapeimageview.CircularImageView
+                    xmlns:app="http://schemas.android.com/apk/res-auto"
+                    android:id="@+id/profile_image"
+                    android:layout_width="100dp"
+                    android:layout_height="100dp"
+                    android:src="@drawable/profdefault"
+                    android:layout_marginLeft="20dp"
+                    android:layout_marginRight="20dp" />
+                <!--<ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:id="@+id/profilePic"
+                    android:src="@drawable/ic_launcher"
+                    android:layout_marginRight="5sp"
+                    />-->
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:id="@+id/borrowerLinear2"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/name"
+                        android:textSize="20sp"
+                        android:layout_marginBottom="8dp"
+                        android:layout_weight="1" />
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_weight="1"
+                        android:layout_marginBottom="8dp">
+                        <ImageView
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:id="@+id/locationicon"
+                            android:src="@drawable/location"
+                            android:layout_marginRight="10dp"
+                            android:clickable="true"
+                            android:background="?attr/selectableItemBackground"
+                            android:onClick="showLocation" />
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:id="@+id/college"
+                            android:textColor="@color/colorPrimary"
+                            android:clickable="true"
+                            android:background="?attr/selectableItemBackground"
+                            android:onClick="showLocation" />
+                    </LinearLayout>
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_weight="1">
+                        <ImageView
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:id="@+id/phoneIcon"
+                            android:src="@drawable/phone"
+                            android:layout_marginRight="10dp"
+                            android:onClick="callPhone"
+                            android:background="?attr/selectableItemBackground"
+                            android:clickable="true" />
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:id="@+id/phoneNum"
+                            android:textColor="@color/colorPrimary"
+                            android:textSize="18sp"
+                            android:background="?attr/selectableItemBackground"
+                            android:clickable="true" />
+                    </LinearLayout>
+                </LinearLayout>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/UploadId"
+                android:orientation="horizontal"
+                android:layout_marginTop="40dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginLeft="16dp">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:text="@string/upload_college_id"
+                    android:textColor="@color/colorPrimary"
+                    android:textSize="16sp"
+                    android:layout_marginEnd="12dp"
+                    android:layout_marginRight="12dp" />
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:id="@+id/IdIcon"
+                    android:src="@drawable/cross"/>
+            </LinearLayout>
+
+            <com.example.aparna.buddy.model.ExpandableHeightGridView
+                android:id="@+id/collegeIdImages"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="16dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="10dp"
+                android:numColumns="4" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="20dp"
+                android:layout_marginLeft="16dp"
+                android:layout_marginStart="16dp">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:text="@string/upload_address_proof"
+                    android:textColor="@color/colorPrimary"
+                    android:textSize="16sp"
+                    android:layout_marginRight="12dp"
+                    android:layout_marginEnd="12dp"/>
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:id="@+id/AddressIcon"
+                    android:src="@drawable/cross"/>
+            </LinearLayout>
+
+            <com.example.aparna.buddy.model.ExpandableHeightGridView
+                android:id="@+id/permanentAddressProofImages"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="16dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="10dp"
+                android:numColumns="4" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="20dp"
+                android:layout_marginLeft="16dp">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:text="@string/upload_other_documents"
+                    android:textColor="@color/colorPrimary"
+                    android:textSize="16sp"
+                    android:layout_marginRight="12dp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:orientation="horizontal"
+                android:layout_marginLeft="16dp"
+                android:layout_marginTop="10dp">
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                    <com.github.siyamed.shapeimageview.RoundedImageView
+                        xmlns:app="http://schemas.android.com/apk/res-auto"
+                        android:layout_width="80dp"
+                        android:layout_height="80dp"
+                        android:id="@+id/bankAcc1"
+                        app:siRadius="6dp"
+                        android:src="@drawable/blank"
+                        app:siBorderWidth="1dp"
+                        app:siBorderColor="@color/darkGray"
+                        app:siSquare="true"
+                        android:scaleType="centerCrop"
+                        />
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:src="@drawable/plus"
+                        android:layout_gravity="center"
+                        android:id="@+id/plusBankAcc1"
+                        android:background="?attr/selectableItemBackground"
+                        android:clickable="true"
+                        />
+                </FrameLayout>
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/reference_details"
+                android:textColor="@color/colorPrimary"
+                android:textSize="16sp"
+                android:layout_marginBottom="12dp"
+                android:layout_marginLeft="16dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="30dp" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/good_friends_prompt"
+                android:textSize="18sp"
+                android:layout_marginBottom="12dp"
+                android:layout_marginLeft="16dp" />
+
+            <RadioGroup
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/goodFriendsCheck"
+                android:layout_marginLeft="16dp"
+                android:layout_marginStart="16dp"
+                android:theme="@style/RadioThemeUse"
+                android:orientation="horizontal">
+                <RadioButton
+                    android:layout_width="100dp"
+                    android:layout_height="match_parent"
+                    android:text="No"
+                    android:textSize="18sp"
+                    android:tag="@+id/goodFriendsNo"
+                    android:textColor="@color/darkGray" />
+                <RadioButton
+                    android:layout_width="100dp"
+                    android:layout_height="match_parent"
+                    android:text="Yes"
+                    android:textSize="18sp"
+                    android:id="@+id/goodFriendsYes"
+                    android:textColor="@color/darkGray" />
+            </RadioGroup>
+
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="16sp"
+                android:textColor="@color/colorPrimary"
+                android:id="@+id/refYear"
+                android:hint="@string/reference_year"
+                android:textColorHint="@color/grey"
+                android:layout_marginBottom="12dp"
+                android:layout_marginLeft="16dp"
+                android:layout_marginRight="16dp"
+                android:theme="@style/TextViewThemeUse" />
+
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="16sp"
+                android:textColor="@color/colorPrimary"
+                android:id="@+id/refDept"
+                android:hint="@string/reference_dept"
+                android:textColorHint="@color/grey"
+                android:layout_marginBottom="12dp"
+                android:layout_marginLeft="16dp"
+                android:layout_marginRight="16dp"
+                android:theme="@style/TextViewThemeUse" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/reference_opinion"
+                android:textColor="@color/colorPrimary"
+                android:textSize="16sp"
+                android:layout_marginBottom="12dp"
+                android:layout_marginLeft="16dp"
+                android:layout_marginStart="16dp"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="16dp"
+                android:layout_marginBottom="12dp"
+                android:orientation="horizontal"
+                android:layout_marginRight="24dp">
+                <TextView
+                    android:layout_width="60dp"
+                    android:layout_height="match_parent"
+                    android:text="Punctuality"
+                    android:textSize="16sp"
+                    android:layout_weight="4" />
+                <android.support.v7.widget.AppCompatSpinner
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:theme="@style/DropDownTheme"
+                    android:id="@+id/punctality"
+                    android:gravity="start"
+                    android:textAlignment="viewStart"
+                    android:layout_weight="1"
+                    android:fadeScrollbars="true"
+                    android:scrollbars="none"
+                    android:scrollbarSize="0dp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="16dp"
+                android:layout_marginBottom="12dp"
+                android:orientation="horizontal"
+                android:layout_marginRight="24dp">
+                <TextView
+                    android:layout_width="60dp"
+                    android:layout_height="match_parent"
+                    android:text="Sincerity in Studies"
+                    android:textSize="16sp"
+                    android:layout_weight="4" />
+                <android.support.v7.widget.AppCompatSpinner
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:theme="@style/DropDownTheme"
+                    android:id="@+id/sincerity"
+                    android:gravity="start"
+                    android:textAlignment="viewStart"
+                    android:layout_weight="1"
+                    android:fadeScrollbars="true"
+                    android:scrollbars="none"
+                    android:scrollbarSize="0dp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="16dp"
+                android:layout_marginBottom="12dp"
+                android:orientation="horizontal"
+                android:layout_marginRight="24dp">
+                <TextView
+                    android:layout_width="60dp"
+                    android:layout_height="match_parent"
+                    android:text="Co-currical Participation"
+                    android:textSize="16sp"
+                    android:layout_weight="4" />
+                <android.support.v7.widget.AppCompatSpinner
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:theme="@style/DropDownTheme"
+                    android:id="@+id/coCurricular"
+                    android:gravity="start"
+                    android:textAlignment="viewStart"
+                    android:layout_weight="1"
+                    android:fadeScrollbars="true"
+                    android:scrollbars="none"
+                    android:scrollbarSize="0dp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="16dp"
+                android:layout_marginBottom="12dp"
+                android:orientation="horizontal"
+                android:layout_marginRight="24dp">
+                <TextView
+                    android:layout_width="60dp"
+                    android:layout_height="match_parent"
+                    android:text="Financial Responsibilty"
+                    android:textSize="16sp"
+                    android:layout_weight="4" />
+                <android.support.v7.widget.AppCompatSpinner
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:theme="@style/DropDownTheme"
+                    android:id="@+id/finResponsibility"
+                    android:gravity="start"
+                    android:textAlignment="viewStart"
+                    android:layout_weight="1"
+                    android:fadeScrollbars="true"
+                    android:scrollbars="none"
+                    android:scrollbarSize="0dp" />
+            </LinearLayout>
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/year_back"
+                android:textColor="@color/colorPrimary"
+                android:textSize="16sp"
+                android:layout_marginBottom="12dp"
+                android:layout_marginLeft="16dp" />
+
+            <RadioGroup
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/yearBackCheck"
+                android:layout_marginLeft="16dp"
+                android:layout_marginStart="16dp"
+                android:theme="@style/RadioThemeUse"
+                android:orientation="horizontal">
+                <RadioButton
+                    android:layout_width="100dp"
+                    android:layout_height="match_parent"
+                    android:text="No"
+                    android:textSize="18sp"
+                    android:tag="@+id/yearBackNo"
+                    android:textColor="@color/darkGray" />
+                <RadioButton
+                    android:layout_width="100dp"
+                    android:layout_height="match_parent"
+                    android:text="Yes"
+                    android:textSize="18sp"
+                    android:id="@+id/yearBackYes"
+                    android:textColor="@color/darkGray" />
+            </RadioGroup>
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/loan_repay"
+                android:textColor="@color/colorPrimary"
+                android:textSize="16sp"
+                android:layout_marginBottom="12dp"
+                android:layout_marginLeft="16dp" />
+            <android.support.v7.widget.AppCompatSpinner
+                android:layout_width="130dp"
+                android:layout_height="match_parent"
+                android:theme="@style/DropDownTheme"
+                android:layout_marginBottom="12dp"
+                android:layout_marginLeft="16dp"
+                android:id="@+id/Loan_repay"
+                android:gravity="start"
+                android:textAlignment="viewStart"
+                android:fadeScrollbars="true"
+                android:scrollbars="none"
+                android:scrollbarSize="0dp" />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/two_transparent"
+                android:textColor="@color/colorPrimary"
+                android:textSize="16sp"
+                android:layout_marginBottom="12dp"
+                android:layout_marginLeft="16dp" />
+
+            <RadioGroup
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/transparentCheck"
+                android:layout_marginLeft="16dp"
+                android:layout_marginStart="16dp"
+                android:theme="@style/RadioThemeUse"
+                android:orientation="horizontal">
+                <RadioButton
+                    android:layout_width="100dp"
+                    android:layout_height="match_parent"
+                    android:text="No"
+                    android:textSize="18sp"
+                    android:tag="@+id/transparentNo"
+                    android:textColor="@color/darkGray" />
+                <RadioButton
+                    android:layout_width="100dp"
+                    android:layout_height="match_parent"
+                    android:text="Yes"
+                    android:textSize="18sp"
+                    android:id="@+id/transparentYes"
+                    android:textColor="@color/darkGray" />
+            </RadioGroup>
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/intern_choice"
+                android:textColor="@color/colorPrimary"
+                android:textSize="16sp"
+                android:layout_marginBottom="12dp"
+                android:layout_marginLeft="16dp" />
+
+            <RadioGroup
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/internchoicecheck"
+                android:layout_marginLeft="16dp"
+                android:layout_marginStart="16dp"
+                android:theme="@style/RadioThemeUse"
+                android:orientation="horizontal">
+                <RadioButton
+                    android:layout_width="100dp"
+                    android:layout_height="match_parent"
+                    android:text="No"
+                    android:textSize="18sp"
+                    android:tag="@+id/internchoiceNo"
+                    android:textColor="@color/darkGray" />
+                <RadioButton
+                    android:layout_width="100dp"
+                    android:layout_height="match_parent"
+                    android:text="Yes"
+                    android:textSize="18sp"
+                    android:id="@+id/internchoiceYes"
+                    android:textColor="@color/darkGray" />
+            </RadioGroup>
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/other_notes"
+                android:textColor="@color/colorPrimary"
+                android:textSize="16sp"
+                android:layout_marginBottom="12dp"
+                android:layout_marginLeft="16dp"
+                android:layout_marginStart="16dp"/>
+
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/other_notes_hint"
+                android:textColorHint="@color/grey"
+                android:textColor="@color/colorPrimary"
+                android:background="@drawable/edittextbg"
+                android:textSize="16sp"
+                android:layout_marginBottom="12dp"
+                android:layout_marginLeft="16dp"
+                android:layout_marginRight="16dp"
+                android:minLines="5"
+                android:maxLines="5"
+                android:maxLength="100"
+                android:inputType="textMultiLine"
+                android:gravity="top"
+                android:id="@+id/otherNotes"
+                android:padding="10dp" />
+
+            <Button
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:text="SUBMIT"
+                android:textColor="#FFFFFF"
+                android:background="@color/colorAccent"
+                android:visibility="visible"
+                android:clickable="false"
+                android:id="@+id/submitButton"
+                android:onClick="confirmSubmit" />
+        </LinearLayout>
+    </ScrollView>
+</LinearLayout>
+

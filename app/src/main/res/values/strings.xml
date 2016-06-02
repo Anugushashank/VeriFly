@@ -1,0 +1,64 @@
+<resources>
+    <string name="app_name">Buddy</string>
+    <string name="title_activity_home">Home Activity</string>
+    <string name="action_settings">Settings</string>
+    <string name="borrower_activity_title">Borrower Details</string>
+    <string-array name="opinions">
+        <item>Good</item>
+        <item>Bad</item>
+        <item>Average</item>
+        <item>Don\'t Know</item>
+    </string-array>
+    <string name="prefs_file">buddyPrefsFile</string>
+
+    <!-- Layout -->
+    <string name="Rs">\u20B9</string>
+    <string name="front_side">Front Side</string>
+    <string name="back_side">Back Side</string>
+    <string name="upload_college_id">Upload College ID</string>
+    <string name="upload_address_proof">Upload Permanent Address Proof</string>
+    <string name="upload_other_documents">Upload Other Documents</string>
+    <string name="good_friends_prompt">Reference good friends with borrower?</string>
+    <string name="reference_details">Reference Details</string>
+    <string name="reference_year">Reference\'s Year</string>
+    <string name="reference_dept">Reference\'s Department</string>
+    <string name="reference_opinion">Reference\'s Opinion About Borrower</string>
+    <string name="year_back">Does the Borrower have an year back?</string>
+    <string name="two_transparent">Did you get the feeling that any of these two persons might not have been completely transparent?</string>
+    <string name="loan_repay">Do you think he will repay back the loan? If yes, how much?</string>
+    <string name="choose">Choose</string>
+    <string-array name="loan_items">
+        <item>Upto 10k</item>
+        <item>Upto 30k</item>
+        <item>Upto 40k</item>
+        <item>No</item>
+    </string-array>
+    <string name="intern_choice">If it was your money, would you give him a loan?</string>
+    <string name="other_notes">Other Notes (Optional)</string>
+    <string name="other_notes_hint">How did it go?</string>
+    <string name="matches_prompt">Does the photo match document shown by borrower?</string>
+    <!-- Image Box -->
+    <string name="rounded_image_view">rounded_image_view</string>
+    <string name="plus_icon">plus_icon</string>
+    <string name="unverified_status_icon">unverified_status_icon</string>
+    <string name="verified_status_icon">verified_status_icon</string>
+    <!-- URLs and HTTP data -->
+    <string name="base_auth_token">Basic YnVkZHlhcGlhZG1pbjptZW1vbmdvc2gx</string>
+    <string name="protocol_scheme">http</string>
+    <string name="api_host">ssl.hellobuddy.in</string>
+    <string name="login_path">api/auth/login/intern</string>
+    <string name="authenticate_path">authenticate</string>
+    <string name="tasks_path">api/user/verify/tasks</string>
+    <string name="upload_path">api/user/verify/docs</string>
+
+    <!-- Dialog Box Texts -->
+    <string name="login_dialogue">Logging In&#8230;</string>
+    <string name="loading_tasks">Loading Tasks&#8230;</string>
+    <string name="uploading_documents">Uploading Documents&#8230;\nPlease Do not Press Back\nOr Anywhere in the Screen</string>
+    <string name="upload_failed">Uploading Documents Failed</string>
+    <string name="upload_success">Documents Uploaded Successfully</string>
+    <string name="invalid_creds">Incorrect username or password!</string>
+    <string name="no_internet_connection">No Internet Connection</string>
+    <string name="take_photo">Take a Photo</string>
+    <string name="choose_photo">Choose a Photo</string>
+</resources>
