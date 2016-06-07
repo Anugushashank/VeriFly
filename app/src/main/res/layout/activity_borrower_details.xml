@@ -163,11 +163,15 @@
                     android:textSize="16sp"
                     android:layout_marginRight="12dp"
                     android:layout_marginEnd="12dp"/>
-                <ImageView
+                <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
-                    android:id="@+id/AddressIcon"
-                    android:src="@drawable/cross"/>
+                    android:text="(Upload Only If Not Present)"
+                    android:textColor="@color/colorPrimary"
+                    android:textSize="8sp"
+                    android:layout_marginTop="6dp"
+                    android:layout_marginRight="12dp"
+                    android:layout_marginEnd="12dp"/>
             </LinearLayout>
 
             <com.example.aparna.buddy.model.ExpandableHeightGridView
@@ -188,55 +192,107 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
-                    android:text="@string/upload_other_documents"
+                    android:text="@string/upload_mark_sheet"
                     android:textColor="@color/colorPrimary"
                     android:textSize="16sp"
                     android:layout_marginRight="12dp" />
             </LinearLayout>
 
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:orientation="horizontal"
+            <com.example.aparna.buddy.model.ExpandableHeightGridView
+                android:id="@+id/gradeSheetImages"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
                 android:layout_marginLeft="16dp"
-                android:layout_marginTop="10dp">
-                <FrameLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
-                    <com.github.siyamed.shapeimageview.RoundedImageView
-                        xmlns:app="http://schemas.android.com/apk/res-auto"
-                        android:layout_width="80dp"
-                        android:layout_height="80dp"
-                        android:id="@+id/bankAcc1"
-                        app:siRadius="6dp"
-                        android:src="@drawable/blank"
-                        app:siBorderWidth="1dp"
-                        app:siBorderColor="@color/darkGray"
-                        app:siSquare="true"
-                        android:scaleType="centerCrop"
-                        />
-                    <ImageView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:src="@drawable/plus"
-                        android:layout_gravity="center"
-                        android:id="@+id/plusBankAcc1"
-                        android:background="?attr/selectableItemBackground"
-                        android:clickable="true"
-                        />
-                </FrameLayout>
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="10dp"
+                android:numColumns="4" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="20dp"
+                android:layout_marginLeft="16dp">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:text="@string/upload_bank_proof"
+                    android:textColor="@color/colorPrimary"
+                    android:textSize="16sp"
+                    android:layout_marginRight="12dp" />
             </LinearLayout>
+
+            <com.example.aparna.buddy.model.ExpandableHeightGridView
+                android:id="@+id/bankProofImages"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="16dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="10dp"
+                android:numColumns="4" />
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/reference_details"
                 android:textColor="@color/colorPrimary"
-                android:textSize="16sp"
+                android:textSize="18sp"
                 android:layout_marginBottom="12dp"
                 android:layout_marginLeft="16dp"
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="30dp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_weight="1"
+                android:layout_marginLeft="20dp"
+                android:layout_marginStart="20dp"
+                android:layout_marginBottom="8dp">
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:id="@+id/friendImageIcon"
+                    android:src="@drawable/location"
+                    android:layout_marginRight="10dp"
+                    android:background="?attr/selectableItemBackground" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:id="@+id/friendName"
+                    android:textColor="@color/colorPrimary"
+                    android:textSize="16sp"
+                    android:background="?attr/selectableItemBackground" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_weight="1"
+                android:layout_marginLeft="20dp"
+                android:layout_marginStart="20dp"
+
+                android:layout_marginBottom="8dp">
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:id="@+id/friendPhoneIcon"
+                    android:src="@drawable/phone"
+                    android:layout_marginRight="10dp"
+                    android:onClick="callPhone"
+                    android:background="?attr/selectableItemBackground"
+                    android:clickable="true" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:id="@+id/friendPhoneNum"
+                    android:textColor="@color/colorPrimary"
+                    android:textSize="16sp"
+                    android:background="?attr/selectableItemBackground"
+                    android:clickable="true" />
+            </LinearLayout>
 
             <TextView
                 android:layout_width="match_parent"
@@ -244,7 +300,8 @@
                 android:text="@string/good_friends_prompt"
                 android:textSize="18sp"
                 android:layout_marginBottom="12dp"
-                android:layout_marginLeft="16dp" />
+                android:layout_marginLeft="16dp"
+                android:layout_marginTop="30dp"/>
 
             <RadioGroup
                 android:layout_width="match_parent"
@@ -302,9 +359,10 @@
                 android:text="@string/reference_opinion"
                 android:textColor="@color/colorPrimary"
                 android:textSize="16sp"
-                android:layout_marginBottom="12dp"
+                android:layout_marginBottom="20dp"
                 android:layout_marginLeft="16dp"
-                android:layout_marginStart="16dp"/>
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="30dp"/>
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -416,7 +474,8 @@
                 android:textColor="@color/colorPrimary"
                 android:textSize="16sp"
                 android:layout_marginBottom="12dp"
-                android:layout_marginLeft="16dp" />
+                android:layout_marginLeft="16dp"
+                android:layout_marginTop="30dp"/>
 
             <RadioGroup
                 android:layout_width="match_parent"
@@ -448,7 +507,9 @@
                 android:textColor="@color/colorPrimary"
                 android:textSize="16sp"
                 android:layout_marginBottom="12dp"
-                android:layout_marginLeft="16dp" />
+                android:layout_marginLeft="16dp"
+                android:layout_marginTop="30dp"/>
+
             <android.support.v7.widget.AppCompatSpinner
                 android:layout_width="130dp"
                 android:layout_height="match_parent"
@@ -468,7 +529,8 @@
                 android:textColor="@color/colorPrimary"
                 android:textSize="16sp"
                 android:layout_marginBottom="12dp"
-                android:layout_marginLeft="16dp" />
+                android:layout_marginLeft="16dp"
+                android:layout_marginTop="30dp"/>
 
             <RadioGroup
                 android:layout_width="match_parent"
@@ -500,7 +562,8 @@
                 android:textColor="@color/colorPrimary"
                 android:textSize="16sp"
                 android:layout_marginBottom="12dp"
-                android:layout_marginLeft="16dp" />
+                android:layout_marginLeft="16dp"
+                android:layout_marginTop="30dp"/>
 
             <RadioGroup
                 android:layout_width="match_parent"
@@ -533,7 +596,8 @@
                 android:textSize="16sp"
                 android:layout_marginBottom="12dp"
                 android:layout_marginLeft="16dp"
-                android:layout_marginStart="16dp"/>
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="30dp"/>
 
             <EditText
                 android:layout_width="match_parent"

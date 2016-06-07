@@ -17,7 +17,8 @@
     <string name="back_side">Back Side</string>
     <string name="upload_college_id">Upload College ID</string>
     <string name="upload_address_proof">Upload Permanent Address Proof</string>
-    <string name="upload_other_documents">Upload Other Documents</string>
+    <string name="upload_mark_sheet">Upload Mark Sheet</string>
+    <string name="upload_bank_proof">Upload Bank Proofs</string>
     <string name="good_friends_prompt">Reference good friends with borrower?</string>
     <string name="reference_details">Reference Details</string>
     <string name="reference_year">Reference\'s Year</string>
@@ -49,7 +50,8 @@
     <string name="login_path">api/auth/login/intern</string>
     <string name="authenticate_path">authenticate</string>
     <string name="tasks_path">api/user/verify/tasks</string>
-    <string name="upload_path">api/user/verify/docs</string>
+    <string name="uploadDoc_path">api/v1/user/profile/docs/verify</string>
+    <string name="uploadVerify_path">api/user/verify</string>
 
     <!-- Dialog Box Texts -->
     <string name="login_dialogue">Logging In&#8230;</string>

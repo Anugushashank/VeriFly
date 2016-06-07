@@ -10,6 +10,7 @@ import android.os.AsyncTask;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -192,6 +193,13 @@ public class LoginActivity extends AppCompatActivity {
                 })
                 .setIcon(android.R.drawable.ic_dialog_alert)
                 .show();
+    }
+
+    @Override
+    public void onBackPressed(){
+        LoginActivity.this.finish();
+        Log.i("djjjsjjs","djgdjgfdhfdhfdghf");
+        super.onBackPressed();
     }
 }
 

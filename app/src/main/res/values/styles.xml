@@ -29,6 +29,10 @@
     </style>
 
     <style name="RadioTheme" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="colorControlActivated">@color/darkGray</item>
+    </style>
+
+    <style name="RadioTheme2" parent="Theme.AppCompat.Light.NoActionBar">
         <item name="colorControlActivated">@color/white</item>
     </style>
 

@@ -4,6 +4,7 @@
     android:background="@color/colorPrimary"
     android:minHeight="?attr/actionBarSize"
     android:elevation="10dp"
+    android:titleTextColor="@color/white"
     >
 
 

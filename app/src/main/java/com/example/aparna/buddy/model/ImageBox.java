@@ -29,7 +29,7 @@ public class ImageBox {
     private RoundedImageView roundedImageView;
     private ImageView plusIcon, unverifiedIcon, verifiedIcon;
     private String imageUrl, roundedImageViewTag, plusIconTag, unverifiedIconTag, verifiedIconTag;
-    private Boolean verified = false;
+    private String verified ;
 
     public ImageBox(FrameLayout view, BorrowerDetailsActivity activity) {
         imageBoxLayout = view;
@@ -62,9 +62,6 @@ public class ImageBox {
             });
 
             plusIcon.setVisibility(View.INVISIBLE);
-            if(this.verified){
-                setVerified();
-            }
         } else {
             imageBoxLayout.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -128,15 +125,22 @@ public class ImageBox {
 
         Intent intent = new Intent(activity, ImageViewActivity.class);
         intent.putExtra("imageUrl", imageUrl);
+
         intent.putExtra("picType", picType);
         intent.putExtra("id", getId());
         intent.putExtra("picNum", picNum);
-        intent.putExtra("verified",verified);
+        intent.putExtra("verified",getVerified());
         if(getId() == 1) {
             intent.putExtra("size", activity.getNumCollegeIds());
         }
         else if(getId() == 2){
             intent.putExtra("size",activity.getNumAddressProofs());
+        }
+        else if(getId() == 3){
+            intent.putExtra("size", activity.getNumGradeSheets());
+        }
+        else if(getId() == 4){
+            intent.putExtra("size", activity.getNumBankProofs());
         }
         activity.startActivityForResult(intent, 3);
     }
@@ -179,12 +183,14 @@ public class ImageBox {
                         if (item.getContent().equals(take_photo)) {
                             Intent intent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
                             editor.putInt("conform",getId());
+                            editor.putString("localPath",getCloudinaryId()+getPicNum());
                             editor.commit();
                             activity.startActivityForResult(intent, 1);
                             dialog.dismiss();
                         } else if (item.getContent().equals(choose_photo)) {
                             Intent intent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
                             editor.putInt("conform",getId());
+                            editor.putString("localPath",getCloudinaryId());
                             editor.commit();
                             intent.setType("image/*");
                             activity.startActivityForResult(intent, 2);
@@ -197,22 +203,10 @@ public class ImageBox {
                 .show();
     }
 
-    public void setVerified() {
-        this.verified = true;
-        this.verifiedIcon.setVisibility(View.VISIBLE);
+    public void setVerified(String verified) {
+        this.verified = verified;
     }
 
-    public void setVerifiedImage() {
-        this.verified = true;
-    }
+    public String getVerified() { return verified; }
 
-    public void setUnverified() {
-        this.verified = false;
-        this.unverifiedIcon.setVisibility(View.VISIBLE);
-    }
-
-
-    public Boolean verified(){
-        return this.verified;
-    }
 }

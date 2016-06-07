@@ -291,6 +291,12 @@ public class HomeActivity extends AppCompatActivity {
             return 3;
         }
     }
+
+    @Override
+    public void onBackPressed(){
+        this.finish();
+        super.onBackPressed();
+    }
 }
 
 

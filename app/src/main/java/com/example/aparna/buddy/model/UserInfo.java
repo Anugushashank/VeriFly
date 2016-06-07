@@ -6,14 +6,18 @@ import java.util.List;
  * Created by Aparna on 24/4/16.
  */
 public class UserInfo {
-    String name, phone, college, fbUserId, date;
-    List<String> collegeIDs, bankStatements, addressProofs;
+    String name, phone, college, fbUserId, date, friendName, friendNumber;
+    List<String> collegeIDs, bankStatements, addressProofs, gradeSheets, bankProofs;
 
     public UserInfo() {}
 
     public String getName() {
         return name;
     }
+
+    public String getFriendName() { return friendName; }
+
+    public String getFriendNumber() { return friendNumber; }
 
     public String getPhone() {
         return phone;
@@ -38,6 +42,10 @@ public class UserInfo {
     public List<String> getAddressProofs() {
         return addressProofs;
     }
+
+    public List<String> getGradeSheets() { return gradeSheets; }
+
+    public List<String> getBankProofs() { return bankProofs; }
 
     public String getDate() {
         return "May 17";

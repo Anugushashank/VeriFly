@@ -32,7 +32,7 @@ public class CloudinaryAPI {
         this.activity   = activity;
     }
 
-    public void uploadImage(final Bitmap bitmap, final ImageBox imageBox, final BorrowerData borrowerData,final UploadCallBack uploadCallBack) {
+    public void uploadImage(final Bitmap bitmap, final String localPath, final BorrowerData borrowerData,final UploadCallBack uploadCallBack) {
         this.uploadCallBack=uploadCallBack;
         new AsyncTask<String, String, String>() {
             MaterialDialog materialDialog;
@@ -62,8 +62,7 @@ public class CloudinaryAPI {
 
                 Long tsLong     = System.currentTimeMillis() / 1000;
                 String ts       = tsLong.toString();
-                int count       = imageBox.getPicNum();
-                String publicId = borrowerData.getUserInfo().getPhone() + imageBox.getCloudinaryId() + ts + count;
+                String publicId = borrowerData.getUserInfo().getPhone() + ts + localPath;
 
                 try {
                     cloudinary.uploader()
@@ -87,7 +86,6 @@ public class CloudinaryAPI {
                 if (materialDialog.isShowing()) {
                     materialDialog.hide();
                 }
-                imageBox.setImageUrl(url);
                 uploadCallBack.methodToCallBack(url);
             }
         }.execute();

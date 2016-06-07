@@ -5,5 +5,6 @@
     android:alpha="0.3"
     android:minHeight="?attr/actionBarSize"
     android:elevation="10dp"
+    android:titleTextColor="@color/white"
     android:titleTextAppearance="@style/Toolbar.TitleText">
 </android.support.v7.widget.Toolbar>

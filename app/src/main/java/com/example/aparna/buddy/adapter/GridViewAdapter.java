@@ -65,6 +65,7 @@ public class GridViewAdapter extends BaseAdapter{
         imageBox.setPicNum(imageBoxArrayList.get(position).getPicNum());
         imageBox.setCloudinaryId(imageBoxArrayList.get(position).getCloudinaryId());
         imageBox.setId(imageBoxArrayList.get(position).getId());
+        imageBox.setVerified(imageBoxArrayList.get(position).getVerified());
         if(position == imageBoxArrayList.size()-1){
             ImageView imageView = (ImageView) imageLayout.findViewWithTag(activity.getResources().getString(R.string.unverified_status_icon));
             imageView.setVisibility(View.INVISIBLE);

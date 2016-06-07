@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.afollestad.materialdialogs.MaterialDialog;
@@ -12,12 +13,14 @@ import com.example.aparna.buddy.app.HomeActivity;
 import com.example.aparna.buddy.app.R;
 import com.example.aparna.buddy.app.TokenService;
 import com.google.gson.Gson;
+import com.google.gson.JsonArray;
 import com.google.gson.reflect.TypeToken;
 
 import org.json.JSONObject;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.Map;
 
 import okhttp3.HttpUrl;
@@ -32,14 +35,23 @@ import okhttp3.Response;
 public class BorrowerDataUpdater {
     BorrowerDetailsActivity activity;
     UserInfo userInfo;
+    UploadDocModel uploadDocModel;
+    VerificationInfo verificationInfo;
+    String submit, username;
+    int conformDocs = 0, conformVerify = 0;
 
-    public BorrowerDataUpdater(BorrowerDetailsActivity activity) {
+    public BorrowerDataUpdater(BorrowerDetailsActivity activity, String submit) {
         this.activity = activity;
+        this.submit = submit;
     }
 
     public void updateToApi() {
 
+        SharedPreferences settings = activity.getSharedPreferences(BuddyConstants.PREFS_FILE, 0);
+        username = settings.getString("username","");
+
         String referenceIsGoodFriend =  activity.getGoodFriendsRadio();
+        String phone = activity.getUserInfo().getPhone();
         String referenceYear = activity.getRefYear().toString();
         String referenceDepartment = activity.getRefDept().toString();
         String punctualityInClass = activity.getSpinnerPunc();
@@ -51,105 +63,371 @@ public class BorrowerDataUpdater {
         String loanRepay = activity.repayBackLoan();
         String transparentTrue = activity.getTransparentRadio();
         String loanRepayTrue = activity.getGiveLoanRadio();
+        ArrayList<ImageBox> addressProofs = activity.getAddressProofs();
+        ArrayList<ImageBox> collegeIds = activity.getCollegeIDs();
+        ArrayList<ImageBox> bankProofs = activity.getBankProofs();
+        ArrayList<ImageBox> gradeSheets = activity.getGradeSheets();
 
 
-        Boolean collegeIdFrontImageBoxVerified = activity.getCollegeIdFrontImageBox().verified();
-        Boolean collegeIdBackImageBoxVerified = activity.getCollegeIdBackImageBox().verified();
-        Boolean addressProofBackImageBoxVerified = activity.getAddressProofBackImageBox().verified();
-        Boolean addressProofFrontImageBoxVerified = activity.getAddressProofFrontImageBox().verified();
-
-        Boolean collegeIdVerified = false;
-        if(collegeIdFrontImageBoxVerified && collegeIdBackImageBoxVerified){
-            collegeIdVerified = true;
-        }
-
-        Boolean addressProofVerified = false;
-        if(addressProofBackImageBoxVerified && addressProofFrontImageBoxVerified){
-            addressProofVerified = true;
-        }
 
 
-        
 
-        // update code will go here
-        new AsyncTask<Void, String, String>() {
-            private Exception asyncException;
-            private Context context = activity;
-            MaterialDialog materialDialog;
 
-            @Override
-            protected void onPreExecute() {
-                super.onPreExecute();
-                materialDialog = new MaterialDialog.Builder(activity)
-                        .content(context.getResources().getString(R.string.uploading_documents))
-                        .progress(true, 0)
-                        .show();
+        verificationInfo = new VerificationInfo();
+
+        if(referenceIsGoodFriend != null){
+            if(referenceIsGoodFriend.equals("true")){
+                verificationInfo.setReferenceIsGoodFriend(true);
             }
+            else{
+                verificationInfo.setReferenceIsGoodFriend(false);
+            }
+            conformVerify++;
+        }
 
-            @Override
-            protected String doInBackground(Void... v) {
-                try {
-                    String token = TokenService.getToken(context, activity);
+        if(referenceYear != null){
+            verificationInfo.setReferenceYear(referenceYear);
+            conformVerify++;
+        }
 
-                    if (token == null) {
-                        throw new Exception();
+        if(referenceDepartment != null){
+            verificationInfo.setReferenceDepartment(referenceDepartment);
+            conformVerify++;
+        }
+
+        if(punctualityInClass != null){
+            verificationInfo.setPunctualityInClass(punctualityInClass);
+            conformVerify++;
+        }
+
+        if(sincerityInStudies != null){
+            verificationInfo.setSincerityInStudies(sincerityInStudies);
+            conformVerify++;
+        }
+
+        if(coCurricularParticipation != null){
+            verificationInfo.setCoCurricularParticipation(coCurricularParticipation);
+            conformVerify++;
+        }
+
+        if(financiallyResponsible != null){
+            verificationInfo.setFinanciallyResponsible(financiallyResponsible);
+            conformVerify++;
+        }
+
+        if(friendVerificationNotes != null){
+            verificationInfo.setFriendVerificationNotes(friendVerificationNotes);
+            conformVerify++;
+        }
+
+        if(yearBackTrue != null){
+            if(yearBackTrue.equals("true")){
+                verificationInfo.setHaveYearBack(true);
+            }
+            else{
+                verificationInfo.setHaveYearBack(false);
+            }
+            conformVerify++;
+        }
+
+        if(loanRepay != null){
+            verificationInfo.setRepayCapacity(loanRepay);
+            conformVerify++;
+        }
+
+        if(transparentTrue != null){
+            if(transparentTrue.equals("true")){
+                verificationInfo.setBorrowerIsLying(true);
+            }
+            else{
+                verificationInfo.setBorrowerIsLying(false);
+            }
+            conformVerify++;
+        }
+
+        if(loanRepayTrue != null){
+            if(loanRepayTrue.equals("true")){
+                verificationInfo.setGiveHimLoan(true);
+            }
+            else{
+                verificationInfo.setGiveHimLoan(false);
+            }
+            conformVerify++;
+        }
+
+
+
+
+
+
+
+
+
+        uploadDocModel = new UploadDocModel();
+
+        uploadDocModel.setUserid(phone);
+
+        if(bankProofs.size() > 1) {
+
+            UploadDocModel.NonFrontAndBackDocs nonFrontAndBackDocsBankProof = uploadDocModel.new NonFrontAndBackDocs();
+
+            nonFrontAndBackDocsBankProof.setInvalidImgUrls(bankProofs);
+            nonFrontAndBackDocsBankProof.setValidImgUrls(bankProofs);
+            nonFrontAndBackDocsBankProof.setVerifiedBy(username);
+            uploadDocModel.setBankProof(nonFrontAndBackDocsBankProof);
+            conformDocs++;
+        }
+
+        if(gradeSheets.size() > 1) {
+
+            UploadDocModel.NonFrontAndBackDocs nonFrontAndBackDocsGradeSheet = uploadDocModel.new NonFrontAndBackDocs();
+
+            nonFrontAndBackDocsGradeSheet.setInvalidImgUrls(gradeSheets);
+            nonFrontAndBackDocsGradeSheet.setValidImgUrls(gradeSheets);
+            nonFrontAndBackDocsGradeSheet.setVerifiedBy(username);
+            uploadDocModel.setGradeSheet(nonFrontAndBackDocsGradeSheet);
+            conformDocs++;
+        }
+
+        if(collegeIds.size() > 1) {
+
+            UploadDocModel.FrontAndBackDocs frontAndBackDocsCollegeId = uploadDocModel.new FrontAndBackDocs();
+
+            UploadDocModel.FrontBackImage frontBackImageFront = uploadDocModel.new FrontBackImage();
+
+            UploadDocModel.FrontBackImage frontBackImageBack = uploadDocModel.new FrontBackImage();
+
+            frontAndBackDocsCollegeId.setInvalidImgUrls(collegeIds);
+            frontAndBackDocsCollegeId.setValidImgUrls(collegeIds);
+
+            if(activity.getBackImageCollegeId() != null) {
+                frontBackImageBack.setImgUrl(activity.getBackImageCollegeId());
+                frontBackImageFront.setVerifiedBy(username);
+                frontBackImageFront.setIsVerified(true);
+                frontAndBackDocsCollegeId.setFront(frontBackImageFront);
+            }
+            if(activity.getFrontImageCollegeId() != null) {
+                frontBackImageFront.setImgUrl(activity.getFrontImageCollegeId());
+                frontBackImageFront.setVerifiedBy(username);
+                frontBackImageFront.setIsVerified(true);
+                frontAndBackDocsCollegeId.setBack(frontBackImageBack);
+            }
+            uploadDocModel.setCollegeID(frontAndBackDocsCollegeId);
+            conformDocs++;
+        }
+
+        if(addressProofs.size() > 1) {
+
+            UploadDocModel.FrontAndBackDocs frontAndBackDocsAddressProof = uploadDocModel.new FrontAndBackDocs();
+
+            UploadDocModel.FrontBackImage frontBackImageFront = uploadDocModel.new FrontBackImage();
+
+            UploadDocModel.FrontBackImage frontBackImageBack = uploadDocModel.new FrontBackImage();
+
+            frontAndBackDocsAddressProof.setInvalidImgUrls(addressProofs);
+            frontAndBackDocsAddressProof.setValidImgUrls(addressProofs);
+
+            if(activity.getFrontImageAddressProof() != null) {
+                frontBackImageFront.setImgUrl(activity.getFrontImageAddressProof());
+                frontBackImageFront.setVerifiedBy(username);
+                frontBackImageFront.setIsVerified(true);
+                frontAndBackDocsAddressProof.setFront(frontBackImageFront);
+            }
+            if(activity.getBackImageAddressProof() != null) {
+                frontBackImageBack.setImgUrl(activity.getBackImageAddressProof());
+                frontBackImageFront.setVerifiedBy(username);
+                frontBackImageFront.setIsVerified(true);
+                frontAndBackDocsAddressProof.setBack(frontBackImageBack);
+            }
+            uploadDocModel.setAddressProof(frontAndBackDocsAddressProof);
+            conformDocs++;
+        }
+
+        if(activity.getBackImageAddressProof() != null && activity.getFrontImageAddressProof() != null &&
+                activity.getFrontImageCollegeId() != null && activity.getBackImageCollegeId() != null){
+            conformDocs++;
+        }
+
+
+        if(conformVerify > 0 && conformDocs > 0){
+            if(conformVerify == 11 && conformDocs == 5){
+                verificationInfo.setTaskStatus("completed");
+            }
+            else{
+                verificationInfo.setTaskStatus("ongoing");
+            }
+        }
+
+
+
+
+
+        // Documents Upload
+        if(conformDocs > 0) {
+            new AsyncTask<Void, String, String>() {
+                private Exception asyncException;
+                private Context context = activity;
+                MaterialDialog materialDialog;
+
+                @Override
+                protected void onPreExecute() {
+                    super.onPreExecute();
+                    if (submit.equals("button")) {
+                        materialDialog = new MaterialDialog.Builder(activity)
+                                .content(context.getResources().getString(R.string.uploading_documents))
+                                .progress(true, 0)
+                                .show();
+                    }
+                }
+
+                @Override
+                protected String doInBackground(Void... v) {
+                    try {
+                        String token = TokenService.getToken(context, activity);
+
+                        if (token == null) {
+                            throw new Exception();
+                        }
+
+
+                        OkHttpClient client = new OkHttpClient();
+                        String jsonString = new Gson().toJson(uploadDocModel);
+
+                        HttpUrl url = new HttpUrl.Builder()
+                                .scheme("http")
+                                .host(context.getResources().getString(R.string.api_host))
+                                .addPathSegments(context.getResources().getString(R.string.uploadDoc_path))
+                                .build();
+
+                        Request request = new Request.Builder()
+                                .url(url)
+                                .header("x-access-token", token)
+                                .addHeader("content-type", "application/json")
+                                .post(RequestBody.create(BuddyConstants.MEDIA_TYPE_JSON, jsonString))
+                                .build();
+
+                        Response response = client.newCall(request).execute();
+                        if (!response.isSuccessful())
+                            throw new IOException("Unexpected code " + response);
+
+                        return response.body().string();
+                    } catch (Exception e) {
+                        asyncException = e;
+                        return "";
                     }
 
-                    OkHttpClient client = new OkHttpClient();
-                    JSONObject jsonObject = new JSONObject();
-                    jsonObject.put("userid",userInfo.getPhone());
-
-
-                    HttpUrl url = new HttpUrl.Builder()
-                            .scheme("http")
-                            .host(context.getResources().getString(R.string.api_host))
-                            .addPathSegments(context.getResources().getString(R.string.upload_path))
-                            .build();
-
-                    Request request = new Request.Builder()
-                            .url(url)
-                            .header("x-access-token", token)
-                            .addHeader("content-type", "application/json")
-                            .post(RequestBody.create(BuddyConstants.MEDIA_TYPE_JSON, jsonObject.toString()))
-                            .build();
-
-                    Response response = client.newCall(request).execute();
-                    if (!response.isSuccessful()) throw new IOException("Unexpected code " + response);
-
-                    return response.body().string();
-                } catch (Exception e) {
-                    asyncException = e;
-                    return "";
                 }
 
-            }
+                @Override
+                protected void onPostExecute(String apiResponse) {
+                    if (submit.equals("button")) {
+                        if (materialDialog.isShowing()) {
+                            materialDialog.hide();
+                        }
+                    }
+                    ApiResponse apiResponse1 = new Gson().fromJson(apiResponse, ApiResponse.class);
 
-            @Override
-            protected void onPostExecute(String apiResponse) {
-                if (materialDialog.isShowing()) {
-                    materialDialog.hide();
+                    if (asyncException != null) {
+                        // here tell that login request has thrown exception and ask to try again
+                        CharSequence text = context.getResources().getString(R.string.upload_failed);
+                        int duration = Toast.LENGTH_SHORT;
+
+                        Toast toast = Toast.makeText(context, text, duration);
+                        toast.show();
+                    } else {
+                        CharSequence text = context.getResources().getString(R.string.upload_success);
+                        int duration = Toast.LENGTH_SHORT;
+
+                        Toast toast = Toast.makeText(context, text, duration);
+                        toast.show();
+                        activity.finish();
+                    }
+                }
+            }.execute();
+        }
+
+
+        if(conformVerify > 0) {
+            new AsyncTask<Void, String, String>() {
+                private Exception asyncException;
+                private Context context = activity;
+                MaterialDialog materialDialog;
+
+                @Override
+                protected void onPreExecute() {
+                    super.onPreExecute();
+                    if (submit.equals("button")) {
+                        materialDialog = new MaterialDialog.Builder(activity)
+                                .content(context.getResources().getString(R.string.uploading_documents))
+                                .progress(true, 0)
+                                .show();
+                    }
                 }
 
-                Type type = new TypeToken<Map<String, String>>(){}.getType();
-                Map<String, String> responseMap = new Gson().fromJson(apiResponse, type);
+                @Override
+                protected String doInBackground(Void... v) {
+                    try {
+                        String token = TokenService.getToken(context, activity);
 
-                if (asyncException != null || !responseMap.get("status").equals("success")) {
-                    // here tell that login request has thrown exception and ask to try again
-                    CharSequence text = context.getResources().getString(R.string.upload_failed);
-                    int duration = Toast.LENGTH_SHORT;
+                        if (token == null) {
+                            throw new Exception();
+                        }
 
-                    Toast toast = Toast.makeText(context, text, duration);
-                    toast.show();
+
+                        OkHttpClient client = new OkHttpClient();
+                        String jsonString = new Gson().toJson(verificationInfo);
+
+                        HttpUrl url = new HttpUrl.Builder()
+                                .scheme("http")
+                                .host(context.getResources().getString(R.string.api_host))
+                                .addPathSegments(context.getResources().getString(R.string.uploadVerify_path))
+                                .build();
+
+                        Request request = new Request.Builder()
+                                .url(url)
+                                .header("x-access-token", token)
+                                .addHeader("content-type", "application/json")
+                                .put(RequestBody.create(BuddyConstants.MEDIA_TYPE_JSON, jsonString))
+                                .build();
+
+                        Response response = client.newCall(request).execute();
+                        if (!response.isSuccessful())
+                            throw new IOException("Unexpected code " + response);
+
+                        return response.body().string();
+                    } catch (Exception e) {
+                        asyncException = e;
+                        return "";
+                    }
+
                 }
-                else {
-                    CharSequence text = context.getResources().getString(R.string.upload_success);
-                    int duration = Toast.LENGTH_SHORT;
 
-                    Toast toast = Toast.makeText(context, text, duration);
-                    toast.show();
-                    activity.finish();
+                @Override
+                protected void onPostExecute(String apiResponse) {
+                    if (submit.equals("button")) {
+                        if (materialDialog.isShowing()) {
+                            materialDialog.hide();
+                        }
+                    }
+                    ApiResponse apiResponse1 = new Gson().fromJson(apiResponse, ApiResponse.class);
+
+                    if (asyncException != null) {
+                        // here tell that login request has thrown exception and ask to try again
+                        CharSequence text = context.getResources().getString(R.string.upload_failed);
+                        int duration = Toast.LENGTH_SHORT;
+
+                        Toast toast = Toast.makeText(context, text, duration);
+                        toast.show();
+                    } else {
+                        CharSequence text = context.getResources().getString(R.string.upload_success);
+                        int duration = Toast.LENGTH_SHORT;
+
+                        Toast toast = Toast.makeText(context, text, duration);
+                        toast.show();
+                        activity.finish();
+                    }
                 }
-            }
-        }.execute();
+            }.execute();
+        }
     }
 }

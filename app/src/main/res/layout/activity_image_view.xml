@@ -19,55 +19,117 @@
         android:layout_marginStart="40dp"
         android:textSize="16sp"/>
 
-    <ImageView
+    <com.example.aparna.buddy.model.TouchImageView
         android:layout_width="match_parent"
         android:layout_height="320dp"
         android:id="@+id/full_image"
         android:layout_alignParentStart="true"
         android:layout_alignParentLeft="true"
         />
-
-    <TextView
+    <FrameLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/matches_prompt"
-        android:textColor="#FFFFFF"
-        android:textSize="16sp"
-        android:layout_marginRight="40dp"
-        android:layout_marginLeft="40dp"/>
+        android:layout_marginTop="10dp"
+        android:id="@+id/frameLayout">
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/collegeIdLayout"
+            android:visibility="invisible"
+            android:orientation="vertical">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/matches_prompt"
+                android:textColor="#FFFFFF"
+                android:textSize="16sp"
+                android:layout_marginRight="40dp"
+                android:layout_marginLeft="40dp"/>
 
-    <RadioGroup
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/imageCheck"
-        android:layout_marginRight="40dp"
-        android:layout_marginLeft="40dp"
-        android:theme="@style/RadioThemeUse"
-        android:orientation="vertical">
-        <RadioButton
+            <RadioGroup
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/imageCheck"
+                android:layout_marginRight="40dp"
+                android:layout_marginLeft="40dp"
+                android:theme="@style/RadioTheme2"
+                android:orientation="vertical">
+                <RadioButton
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Invalid"
+                    android:textSize="16sp"
+                    android:buttonTint="@color/white"
+                    android:id="@+id/matchInvalid"
+                    android:textColor="#FFFFFF" />
+                <RadioButton
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Valid"
+                    android:textSize="16sp"
+                    android:buttonTint="@color/white"
+                    android:id="@+id/matchValid"
+                    android:textColor="#FFFFFF" />
+                <RadioButton
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Matches Front Side"
+                    android:textSize="16sp"
+                    android:buttonTint="@color/white"
+                    android:id="@+id/matchFront"
+                    android:textColor="#FFFFFF" />
+                <RadioButton
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Matches Back Side"
+                    android:textSize="16sp"
+                    android:buttonTint="@color/white"
+                    android:id="@+id/matchBack"
+                    android:textColor="#FFFFFF" />
+            </RadioGroup>
+        </LinearLayout>
+        <LinearLayout
             android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:text="No"
-            android:textSize="16sp"
-            android:buttonTint="@color/white"
-            android:tag="@+id/No"
-            android:textColor="#FFFFFF" />
-        <RadioButton
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:text="Matches Front Side"
-            android:textSize="16sp"
-            android:buttonTint="@color/white"
-            android:id="@+id/matchFront"
-            android:textColor="#FFFFFF" />
-        <RadioButton
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:text="Matches Back Side"
-            android:textSize="16sp"
-            android:buttonTint="@color/white"
-            android:id="@+id/matchBack"
-            android:textColor="#FFFFFF" />
-    </RadioGroup>
+            android:layout_height="wrap_content"
+            android:id="@+id/gradeSheetLayout"
+            android:visibility="invisible"
+            android:orientation="vertical">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Is this a valid document?"
+                android:textColor="#FFFFFF"
+                android:textSize="16sp"
+                android:layout_marginRight="40dp"
+                android:layout_marginLeft="40dp"/>
+            <RadioGroup
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/imageValid"
+                android:layout_marginRight="40dp"
+                android:layout_marginLeft="40dp"
+                android:theme="@style/RadioTheme2"
+                android:orientation="vertical">
+                <RadioButton
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Valid"
+                    android:textSize="16sp"
+                    android:buttonTint="@color/white"
+                    android:id="@+id/valid"
+                    android:textColor="#FFFFFF" />
+                <RadioButton
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Invalid"
+                    android:textSize="16sp"
+                    android:buttonTint="@color/white"
+                    android:id="@+id/invalid"
+                    android:textColor="#FFFFFF" />
+            </RadioGroup>
+        </LinearLayout>
+
+
+    </FrameLayout>
 
 </LinearLayout>
