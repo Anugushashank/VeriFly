@@ -99,7 +99,25 @@ public class BorrowerDetailsActivity extends AppCompatActivity implements Adapte
         uploadDocModel = borrowerData.getUploadDocModel();
         verInfo = borrowerData.getVerificationInfo();
 
+
+
+        profilePic = (CircularImageView) findViewById(R.id.profile_image);
+        name = (TextView) findViewById(R.id.name);
+        phoneNum = (TextView) findViewById(R.id.phoneNum);
+        phoneIcon = (ImageView) findViewById(R.id.phoneIcon);
+        friendName = (TextView) findViewById(R.id.friendName);
+        friendPhoneNum = (TextView) findViewById(R.id.friendPhoneNum);
+        college = (TextView) findViewById(R.id.college);
+        IdIcon = (ImageView) findViewById(R.id.IdIcon);
+        refYear = (EditText) findViewById(R.id.refYear);
+        refDept = (EditText) findViewById(R.id.refDept);
+        otherNotes = (EditText) findViewById(R.id.otherNotes);
+        referenceSelection = (RadioGroup) findViewById(R.id.goodFriendsCheck);
+        submitButton = (Button) findViewById(R.id.submitButton);
         toolBar = (Toolbar) findViewById(R.id.borrower_details_tool_bar);
+
+
+
         setSupportActionBar(toolBar);
         if (getSupportActionBar() != null) {
             getSupportActionBar().setTitle(getResources().getString(R.string.borrower_activity_title));
@@ -114,46 +132,75 @@ public class BorrowerDetailsActivity extends AppCompatActivity implements Adapte
             }
         });
 
-        submitButton = (Button) findViewById(R.id.submitButton);
+
+
+        String userId = uploadDocModel.getFbUserId();
+        Picasso.with(this)
+                .load("https://graph.facebook.com/" + userId + "/picture?type=large").placeholder(R.drawable.loading_image)
+                .into(profilePic);
+
+        name.setText(uploadDocModel.getName());
+
+        college.setTextSize(18 - (uploadDocModel.getCollege().length()) / 8);
+        college.setText(uploadDocModel.getCollege());
+
+        phoneNum.setText(uploadDocModel.getPhone());
+        phoneNum.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String phone_num = (phoneNum.getText()).toString();
+                Intent callIntent = new Intent(Intent.ACTION_CALL);
+                callIntent.setData(Uri.parse("tel:" + phone_num));
+                if (ContextCompat.checkSelfPermission(BorrowerDetailsActivity.this, Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
+                    ActivityCompat.requestPermissions(BorrowerDetailsActivity.this, new String[]{Manifest.permission.CALL_PHONE},3);
+                }
+                if(ContextCompat.checkSelfPermission(BorrowerDetailsActivity.this, Manifest.permission.CALL_PHONE) == PackageManager.PERMISSION_GRANTED) {
+                    startActivity(callIntent);
+                }
+            }
+        });
+
+
 
         collegeID = new ArrayList<>();
         count = -1;
+        if(uploadDocModel.getCollegeID() != null) {
+            if (uploadDocModel.getCollegeID().getFront() != null) {
+                ImageBox ib = new ImageBox(imageLayout, BorrowerDetailsActivity.this);
+                ib.setImageUrl(uploadDocModel.getCollegeID().getFront().getImgUrl());
+                frontImageCollegeId = ib.getImageUrl();
+                ib.setPicNum(++count);
+                ib.setPicType("College ID");
+                ib.setCloudinaryId("collegeId");
+                ib.setId(1);
+                ib.setVerified("front");
+                insertCollegeImageBox(ib);
+            }
 
-        if (uploadDocModel.getCollegeID().getFront()!= null) {
-            ImageBox ib = new ImageBox(imageLayout, BorrowerDetailsActivity.this);
-            ib.setImageUrl(uploadDocModel.getCollegeID().getFront().getImgUrl());
-            frontImageCollegeId = ib.getImageUrl();
-            ib.setPicNum(++count);
-            ib.setPicType("College ID");
-            ib.setCloudinaryId("collegeId");
-            ib.setId(1);
-            ib.setVerified("front");
-            insertCollegeImageBox(ib);
-        }
-
-        if (uploadDocModel.getCollegeID().getBack().getImgUrl() != null) {
-            ImageBox ib = new ImageBox(imageLayout, BorrowerDetailsActivity.this);
-            ib.setImageUrl(uploadDocModel.getCollegeID().getBack().getImgUrl());
-            backImageCollegeId = ib.getImageUrl();
-            ib.setPicNum(++count);
-            ib.setPicType("College ID");
-            ib.setCloudinaryId("collegeId");
-            ib.setId(1);
-            ib.setVerified("back");
-            insertCollegeImageBox(ib);
-        }
-        if(uploadDocModel.getCollegeID().getFront()== null ||  uploadDocModel.getCollegeID().getBack() != null) {
-            if (uploadDocModel.getCollegeID().getImgUrls() != null) {
-                for (int i = count + 1; i < uploadDocModel.getCollegeID().getImgUrls().size(); i++) {
-                    ImageBox ib = new ImageBox(imageLayout, BorrowerDetailsActivity.this);
-                    ib.setImageUrl(uploadDocModel.getCollegeID().getImgUrls().get(count));
-                    ib.setPicNum(count);
-                    count = i;
-                    ib.setPicType("College ID");
-                    ib.setCloudinaryId("collegeId");
-                    ib.setId(1);
-                    ib.setVerified("invalid");
-                    insertCollegeImageBox(ib);
+            if (uploadDocModel.getCollegeID().getBack() != null) {
+                ImageBox ib = new ImageBox(imageLayout, BorrowerDetailsActivity.this);
+                ib.setImageUrl(uploadDocModel.getCollegeID().getBack().getImgUrl());
+                backImageCollegeId = ib.getImageUrl();
+                ib.setPicNum(++count);
+                ib.setPicType("College ID");
+                ib.setCloudinaryId("collegeId");
+                ib.setId(1);
+                ib.setVerified("back");
+                insertCollegeImageBox(ib);
+            }
+            if (uploadDocModel.getCollegeID().getFront() == null || uploadDocModel.getCollegeID().getBack() == null) {
+                if (uploadDocModel.getCollegeID().getImgUrls() != null) {
+                    for (int i = count + 1; i < uploadDocModel.getCollegeID().getImgUrls().size(); i++) {
+                        ImageBox ib = new ImageBox(imageLayout, BorrowerDetailsActivity.this);
+                        ib.setImageUrl(uploadDocModel.getCollegeID().getImgUrls().get(count));
+                        ib.setPicNum(count);
+                        count = i;
+                        ib.setPicType("College ID");
+                        ib.setCloudinaryId("collegeId");
+                        ib.setId(1);
+                        ib.setVerified("invalid");
+                        insertCollegeImageBox(ib);
+                    }
                 }
             }
         }
@@ -173,40 +220,42 @@ public class BorrowerDetailsActivity extends AppCompatActivity implements Adapte
 
         addressProof = new ArrayList<>();
         count = -1;
-
-        if (uploadDocModel.getAddressProof().getFront()!= null) {
-            ImageBox ib = new ImageBox(imageLayout, BorrowerDetailsActivity.this);
-            ib.setImageUrl(uploadDocModel.getAddressProof().getFront().getImgUrl());
-            frontImageAddressProof = ib.getImageUrl();
-            ib.setPicNum(++count);
-            ib.setPicType("Permanent Address Proof");
-            ib.setCloudinaryId("addressProof");
-            ib.setId(2);
-            ib.setVerified("front");
-            insertAddressProofImageBox(ib);
-        }
-        if (uploadDocModel.getAddressProof().getBack() != null) {
-            ImageBox ib = new ImageBox(imageLayout, BorrowerDetailsActivity.this);
-            ib.setImageUrl(uploadDocModel.getAddressProof().getBack().getImgUrl());
-            backImageAddressProof = ib.getImageUrl();
-            ib.setPicNum(++count);
-            ib.setPicType("Permanent Address Proof");
-            ib.setCloudinaryId("addressProof");
-            ib.setId(2);
-            ib.setVerified("back");
-            insertAddressProofImageBox(ib);
-        }
-        if(uploadDocModel.getAddressProof().getFront()== null ||  uploadDocModel.getAddressProof().getBack() != null) {
-            if (uploadDocModel.getAddressProof().getImgUrls() != null) {
-                for (int i = count + 1; i < uploadDocModel.getAddressProof().getImgUrls().size(); i++) {
-                    ImageBox ib = new ImageBox(imageLayout, BorrowerDetailsActivity.this);
-                    ib.setImageUrl(uploadDocModel.getAddressProof().getImgUrls().get(count));
-                    ib.setPicNum(count);count = i;
-                    ib.setPicType("Permanent Address Proof");
-                    ib.setCloudinaryId("addressProof");
-                    ib.setId(2);
-                    ib.setVerified("invalid");
-                    insertAddressProofImageBox(ib);
+        if(uploadDocModel.getAddressProof() != null) {
+            if (uploadDocModel.getAddressProof().getFront() != null) {
+                ImageBox ib = new ImageBox(imageLayout, BorrowerDetailsActivity.this);
+                ib.setImageUrl(uploadDocModel.getAddressProof().getFront().getImgUrl());
+                frontImageAddressProof = ib.getImageUrl();
+                ib.setPicNum(++count);
+                ib.setPicType("Permanent Address Proof");
+                ib.setCloudinaryId("addressProof");
+                ib.setId(2);
+                ib.setVerified("front");
+                insertAddressProofImageBox(ib);
+            }
+            if (uploadDocModel.getAddressProof().getBack() != null) {
+                ImageBox ib = new ImageBox(imageLayout, BorrowerDetailsActivity.this);
+                ib.setImageUrl(uploadDocModel.getAddressProof().getBack().getImgUrl());
+                backImageAddressProof = ib.getImageUrl();
+                ib.setPicNum(++count);
+                ib.setPicType("Permanent Address Proof");
+                ib.setCloudinaryId("addressProof");
+                ib.setId(2);
+                ib.setVerified("back");
+                insertAddressProofImageBox(ib);
+            }
+            if (uploadDocModel.getAddressProof().getFront() == null || uploadDocModel.getAddressProof().getBack() == null) {
+                if (uploadDocModel.getAddressProof().getImgUrls() != null) {
+                    for (int i = count + 1; i < uploadDocModel.getAddressProof().getImgUrls().size(); i++) {
+                        ImageBox ib = new ImageBox(imageLayout, BorrowerDetailsActivity.this);
+                        ib.setImageUrl(uploadDocModel.getAddressProof().getImgUrls().get(count));
+                        ib.setPicNum(count);
+                        count = i;
+                        ib.setPicType("Permanent Address Proof");
+                        ib.setCloudinaryId("addressProof");
+                        ib.setId(2);
+                        ib.setVerified("invalid");
+                        insertAddressProofImageBox(ib);
+                    }
                 }
             }
         }
@@ -226,18 +275,19 @@ public class BorrowerDetailsActivity extends AppCompatActivity implements Adapte
 
         gradeSheet = new ArrayList<>();
         count = -1;
-
-        if (uploadDocModel.getGradeSheet().getImgUrls() != null) {
-            for (int i = count + 1; i < uploadDocModel.getGradeSheet().getImgUrls().size(); i++) {
-                ImageBox ib = new ImageBox(imageLayout, BorrowerDetailsActivity.this);
-                ib.setImageUrl(uploadDocModel.getGradeSheet().getImgUrls().get(i));
-                ib.setPicNum(i);
-                count = i;
-                ib.setPicType("Grade Sheet");
-                ib.setCloudinaryId("gradeSheet");
-                ib.setId(3);
-                ib.setVerified("invalid");
-                insertGradeSheetImageBox(ib);
+        if(uploadDocModel.getGradeSheet() != null) {
+            if (uploadDocModel.getGradeSheet().getImgUrls() != null) {
+                for (int i = count + 1; i < uploadDocModel.getGradeSheet().getImgUrls().size(); i++) {
+                    ImageBox ib = new ImageBox(imageLayout, BorrowerDetailsActivity.this);
+                    ib.setImageUrl(uploadDocModel.getGradeSheet().getImgUrls().get(i));
+                    ib.setPicNum(i);
+                    count = i;
+                    ib.setPicType("Grade Sheet");
+                    ib.setCloudinaryId("gradeSheet");
+                    ib.setId(3);
+                    ib.setVerified("invalid");
+                    insertGradeSheetImageBox(ib);
+                }
             }
         }
         ibx = new ImageBox(imageLayout,BorrowerDetailsActivity.this);
@@ -256,18 +306,19 @@ public class BorrowerDetailsActivity extends AppCompatActivity implements Adapte
 
         bankProof = new ArrayList<>();
         count = -1;
-
-        if (uploadDocModel.getBankProof().getImgUrls() != null) {
-            for (int i = count + 1; i < uploadDocModel.getBankProof().getImgUrls().size(); i++) {
-                ImageBox ib = new ImageBox(imageLayout, BorrowerDetailsActivity.this);
-                ib.setImageUrl(uploadDocModel.getBankProof().getImgUrls().get(i));
-                ib.setPicNum(i);
-                count = i;
-                ib.setPicType("Bank Proof");
-                ib.setCloudinaryId("bankProof");
-                ib.setId(4);
-                ib.setVerified("invalid");
-                insertBankProofImageBox(ib);
+        if(uploadDocModel.getBankProof() != null) {
+            if (uploadDocModel.getBankProof().getImgUrls() != null) {
+                for (int i = count + 1; i < uploadDocModel.getBankProof().getImgUrls().size(); i++) {
+                    ImageBox ib = new ImageBox(imageLayout, BorrowerDetailsActivity.this);
+                    ib.setImageUrl(uploadDocModel.getBankProof().getImgUrls().get(i));
+                    ib.setPicNum(i);
+                    count = i;
+                    ib.setPicType("Bank Proof");
+                    ib.setCloudinaryId("bankProof");
+                    ib.setId(4);
+                    ib.setVerified("invalid");
+                    insertBankProofImageBox(ib);
+                }
             }
         }
         ibx = new ImageBox(imageLayout,BorrowerDetailsActivity.this);
@@ -283,89 +334,6 @@ public class BorrowerDetailsActivity extends AppCompatActivity implements Adapte
 
 
 
-
-
-        profilePic = (CircularImageView) findViewById(R.id.profile_image);
-        name = (TextView) findViewById(R.id.name);
-        phoneNum = (TextView) findViewById(R.id.phoneNum);
-        phoneIcon = (ImageView) findViewById(R.id.phoneIcon);
-        friendName = (TextView) findViewById(R.id.friendName);
-        friendPhoneNum = (TextView) findViewById(R.id.friendPhoneNum);
-        college = (TextView) findViewById(R.id.college);
-        IdIcon = (ImageView) findViewById(R.id.IdIcon);
-        refYear = (EditText) findViewById(R.id.refYear);
-        refDept = (EditText) findViewById(R.id.refDept);
-        otherNotes = (EditText) findViewById(R.id.otherNotes);
-        referenceSelection = (RadioGroup) findViewById(R.id.goodFriendsCheck);
-        referenceSelection.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(RadioGroup group, int checkedId) {
-                if (checkedId == R.id.goodFriendsYes) {
-                    goodFriendsRadio = "true";
-                } else {
-                    goodFriendsRadio = "false";
-                }
-            }
-        });
-        yearBackSelection = (RadioGroup) findViewById(R.id.yearBackCheck);
-        yearBackSelection.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(RadioGroup group, int checkedId) {
-                if (checkedId == R.id.yearBackYes) {
-                    yearBackRadio = "true";
-                } else {
-                    yearBackRadio = "false";
-                }
-            }
-        });
-        transparentSelection = (RadioGroup) findViewById(R.id.transparentCheck);
-        transparentSelection.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(RadioGroup group, int checkedId) {
-                if (checkedId == R.id.transparentYes) {
-                    transparentRadio = "true";
-                } else {
-                    transparentRadio = "false";
-                }
-            }
-        });
-        internSelection = (RadioGroup) findViewById(R.id.internchoicecheck);
-        internSelection.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(RadioGroup group, int checkedId) {
-                if (checkedId == R.id.internchoiceYes) {
-                    giveLoanRadio = "true";
-                } else {
-                    giveLoanRadio = "false";
-                }
-            }
-        });
-
-        String userId = uploadDocModel.getFbUserId();
-        Picasso.with(this)
-                .load("https://graph.facebook.com/" + userId + "/picture?type=large")
-                .into(profilePic);
-
-        name.setText(uploadDocModel.getName());
-
-        phoneNum.setText(uploadDocModel.getPhone());
-        phoneNum.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                String phone_num = (phoneNum.getText()).toString();
-                Intent callIntent = new Intent(Intent.ACTION_CALL);
-                callIntent.setData(Uri.parse("tel:" + phone_num));
-                if (ContextCompat.checkSelfPermission(BorrowerDetailsActivity.this, Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
-                    ActivityCompat.requestPermissions(BorrowerDetailsActivity.this, new String[]{Manifest.permission.CALL_PHONE},3);
-                }
-                if(ContextCompat.checkSelfPermission(BorrowerDetailsActivity.this, Manifest.permission.CALL_PHONE) == PackageManager.PERMISSION_GRANTED) {
-                    startActivity(callIntent);
-                }
-            }
-        });
-
-        college.setTextSize(18 - (uploadDocModel.getCollege().length()) / 8);
-        college.setText(uploadDocModel.getCollege());
 
         friendName.setText(uploadDocModel.getFriendName());
         friendPhoneNum.setText(uploadDocModel.getFriendNumber());
@@ -383,6 +351,21 @@ public class BorrowerDetailsActivity extends AppCompatActivity implements Adapte
                 }
             }
         });
+
+
+
+
+
+        referenceSelection.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(RadioGroup group, int checkedId) {
+                if (checkedId == R.id.goodFriendsYes) {
+                    goodFriendsRadio = "true";
+                } else {
+                    goodFriendsRadio = "false";
+                }
+            }
+        });
         if(verInfo.getReferenceIsGoodFriend() != null) {
             if (verInfo.getReferenceIsGoodFriend()) {
                 referenceSelection.check(R.id.goodFriendsYes);
@@ -393,6 +376,7 @@ public class BorrowerDetailsActivity extends AppCompatActivity implements Adapte
             }
         }
 
+
         if (verInfo.getReferenceYear() != null) {
             refYear.setText(verInfo.getReferenceYear());
 
@@ -402,39 +386,7 @@ public class BorrowerDetailsActivity extends AppCompatActivity implements Adapte
             refDept.setText(verInfo.getReferenceDepartment());
         }
 
-        if (verInfo.getFinalVerificationNotes() != null) {
-            otherNotes.setText(verInfo.getFinalVerificationNotes());
-        }
 
-        if(verInfo.getHaveYearBack() != null) {
-            if (verInfo.getHaveYearBack()) {
-                yearBackSelection.check(R.id.yearBackYes);
-                yearBackRadio = "true";
-            } else {
-                yearBackSelection.check(R.id.yearBackNo);
-                yearBackRadio = "false";
-            }
-        }
-
-        if(verInfo.getGiveHimLoan() != null) {
-            if (verInfo.getGiveHimLoan()) {
-                internSelection.check(R.id.internchoiceYes);
-                giveLoanRadio = "true";
-            } else {
-                internSelection.check(R.id.internchoiceNo);
-                giveLoanRadio = "false";
-            }
-        }
-
-        if(verInfo.getBorrowerIsLying() != null) {
-            if (verInfo.getBorrowerIsLying()) {
-                transparentSelection.check(R.id.transparentYes);
-                transparentRadio = "true";
-            } else {
-                transparentSelection.check(R.id.transparentNo);
-                transparentRadio = "false";
-            }
-        }
 
         spinnerPunc = (AppCompatSpinner) findViewById(R.id.punctality);
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this, R.array.opinions, R.layout.spinner_item);
@@ -491,6 +443,35 @@ public class BorrowerDetailsActivity extends AppCompatActivity implements Adapte
             coCurricularParticipation = verInfo.getCoCurricularParticipation();
         }
 
+
+
+
+
+        yearBackSelection = (RadioGroup) findViewById(R.id.yearBackCheck);
+        yearBackSelection.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(RadioGroup group, int checkedId) {
+                if (checkedId == R.id.yearBackYes) {
+                    yearBackRadio = "true";
+                } else {
+                    yearBackRadio = "false";
+                }
+            }
+        });
+        if(verInfo.getHaveYearBack() != null) {
+            if (verInfo.getHaveYearBack()) {
+                yearBackSelection.check(R.id.yearBackYes);
+                yearBackRadio = "true";
+            } else {
+                yearBackSelection.check(R.id.yearBackNo);
+                yearBackRadio = "false";
+            }
+        }
+
+
+
+
+
         ArrayAdapter<CharSequence> sadapter = ArrayAdapter.createFromResource(this,
                 R.array.loan_items, R.layout.spinner_item);
         sadapter.setDropDownViewResource(R.layout.spinner_dropdown_list);
@@ -508,6 +489,60 @@ public class BorrowerDetailsActivity extends AppCompatActivity implements Adapte
         if(verInfo.getRepayCapacity() != null){
             spinnerLoan.setSelection(sadapter.getPosition(verInfo.getRepayCapacity()) + 1);
             loanRepay = verInfo.getRepayCapacity();
+        }
+
+
+
+        transparentSelection = (RadioGroup) findViewById(R.id.transparentCheck);
+        transparentSelection.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(RadioGroup group, int checkedId) {
+                if (checkedId == R.id.transparentYes) {
+                    transparentRadio = "true";
+                } else {
+                    transparentRadio = "false";
+                }
+            }
+        });
+        if(verInfo.getBorrowerIsLying() != null) {
+            if (verInfo.getBorrowerIsLying()) {
+                transparentSelection.check(R.id.transparentYes);
+                transparentRadio = "true";
+            } else {
+                transparentSelection.check(R.id.transparentNo);
+                transparentRadio = "false";
+            }
+        }
+
+
+
+
+
+        internSelection = (RadioGroup) findViewById(R.id.internchoicecheck);
+        internSelection.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(RadioGroup group, int checkedId) {
+                if (checkedId == R.id.internchoiceYes) {
+                    giveLoanRadio = "true";
+                } else {
+                    giveLoanRadio = "false";
+                }
+            }
+        });
+        if(verInfo.getGiveHimLoan() != null) {
+            if (verInfo.getGiveHimLoan()) {
+                internSelection.check(R.id.internchoiceYes);
+                giveLoanRadio = "true";
+            } else {
+                internSelection.check(R.id.internchoiceNo);
+                giveLoanRadio = "false";
+            }
+        }
+
+
+
+        if (verInfo.getFinalVerificationNotes() != null) {
+            otherNotes.setText(verInfo.getFinalVerificationNotes());
         }
 
     }
@@ -538,6 +573,7 @@ public class BorrowerDetailsActivity extends AppCompatActivity implements Adapte
                     do {
                         uri = Uri.parse(cursor.getString(cursor.getColumnIndex(MediaStore.Images.Media.DATA)));
                         photoPath = uri.toString();
+                        Log.i("dsjfhjdsfds",photoPath);
                     } while (cursor.moveToNext());
                     cursor.close();
                 }
@@ -979,8 +1015,204 @@ public class BorrowerDetailsActivity extends AppCompatActivity implements Adapte
                         }
                         backImageCollegeId = imageUrl;
                     }
+                    else if(check.equals("invalid")){
+                        if( frontImageCollegeId != null && backImageCollegeId != null) {
+                            if(picNum == 0) {
+                                imageBox1 = collegeID.get(0);
+                                imageBox2 = collegeID.get(1);
+
+                                imageBox1.setVerified("invalid");
+
+                                collegeID.set(0,imageBox2);
+                                collegeID.set(1,imageBox1);
+
+                                createCollegeIdLayout();
+
+                                frontImageCollegeId = null;
+                                ViewTreeObserver viewTreeObserver = gridView.getViewTreeObserver();
+                                viewTreeObserver.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+
+                                    @Override
+                                    public void onGlobalLayout() {
+
+                                        LinearLayout gridChild = (LinearLayout) gridView.getChildAt(0);
+                                        imageLayout = (FrameLayout) gridChild.findViewById(R.id.imageLayout);
+                                        imageLayout.findViewWithTag(getResources().getString(R.string.unverified_status_icon)).setVisibility(View.INVISIBLE);
+                                        imageLayout.findViewWithTag(getString(R.string.verified_status_icon)).setVisibility(View.VISIBLE);
+                                        textView = (TextView) gridChild.findViewById(R.id.textView);
+                                        textView.setText("BackSide");
+                                        textView.setVisibility(View.VISIBLE);
+
+                                        LinearLayout gridChild1 = (LinearLayout) gridView.getChildAt(1);
+                                        imageLayout1 = (FrameLayout) gridChild1.findViewById(R.id.imageLayout);
+                                        imageLayout1.findViewWithTag(getResources().getString(R.string.unverified_status_icon)).setVisibility(View.VISIBLE);
+                                        imageLayout1.findViewWithTag(getString(R.string.verified_status_icon)).setVisibility(View.INVISIBLE);
+                                        textView = (TextView) gridChild1.findViewById(R.id.textView);
+                                        textView.setVisibility(View.INVISIBLE);
+                                    }
+                                });
+                            }
+                            else if(picNum == 1){
+                                imageBox1 = collegeID.get(1);
+
+                                imageBox1.setVerified("invalid");
+
+                                backImageCollegeId = null;
+
+                                createCollegeIdLayout();
+
+                                ViewTreeObserver viewTreeObserver = gridView.getViewTreeObserver();
+                                viewTreeObserver.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+
+                                    @Override
+                                    public void onGlobalLayout() {
+
+                                        LinearLayout gridChild = (LinearLayout) gridView.getChildAt(1);
+                                        imageLayout = (FrameLayout) gridChild.findViewById(R.id.imageLayout);
+                                        imageLayout.findViewWithTag(getResources().getString(R.string.unverified_status_icon)).setVisibility(View.VISIBLE);
+                                        imageLayout.findViewWithTag(getString(R.string.verified_status_icon)).setVisibility(View.INVISIBLE);
+                                        textView = (TextView) gridChild.findViewById(R.id.textView);
+                                        textView.setVisibility(View.INVISIBLE);
+                                    }
+                                });
+                            }
+                            else{
+                                imageBox1 = collegeID.get(picNum);
+
+                                imageBox1.setVerified("invalid");
+
+                                createCollegeIdLayout();
+
+                                ViewTreeObserver viewTreeObserver = gridView.getViewTreeObserver();
+                                viewTreeObserver.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+
+                                    @Override
+                                    public void onGlobalLayout() {
+
+                                        LinearLayout gridChild = (LinearLayout) gridView.getChildAt(picNum);
+                                        imageLayout = (FrameLayout) gridChild.findViewById(R.id.imageLayout);
+                                        imageLayout.findViewWithTag(getResources().getString(R.string.unverified_status_icon)).setVisibility(View.VISIBLE);
+                                        imageLayout.findViewWithTag(getString(R.string.verified_status_icon)).setVisibility(View.INVISIBLE);
+                                        textView = (TextView) gridChild.findViewById(R.id.textView);
+                                        textView.setVisibility(View.INVISIBLE);
+                                    }
+                                });
+                            }
+                        }
+                        else if(frontImageCollegeId != null ){
+                            if(picNum == 0){
+                                imageBox1 = collegeID.get(0);
+
+                                imageBox1.setVerified("invalid");
+                                frontImageCollegeId = null;
+                                createCollegeIdLayout();
+                                ViewTreeObserver viewTreeObserver = gridView.getViewTreeObserver();
+                                viewTreeObserver.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+
+                                    @Override
+                                    public void onGlobalLayout() {
+
+                                        LinearLayout gridChild = (LinearLayout) gridView.getChildAt(0);
+                                        imageLayout = (FrameLayout) gridChild.findViewById(R.id.imageLayout);
+                                        imageLayout.findViewWithTag(getResources().getString(R.string.unverified_status_icon)).setVisibility(View.VISIBLE);
+                                        imageLayout.findViewWithTag(getString(R.string.verified_status_icon)).setVisibility(View.INVISIBLE);
+                                        textView = (TextView)gridChild.findViewById(R.id.textView);
+                                        textView.setVisibility(View.INVISIBLE);
+
+                                    }
+                                });
+                            }
+                            else {
+                                imageBox1 = collegeID.get(picNum);
+                                imageBox1.setVerified("invalid");
+
+                                createCollegeIdLayout();
+                                ViewTreeObserver viewTreeObserver = gridView.getViewTreeObserver();
+                                viewTreeObserver.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+
+                                    @Override
+                                    public void onGlobalLayout() {
+                                        LinearLayout gridChild = (LinearLayout) gridView.getChildAt(picNum);
+                                        imageLayout = (FrameLayout) gridChild.findViewById(R.id.imageLayout);
+                                        imageLayout.findViewWithTag(getResources().getString(R.string.unverified_status_icon)).setVisibility(View.VISIBLE);
+                                        imageLayout.findViewWithTag(getString(R.string.verified_status_icon)).setVisibility(View.INVISIBLE);
+                                        TextView textView = (TextView)gridChild.findViewById(R.id.textView);
+                                        textView.setVisibility(View.INVISIBLE);
+                                    }
+                                });
+                            }
+
+                        }
+                        else if(backImageCollegeId != null){
+                            if(picNum == 0){
+                                imageBox1 = collegeID.get(0);
+
+                                imageBox1.setVerified("invalid");
+                                backImageCollegeId = null;
+                                createCollegeIdLayout();
+                                ViewTreeObserver viewTreeObserver = gridView.getViewTreeObserver();
+                                viewTreeObserver.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+
+                                    @Override
+                                    public void onGlobalLayout() {
+
+                                        LinearLayout gridChild = (LinearLayout) gridView.getChildAt(0);
+                                        imageLayout = (FrameLayout) gridChild.findViewById(R.id.imageLayout);
+                                        imageLayout.findViewWithTag(getResources().getString(R.string.unverified_status_icon)).setVisibility(View.VISIBLE);
+                                        imageLayout.findViewWithTag(getString(R.string.verified_status_icon)).setVisibility(View.INVISIBLE);
+                                        textView = (TextView)gridChild.findViewById(R.id.textView);
+                                        textView.setVisibility(View.INVISIBLE);
+
+                                    }
+                                });
+                            }
+                            else {
+                                imageBox1 = collegeID.get(picNum);
+                                imageBox1.setVerified("invalid");
+
+                                createCollegeIdLayout();
+                                ViewTreeObserver viewTreeObserver = gridView.getViewTreeObserver();
+                                viewTreeObserver.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+
+                                    @Override
+                                    public void onGlobalLayout() {
+                                        LinearLayout gridChild = (LinearLayout) gridView.getChildAt(picNum);
+                                        imageLayout = (FrameLayout) gridChild.findViewById(R.id.imageLayout);
+                                        imageLayout.findViewWithTag(getResources().getString(R.string.unverified_status_icon)).setVisibility(View.VISIBLE);
+                                        imageLayout.findViewWithTag(getString(R.string.verified_status_icon)).setVisibility(View.INVISIBLE);
+                                        TextView textView = (TextView)gridChild.findViewById(R.id.textView);
+                                        textView.setVisibility(View.INVISIBLE);
+                                    }
+                                });
+                            }
+
+                        }
+                        else{
+
+                            imageBox2 = collegeID.get(picNum);
+
+                            imageBox2.setVerified("invalid");
+
+                            createCollegeIdLayout();
+                            ViewTreeObserver viewTreeObserver = gridView.getViewTreeObserver();
+                            viewTreeObserver.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+
+                                @Override
+                                public void onGlobalLayout() {
+
+                                    LinearLayout gridChild = (LinearLayout) gridView.getChildAt(picNum);
+                                    imageLayout = (FrameLayout) gridChild.findViewById(R.id.imageLayout);
+                                    imageLayout.findViewWithTag(getResources().getString(R.string.unverified_status_icon)).setVisibility(View.VISIBLE);
+                                    imageLayout.findViewWithTag(getString(R.string.verified_status_icon)).setVisibility(View.INVISIBLE);
+                                    TextView textView = (TextView)gridChild.findViewById(R.id.textView);
+                                    textView.setVisibility(View.INVISIBLE);
+                                }
+                            });
+
+                        }
+                    }
                 }
-                else if(id == 2){
+                else if(id == 6){
                     gridView = (GridView) findViewById(R.id.permanentAddressProofImages);
                     if(check.equals("front")){
                         if(frontImageAddressProof != null && backImageAddressProof != null){
@@ -1698,6 +1930,7 @@ public class BorrowerDetailsActivity extends AppCompatActivity implements Adapte
         imageBoxtemp = new ImageBox(imageLayout,BorrowerDetailsActivity.this);
         id = settings.getInt("conform",-1);
         imageBox.setId(id);
+         Log.i("jsgdf",imageUrl);
         imageBoxtemp.setId(id);
         if(id == 1){
             imageBox.setPicType("College ID");
@@ -1710,6 +1943,7 @@ public class BorrowerDetailsActivity extends AppCompatActivity implements Adapte
             imageBoxtemp.setPicType("College ID");
             imageBoxtemp.setCloudinaryId("collegeId");
             imageBoxtemp.setImageUrl(null);
+            imageBoxtemp.setVerified("invalid");
             imageBoxtemp.setPicNum(collegeID.size());
             insertCollegeImageBox(imageBoxtemp);
             createCollegeIdLayout();
@@ -1725,6 +1959,7 @@ public class BorrowerDetailsActivity extends AppCompatActivity implements Adapte
             imageBoxtemp.setPicType("Permanent Address Proof");
             imageBoxtemp.setCloudinaryId("addressProof");
             imageBoxtemp.setImageUrl(null);
+            imageBoxtemp.setVerified("invalid");
             imageBoxtemp.setPicNum(addressProof.size());
             insertAddressProofImageBox(imageBoxtemp);
             createAddressProofLayout();
@@ -1740,6 +1975,7 @@ public class BorrowerDetailsActivity extends AppCompatActivity implements Adapte
             imageBoxtemp.setPicType("Grade Sheet");
             imageBoxtemp.setCloudinaryId("gradeSheet");
             imageBoxtemp.setImageUrl(null);
+            imageBoxtemp.setVerified("invalid");
             imageBoxtemp.setPicNum(gradeSheet.size());
             insertGradeSheetImageBox(imageBoxtemp);
             createGradeSheetsLayout();
@@ -1755,6 +1991,7 @@ public class BorrowerDetailsActivity extends AppCompatActivity implements Adapte
             imageBoxtemp.setPicType("Bank Proof");
             imageBoxtemp.setCloudinaryId("bankProof");
             imageBoxtemp.setImageUrl(null);
+            imageBoxtemp.setVerified("invalid");
             imageBoxtemp.setPicNum(bankProof.size());
             insertBankProofImageBox(imageBoxtemp);
             createBankProofsLayout();

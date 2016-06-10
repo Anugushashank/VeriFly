@@ -87,6 +87,7 @@ public class UploadDocModel {
         private List<String> validImgUrls = new ArrayList<>();
         private List<String> invalidImgUrls = new ArrayList<>();
         private List<String> imgUrls = new ArrayList<>();
+        private String type;
         private Boolean isVerified;
         private String verifiedBy;
 
@@ -135,6 +136,8 @@ public class UploadDocModel {
         private FrontBackImage front;
         private FrontBackImage back;
         private List<String> imgUrls = new ArrayList<>();
+        private List<String> validImgUrls = new ArrayList<>();
+        private List<String> invalidImgUrls = new ArrayList<>();
 
         public void setFront(FrontBackImage front){
             this.front = front;

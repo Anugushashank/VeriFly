@@ -101,7 +101,6 @@
                             android:id="@+id/phoneIcon"
                             android:src="@drawable/phone"
                             android:layout_marginRight="10dp"
-                            android:onClick="callPhone"
                             android:background="?attr/selectableItemBackground"
                             android:clickable="true" />
                         <TextView
@@ -281,7 +280,6 @@
                     android:id="@+id/friendPhoneIcon"
                     android:src="@drawable/phone"
                     android:layout_marginRight="10dp"
-                    android:onClick="callPhone"
                     android:background="?attr/selectableItemBackground"
                     android:clickable="true" />
                 <TextView

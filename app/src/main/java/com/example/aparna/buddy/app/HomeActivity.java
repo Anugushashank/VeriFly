@@ -25,6 +25,7 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.afollestad.materialdialogs.MaterialDialog;
+import com.example.aparna.buddy.model.ApiResponse;
 import com.example.aparna.buddy.model.BuddyConstants;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
@@ -54,8 +55,9 @@ public class HomeActivity extends AppCompatActivity {
     private TabLayout tabLayout;
     private ViewPager viewPager;
     private final Map<Integer, String> allTabsData = new HashMap<>();
-    private final List<String> taskTypes = Arrays.asList("new", "completed", "completed");
+    private final List<String> taskTypes = Arrays.asList("new", "ongoing", "completed");
     private Context context;
+    Intent intent;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,7 +68,7 @@ public class HomeActivity extends AppCompatActivity {
         tabLayout = (TabLayout) findViewById(R.id.tabs);
         viewPager = (ViewPager) findViewById(R.id.viewpager);
         context   = getApplicationContext();
-
+        intent = getIntent();
 
         toolBar.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -83,7 +85,7 @@ public class HomeActivity extends AppCompatActivity {
         SharedPreferences settings = getSharedPreferences(BuddyConstants.PREFS_FILE, 0);
         username = settings.getString("username","");
 
-        // Earnings does not has an API now just setting some 
+        // Earnings does not has an API now just setting some
         TextView earnings = (TextView)toolBar.findViewById(R.id.earnings);
         String earns ="Earnings ".concat(getString(R.string.Rs)).concat("3200");
         if (earnings != null) {
@@ -141,12 +143,20 @@ public class HomeActivity extends AppCompatActivity {
                         }
 
                         apiResponse = response.body().string();
+                        Log.i("Status",apiResponse);
+                        ApiResponse apiResponse1 = new Gson().fromJson(apiResponse, ApiResponse.class);
+                        if(apiResponse1.getStatus().equals("error")){
+                            allTabsData.put(position, null);
+                            position++;
+                        }
+                        else {
 
-                        responseReader = new JSONObject(apiResponse);
-                        dataList       = responseReader.getJSONArray("data");
+                            responseReader = new JSONObject(apiResponse);
+                            dataList = responseReader.getJSONArray("data");
 
-                        allTabsData.put(position, dataList.toString());
-                        position++;
+                            allTabsData.put(position, dataList.toString());
+                            position++;
+                        }
                     } catch (Exception e) {
                         apiException = e;
                         Log.d("Tasks", e.getMessage());
@@ -311,6 +321,13 @@ public class HomeActivity extends AppCompatActivity {
     public void onBackPressed(){
         this.finish();
         super.onBackPressed();
+    }
+
+    @Override
+    public void onRestart(){
+        super.onRestart();
+        finish();
+        startActivity(intent);
     }
 }
 

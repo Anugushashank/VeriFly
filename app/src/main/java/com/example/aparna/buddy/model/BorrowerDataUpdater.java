@@ -52,7 +52,7 @@ public class BorrowerDataUpdater {
         username = settings.getString("username","");
 
         String referenceIsGoodFriend =  activity.getGoodFriendsRadio();
-        String phone = activity.getUploadDocModel().getPhone();
+        final String phone = activity.getUploadDocModel().getPhone();
         String referenceYear = activity.getRefYear();
         String referenceDepartment = activity.getRefDept();
         String punctualityInClass = activity.getSpinnerPunc();
@@ -167,6 +167,7 @@ public class BorrowerDataUpdater {
         else{
             verificationInfo.setTaskStatus("new");
         }
+        verificationInfo.setTaskStatus("completed");
 
 
 
@@ -216,13 +217,13 @@ public class BorrowerDataUpdater {
                 frontBackImageBack.setImgUrl(activity.getBackImageCollegeId());
                 frontBackImageFront.setVerifiedBy(username);
                 frontBackImageFront.setIsVerified(true);
-                frontAndBackDocsCollegeId.setFront(frontBackImageFront);
+                frontAndBackDocsCollegeId.setBack(frontBackImageBack);
             }
             if(activity.getFrontImageCollegeId() != null) {
                 frontBackImageFront.setImgUrl(activity.getFrontImageCollegeId());
                 frontBackImageFront.setVerifiedBy(username);
                 frontBackImageFront.setIsVerified(true);
-                frontAndBackDocsCollegeId.setBack(frontBackImageBack);
+                frontAndBackDocsCollegeId.setFront(frontBackImageFront);
             }
             uploadDocModel.setCollegeID(frontAndBackDocsCollegeId);
             conformDocs++;
@@ -244,7 +245,7 @@ public class BorrowerDataUpdater {
             }
             if(activity.getBackImageAddressProof() != null) {
                 frontBackImageBack.setImgUrl(activity.getBackImageAddressProof());
-                frontBackImageFront.setVerifiedBy(username);
+                frontBackImageBack.setVerifiedBy(username);
                 frontBackImageFront.setIsVerified(true);
                 frontAndBackDocsAddressProof.setBack(frontBackImageBack);
             }
@@ -329,7 +330,7 @@ public class BorrowerDataUpdater {
                     }
                     ApiResponse apiResponse1 = new Gson().fromJson(apiResponse, ApiResponse.class);
 
-                    if (asyncException != null) {
+                    if (asyncException != null || !apiResponse1.getStatus().equals("success")) {
                         // here tell that login request has thrown exception and ask to try again
                         CharSequence text = context.getResources().getString(R.string.upload_failed);
                         int duration = Toast.LENGTH_SHORT;
@@ -378,6 +379,7 @@ public class BorrowerDataUpdater {
                                 .scheme("http")
                                 .host(context.getResources().getString(R.string.api_host))
                                 .addPathSegments(context.getResources().getString(R.string.uploadVerify_path))
+                                .addQueryParameter("userid", phone)
                                 .build();
 
                         Request request = new Request.Builder()
@@ -408,7 +410,7 @@ public class BorrowerDataUpdater {
                     }
                     ApiResponse apiResponse1 = new Gson().fromJson(apiResponse, ApiResponse.class);
 
-                    if (asyncException != null) {
+                    if (asyncException != null || !apiResponse1.getStatus().equals("success")) {
                         // here tell that login request has thrown exception and ask to try again
                         CharSequence text = context.getResources().getString(R.string.upload_failed);
                         int duration = Toast.LENGTH_SHORT;

@@ -66,6 +66,20 @@ public class GridViewAdapter extends BaseAdapter{
         imageBox.setCloudinaryId(imageBoxArrayList.get(position).getCloudinaryId());
         imageBox.setId(imageBoxArrayList.get(position).getId());
         imageBox.setVerified(imageBoxArrayList.get(position).getVerified());
+        if(imageBoxArrayList.get(position).getVerified().equals("front")){
+            imageLayout.findViewWithTag(activity.getResources().getString(R.string.unverified_status_icon)).setVisibility(View.INVISIBLE);
+            imageLayout.findViewWithTag(activity.getResources().getString(R.string.verified_status_icon)).setVisibility(View.VISIBLE);
+            TextView textView = (TextView) item.findViewById(R.id.textView);
+            textView.setText("FrontSide");
+            textView.setVisibility(View.VISIBLE);
+        }
+        if(imageBoxArrayList.get(position).getVerified().equals("back")){
+            imageLayout.findViewWithTag(activity.getResources().getString(R.string.unverified_status_icon)).setVisibility(View.INVISIBLE);
+            imageLayout.findViewWithTag(activity.getResources().getString(R.string.verified_status_icon)).setVisibility(View.VISIBLE);
+            TextView textView = (TextView) item.findViewById(R.id.textView);
+            textView.setText("BackSide");
+            textView.setVisibility(View.VISIBLE);
+        }
         if(position == imageBoxArrayList.size()-1){
             ImageView imageView = (ImageView) imageLayout.findViewWithTag(activity.getResources().getString(R.string.unverified_status_icon));
             imageView.setVisibility(View.INVISIBLE);
