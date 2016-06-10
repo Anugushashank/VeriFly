@@ -83,7 +83,7 @@ public class HomeActivity extends AppCompatActivity {
         SharedPreferences settings = getSharedPreferences(BuddyConstants.PREFS_FILE, 0);
         username = settings.getString("username","");
 
-        // Earnings does not has an API now just setting some dummy stuff
+        // Earnings does not has an API now just setting some 
         TextView earnings = (TextView)toolBar.findViewById(R.id.earnings);
         String earns ="Earnings ".concat(getString(R.string.Rs)).concat("3200");
         if (earnings != null) {
