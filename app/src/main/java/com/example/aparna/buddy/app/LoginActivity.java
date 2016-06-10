@@ -1,5 +1,6 @@
 package com.example.aparna.buddy.app;
 
+import android.app.Application;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -26,6 +27,8 @@ import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.Map;
 
+import io.intercom.android.sdk.Intercom;
+import io.intercom.android.sdk.identity.Registration;
 import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -39,6 +42,8 @@ public class LoginActivity extends AppCompatActivity {
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        Intercom.initialize((Application) getApplicationContext(), "android_sdk-a252775c0f9cdd6cd922b6420a558fd2eb3f89b0", "utga6z2r");
         SharedPreferences settings = getSharedPreferences(BuddyConstants.PREFS_FILE, 0);
 
         //Get "hasLoggedIn" value. If the value doesn't exist yet false is returned
@@ -49,6 +54,7 @@ public class LoginActivity extends AppCompatActivity {
                 alertBox();
                 return;
             }
+            Intercom.client().registerIdentifiedUser(new Registration().withUserId(settings.getString("username","")));
             Intent intent = new Intent(this, com.example.aparna.buddy.app.HomeActivity.class);
             startActivity(intent);
             this.finish();
@@ -161,7 +167,7 @@ public class LoginActivity extends AppCompatActivity {
                     //Set "hasLoggedIn" to true and set username
                     editor.putBoolean("hasLoggedIn", true);
                     editor.putString("username", username);
-
+                    successfulLogin(username);
                     // Commit the edits!
                     editor.commit();
                     Intent intent = new Intent(LoginActivity.this , HomeActivity.class);
@@ -198,8 +204,14 @@ public class LoginActivity extends AppCompatActivity {
     @Override
     public void onBackPressed(){
         LoginActivity.this.finish();
-        Log.i("djjjsjjs","djgdjgfdhfdhfdghf");
         super.onBackPressed();
     }
+    private void successfulLogin(String username){
+        // …
+        // Registering with Intercom is easy. For best results, use a unique
+        // user_id if you have one.
+        Intercom.client().registerIdentifiedUser(new Registration().withUserId(username));
+    }
+
 }
 

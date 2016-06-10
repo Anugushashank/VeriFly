@@ -41,6 +41,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import io.intercom.android.sdk.Intercom;
 import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -65,6 +66,19 @@ public class HomeActivity extends AppCompatActivity {
         tabLayout = (TabLayout) findViewById(R.id.tabs);
         viewPager = (ViewPager) findViewById(R.id.viewpager);
         context   = getApplicationContext();
+
+
+        toolBar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                try {
+                    Intercom.client().displayConversationsList();
+                } catch (Exception e) {
+
+                }
+
+            }
+        });
 
         SharedPreferences settings = getSharedPreferences(BuddyConstants.PREFS_FILE, 0);
         username = settings.getString("username","");
@@ -238,6 +252,7 @@ public class HomeActivity extends AppCompatActivity {
 
                             //Set "hasLoggedIn" to false
                             editor.putBoolean("hasLoggedIn", false);
+                            Intercom.client().reset();
 
                             // Commit the edits!
                             editor.commit();

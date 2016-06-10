@@ -38,4 +38,8 @@ dependencies {
     compile('com.github.afollestad.material-dialogs:commons:0.8.5.7@aar') {
         transitive = true
     }
+    compile project(':intercom-sdk-base')
+    compile project(':intercom-sdk-gcm')
+    compile 'com.google.android.gms:play-services-gcm:8.1.0'
+
 }

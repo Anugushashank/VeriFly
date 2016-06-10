@@ -15,9 +15,32 @@ public class BorrowerStateContainer {
         this.activity = activity;
     }
 
-    public void update() {
-        Log.d("global","shashank");
+    public Boolean isCompleted() {
+        if(activity.getFrontImageCollegeId() !=null && activity.getBackImageCollegeId() != null && activity.getFrontImageAddressProof() != null
+                && activity.getBackImageAddressProof() != null && activity.getGoodFriendsRadio() != null && activity.getYearBackRadio() != null
+                && activity.getRefDept() != null && activity.getRefYear() != null && activity.getRepayBackLoan() != null &&
+                activity.getTransparentRadio() != null && activity.getGiveLoanRadio() != null && activity.getSpinnerCocurricular() != null
+                && activity.getSpinnerFinRes() != null && activity.getSpinnerPunc() != null && activity.getSpinnerSincere() != null &&
+                activity.getNumBankProofs() > 0 && activity.getNumGradeSheets() > 0 ){
 
+            return true;
+        }
+        else{
+            return false;
+        }
+    }
 
+    public Boolean isOngoing() {
+        if(     activity.getGoodFriendsRadio() != null || activity.getYearBackRadio() != null || activity.getRefDept() != null ||
+                activity.getRefYear() != null || activity.getRepayBackLoan() != null ||
+                activity.getTransparentRadio() != null || activity.getGiveLoanRadio() != null || activity.getSpinnerCocurricular() != null
+                && activity.getSpinnerFinRes() != null || activity.getSpinnerPunc() != null || activity.getSpinnerSincere() != null ||
+                activity.getNumBankProofs() > 0 || activity.getNumGradeSheets() > 0 ){
+
+            return true;
+        }
+        else{
+            return false;
+        }
     }
 }

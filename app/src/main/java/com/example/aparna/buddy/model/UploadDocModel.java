@@ -11,22 +11,53 @@ import java.util.Map;
  * Created by Shashank on 06-06-2016.
  */
 
-
-
-/**
- * Created by rock on 6/4/16.
- */
 public class UploadDocModel {
 
     private String userid;
+    private String name, phone, college, fbUserId, date, friendName, friendNumber;
     private NonFrontAndBackDocs bankStatement, bankProof, gradeSheet;
     private FrontAndBackDocs collegeID, addressProof;
+    private FrontBackImage panProof;
+    private List<String> selfie, signature;
+    private String taskStatus;
 
     public UploadDocModel(){}
+
+    public String getName() {
+        return name;
+    }
+
+    public String getFriendName() { return friendName; }
+
+    public String getFriendNumber() { return friendNumber; }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public String getCollege() {
+        return college;
+    }
+
+    public String getFbUserId() {
+        return fbUserId;
+    }
+
+    public String getDate() {
+        return "May 17";
+    }
 
     public void setUserid(String userid){ this.userid = userid; }
 
     public String getUserid() { return userid; }
+
+    public List<String> getSelfie() { return selfie; }
+
+    public List<String> getSignature() { return signature; }
+
+    public String getTaskStatus() { return taskStatus; }
+
+    public void setTaskStatus(String taskStatus) { this.taskStatus = taskStatus; }
 
     public void setBankStatement(NonFrontAndBackDocs bankStatement){ this.bankStatement = bankStatement; }
 
@@ -38,15 +69,25 @@ public class UploadDocModel {
         this.gradeSheet = gradeSheet;
     }
 
+    public NonFrontAndBackDocs getBankProof() { return bankProof; }
+
+    public NonFrontAndBackDocs getGradeSheet() { return gradeSheet; }
+
     public void setCollegeID(FrontAndBackDocs collegeID){
         this.collegeID = collegeID;
     }
 
+    public FrontAndBackDocs getCollegeID() { return collegeID; }
+
     public void setAddressProof(FrontAndBackDocs addressProof){ this.addressProof = addressProof;}
+
+    public FrontAndBackDocs getAddressProof() { return addressProof; }
 
     public class NonFrontAndBackDocs{
         private List<String> validImgUrls = new ArrayList<>();
         private List<String> invalidImgUrls = new ArrayList<>();
+        private List<String> imgUrls = new ArrayList<>();
+        private Boolean isVerified;
         private String verifiedBy;
 
         public void setValidImgUrls(ArrayList<ImageBox> arrayList){
@@ -69,6 +110,10 @@ public class UploadDocModel {
             this.verifiedBy = verifiedBy;
         }
 
+        public void setIsVerified(Boolean isVerified) { this.isVerified = isVerified; }
+
+        public Boolean getIsVerified() { return isVerified; }
+
         public String getVerifiedBy() {
             return verifiedBy;
         }
@@ -81,48 +126,30 @@ public class UploadDocModel {
             return invalidImgUrls;
         }
 
+        public List<String> getImgUrls() { return imgUrls; }
+
 
     }
 
     public class FrontAndBackDocs{
         private FrontBackImage front;
         private FrontBackImage back;
-        private List<String> validImgUrls = new ArrayList<>();
-        private List<String> invalidImgUrls = new ArrayList<>();
+        private List<String> imgUrls = new ArrayList<>();
 
         public void setFront(FrontBackImage front){
             this.front = front;
         }
 
+        public FrontBackImage getFront() { return front; }
+
         public void setBack(FrontBackImage back){
             this.back = back;
         }
 
-        public void setValidImgUrls(ArrayList<ImageBox> arrayList){
-            for(int i=0 ; i < arrayList.size()-1 ; i++){
-                if(arrayList.get(i).getVerified().equals("valid")) {
-                    Log.i("error","kjdfsgfdgsfhgdsdshfdgfdhfd");
-                    this.validImgUrls.add(arrayList.get(i).getImageUrl());
-                }
-            }
-        }
+        public FrontBackImage getBack() { return back; }
 
-        public void setInvalidImgUrls(ArrayList<ImageBox> arrayList){
-            for(int i=0 ; i < arrayList.size()-1 ; i++){
-                if(arrayList.get(i).getVerified().equals("invalid")) {
-                    Log.i("error","kjdfsgfdgsfhgdsdshfdgfdhfd");
-                    this.invalidImgUrls.add(arrayList.get(i).getImageUrl());
-                }
-            }
-        }
+        public List<String> getImgUrls(){ return imgUrls; }
 
-        public List<String> getValidImgUrls(){
-            return validImgUrls;
-        }
-
-        public List<String> getInvalidImgUrls() {
-            return invalidImgUrls;
-        }
     }
 
     public class FrontBackImage {

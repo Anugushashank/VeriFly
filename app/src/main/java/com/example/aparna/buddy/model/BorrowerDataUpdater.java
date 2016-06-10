@@ -37,6 +37,7 @@ public class BorrowerDataUpdater {
     UserInfo userInfo;
     UploadDocModel uploadDocModel;
     VerificationInfo verificationInfo;
+    BorrowerStateContainer borrowerStateContainer;
     String submit, username;
     int conformDocs = 0, conformVerify = 0;
 
@@ -51,16 +52,16 @@ public class BorrowerDataUpdater {
         username = settings.getString("username","");
 
         String referenceIsGoodFriend =  activity.getGoodFriendsRadio();
-        String phone = activity.getUserInfo().getPhone();
-        String referenceYear = activity.getRefYear().toString();
-        String referenceDepartment = activity.getRefDept().toString();
+        String phone = activity.getUploadDocModel().getPhone();
+        String referenceYear = activity.getRefYear();
+        String referenceDepartment = activity.getRefDept();
         String punctualityInClass = activity.getSpinnerPunc();
         String sincerityInStudies = activity.getSpinnerSincere();
         String coCurricularParticipation = activity.getSpinnerCocurricular();
         String financiallyResponsible = activity.getSpinnerFinRes();
         String friendVerificationNotes = activity.getOtherNotes().toString();
         String yearBackTrue = activity.getYearBackRadio();
-        String loanRepay = activity.repayBackLoan();
+        String loanRepay = activity.getRepayBackLoan();
         String transparentTrue = activity.getTransparentRadio();
         String loanRepayTrue = activity.getGiveLoanRadio();
         ArrayList<ImageBox> addressProofs = activity.getAddressProofs();
@@ -155,6 +156,18 @@ public class BorrowerDataUpdater {
             conformVerify++;
         }
 
+        borrowerStateContainer = new BorrowerStateContainer(activity);
+
+        if(borrowerStateContainer.isCompleted()){
+            verificationInfo.setTaskStatus("completed");
+        }
+        else if(borrowerStateContainer.isOngoing()){
+            verificationInfo.setTaskStatus("ongoing");
+        }
+        else{
+            verificationInfo.setTaskStatus("new");
+        }
+
 
 
 
@@ -174,6 +187,7 @@ public class BorrowerDataUpdater {
             nonFrontAndBackDocsBankProof.setInvalidImgUrls(bankProofs);
             nonFrontAndBackDocsBankProof.setValidImgUrls(bankProofs);
             nonFrontAndBackDocsBankProof.setVerifiedBy(username);
+            nonFrontAndBackDocsBankProof.setIsVerified(true);
             uploadDocModel.setBankProof(nonFrontAndBackDocsBankProof);
             conformDocs++;
         }
@@ -185,6 +199,7 @@ public class BorrowerDataUpdater {
             nonFrontAndBackDocsGradeSheet.setInvalidImgUrls(gradeSheets);
             nonFrontAndBackDocsGradeSheet.setValidImgUrls(gradeSheets);
             nonFrontAndBackDocsGradeSheet.setVerifiedBy(username);
+            nonFrontAndBackDocsGradeSheet.setIsVerified(true);
             uploadDocModel.setGradeSheet(nonFrontAndBackDocsGradeSheet);
             conformDocs++;
         }
@@ -196,9 +211,6 @@ public class BorrowerDataUpdater {
             UploadDocModel.FrontBackImage frontBackImageFront = uploadDocModel.new FrontBackImage();
 
             UploadDocModel.FrontBackImage frontBackImageBack = uploadDocModel.new FrontBackImage();
-
-            frontAndBackDocsCollegeId.setInvalidImgUrls(collegeIds);
-            frontAndBackDocsCollegeId.setValidImgUrls(collegeIds);
 
             if(activity.getBackImageCollegeId() != null) {
                 frontBackImageBack.setImgUrl(activity.getBackImageCollegeId());
@@ -224,9 +236,6 @@ public class BorrowerDataUpdater {
 
             UploadDocModel.FrontBackImage frontBackImageBack = uploadDocModel.new FrontBackImage();
 
-            frontAndBackDocsAddressProof.setInvalidImgUrls(addressProofs);
-            frontAndBackDocsAddressProof.setValidImgUrls(addressProofs);
-
             if(activity.getFrontImageAddressProof() != null) {
                 frontBackImageFront.setImgUrl(activity.getFrontImageAddressProof());
                 frontBackImageFront.setVerifiedBy(username);
@@ -249,14 +258,7 @@ public class BorrowerDataUpdater {
         }
 
 
-        if(conformVerify > 0 && conformDocs > 0){
-            if(conformVerify == 11 && conformDocs == 5){
-                verificationInfo.setTaskStatus("completed");
-            }
-            else{
-                verificationInfo.setTaskStatus("ongoing");
-            }
-        }
+
 
 
 
@@ -335,11 +337,6 @@ public class BorrowerDataUpdater {
                         Toast toast = Toast.makeText(context, text, duration);
                         toast.show();
                     } else {
-                        CharSequence text = context.getResources().getString(R.string.upload_success);
-                        int duration = Toast.LENGTH_SHORT;
-
-                        Toast toast = Toast.makeText(context, text, duration);
-                        toast.show();
                         activity.finish();
                     }
                 }
@@ -419,11 +416,6 @@ public class BorrowerDataUpdater {
                         Toast toast = Toast.makeText(context, text, duration);
                         toast.show();
                     } else {
-                        CharSequence text = context.getResources().getString(R.string.upload_success);
-                        int duration = Toast.LENGTH_SHORT;
-
-                        Toast toast = Toast.makeText(context, text, duration);
-                        toast.show();
                         activity.finish();
                     }
                 }

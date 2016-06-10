@@ -1,9 +1,13 @@
 package com.example.aparna.buddy.model;
 
+import android.Manifest;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.provider.MediaStore;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.View;
 import android.widget.FrameLayout;
@@ -147,7 +151,7 @@ public class ImageBox {
 
     public void loadImage(RoundedImageView view, String imageUrl) {
         Picasso.with(activity)
-               .load(imageUrl)
+               .load(imageUrl).placeholder(R.drawable.loading_image)
                .fit()
                .into(view);
     }
@@ -185,16 +189,26 @@ public class ImageBox {
                             editor.putInt("conform",getId());
                             editor.putString("localPath",getCloudinaryId()+getPicNum());
                             editor.commit();
-                            activity.startActivityForResult(intent, 1);
                             dialog.dismiss();
+                            if (ContextCompat.checkSelfPermission(activity, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+                                    ActivityCompat.requestPermissions(activity, new String[]{Manifest.permission.CAMERA},1);
+                            }
+                            if(ContextCompat.checkSelfPermission(activity, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
+                                activity.startActivityForResult(intent, 1);
+                            }
                         } else if (item.getContent().equals(choose_photo)) {
                             Intent intent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
                             editor.putInt("conform",getId());
                             editor.putString("localPath",getCloudinaryId());
                             editor.commit();
                             intent.setType("image/*");
-                            activity.startActivityForResult(intent, 2);
                             dialog.dismiss();
+                            if (ContextCompat.checkSelfPermission(activity, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                                    ActivityCompat.requestPermissions(activity, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},2);
+                            }
+                            if(ContextCompat.checkSelfPermission(activity, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
+                                activity.startActivityForResult(intent, 2);
+                            }
                         } else {
                             dialog.dismiss();
                         }

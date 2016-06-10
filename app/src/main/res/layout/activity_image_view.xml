@@ -65,14 +65,6 @@
                 <RadioButton
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Valid"
-                    android:textSize="16sp"
-                    android:buttonTint="@color/white"
-                    android:id="@+id/matchValid"
-                    android:textColor="#FFFFFF" />
-                <RadioButton
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
                     android:text="Matches Front Side"
                     android:textSize="16sp"
                     android:buttonTint="@color/white"

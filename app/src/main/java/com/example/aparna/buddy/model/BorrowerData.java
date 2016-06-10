@@ -7,14 +7,12 @@ package com.example.aparna.buddy.model;
 public class BorrowerData {
 
     VerificationInfo verificationInfo;
-    UserInfo userInfo;
+    UploadDocModel userInfo;
     String _id, userId;
 
     public BorrowerData() { }
 
-    public UserInfo getUserInfo() {
-        return userInfo;
-    }
+    public UploadDocModel getUploadDocModel() { return userInfo; }
 
     public VerificationInfo getVerificationInfo() {
         return verificationInfo;

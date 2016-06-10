@@ -1,10 +1,12 @@
 package com.example.aparna.buddy.app;
 
+import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -13,6 +15,8 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.provider.Settings;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.AppCompatSpinner;
 import android.support.v7.widget.Toolbar;
@@ -41,6 +45,7 @@ import com.example.aparna.buddy.model.BuddyConstants;
 import com.example.aparna.buddy.model.CloudinaryAPI;
 import com.example.aparna.buddy.model.ExpandableHeightGridView;
 import com.example.aparna.buddy.model.ImageBox;
+import com.example.aparna.buddy.model.UploadDocModel;
 import com.example.aparna.buddy.model.UserInfo;
 import com.example.aparna.buddy.model.VerificationInfo;
 import com.github.siyamed.shapeimageview.CircularImageView;
@@ -60,58 +65,38 @@ import java.util.Map;
 public class BorrowerDetailsActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener,CloudinaryAPI.UploadCallBack,Serializable {
 
     private BorrowerData borrowerData;
-    private BorrowerStateContainer state;
-    private UserInfo userInfo;
+    private BorrowerDataUpdater borrowerDataUpdater;
+    private UploadDocModel uploadDocModel;
     private VerificationInfo verInfo;
     private Toolbar toolBar;
-    private TextView phoneNum, name, college;
-    private TextView friendPhoneNum, friendName;
+    private TextView phoneNum, name, college, friendPhoneNum, friendName, textView;
     private RadioGroup referenceSelection, yearBackSelection, transparentSelection, internSelection;
     private EditText refYear, refDept, otherNotes;
-    private ImageView phoneIcon, IdIcon, IdIconPlusFront, IdIconPlusBack;
-    private FrameLayout collegeIdFrontLayout, collegeIdBackLayout, addressProofFrontLayout, addressProofBackLayout;
-    private ImageBox collegeIdFrontImageBox, collegeIdBackImageBox, addressProofFrontImageBox, addressProofBackImageBox;
+    private ImageView phoneIcon, IdIcon, IdIconPlusFront, IdIconPlusBack, Im;
     private FrameLayout imageLayout, imageLayout1, imageLayout2;
-    private ImageBox imageBox, imageBoxtemp;
-    private Map<Integer, ImageBox> allImageBoxes = new HashMap<>();
+    private ImageBox imageBox, imageBoxtemp, ibx;
     private AppCompatSpinner spinnerPunc,spinnerSincere,spinnerCocurricular,spinnerFinRes,spinnerLoan;
-    private Spinner spinner;
     private CircularImageView profilePic;
-    private String newPicClickedImageBoxId;
-    private LinearLayout rootLayoutMain;
-    private boolean spinnerFlag1, spinnerFlag2, spinnerFlag3, spinnerFlag4,spinnerFlag5 = true, spinnerFlag;
     private String goodFriendsRadio, yearBackRadio, transparentRadio, giveLoanRadio;
     private Button submitButton;
-    private ArrayList<ImageBox> collegeIds, addressProofs, gradeSheets, bankProofs;
-    private String items[];
-    private TextView textView;
+    private ArrayList<ImageBox> collegeID, addressProof, gradeSheet, bankProof, bankStatement;
     private String frontImageCollegeId, backImageCollegeId, frontImageAddressProof, backImageAddressProof;
     private String punctualityInClass, sincerityInStudies, coCurricularParticipation, financiallyResponsible, loanRepay, friendVerificationNotes;
-    //String idFront, idBack, addFront, addBack;
-    ImageView Im;
     private String imageurl;
-    BorrowerDataUpdater borrowerDataUpdater;
+    private int count;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_borrower_details);
 
-        final BorrowerStateContainer borrowerStateContainer = new BorrowerStateContainer(this);
         borrowerDataUpdater = new BorrowerDataUpdater(this, "button");
 
         Bundle extras = getIntent().getExtras();
 
-        spinnerFlag1 = false;
-        spinnerFlag2 = false;
-        spinnerFlag3 = false;
-        spinnerFlag4 = false;
-        spinnerFlag5 = false;
-        spinnerFlag = false;
-
 
         borrowerData = new Gson().fromJson(extras.getString("borrowerData"), BorrowerData.class);
-        state = new BorrowerStateContainer(BorrowerDetailsActivity.this);
-        userInfo = borrowerData.getUserInfo();
+        uploadDocModel = borrowerData.getUploadDocModel();
         verInfo = borrowerData.getVerificationInfo();
 
         toolBar = (Toolbar) findViewById(R.id.borrower_details_tool_bar);
@@ -119,11 +104,9 @@ public class BorrowerDetailsActivity extends AppCompatActivity implements Adapte
         if (getSupportActionBar() != null) {
             getSupportActionBar().setTitle(getResources().getString(R.string.borrower_activity_title));
         }
-
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         toolBar.setTitleTextColor(Color.WHITE);
         toolBar.setNavigationIcon(R.drawable.back);
-
         toolBar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -131,161 +114,175 @@ public class BorrowerDetailsActivity extends AppCompatActivity implements Adapte
             }
         });
 
-        rootLayoutMain = (LinearLayout) findViewById(R.id.rootLayoutMain);
-        rootLayoutMain.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-            @Override
-            public void onGlobalLayout() {
-                Log.d("global", "shizz");
-                borrowerStateContainer.update();
-            }
-        });
-
         submitButton = (Button) findViewById(R.id.submitButton);
 
+        collegeID = new ArrayList<>();
+        count = -1;
 
-        collegeIds = new ArrayList<>();
+        if (uploadDocModel.getCollegeID().getFront()!= null) {
+            ImageBox ib = new ImageBox(imageLayout, BorrowerDetailsActivity.this);
+            ib.setImageUrl(uploadDocModel.getCollegeID().getFront().getImgUrl());
+            frontImageCollegeId = ib.getImageUrl();
+            ib.setPicNum(++count);
+            ib.setPicType("College ID");
+            ib.setCloudinaryId("collegeId");
+            ib.setId(1);
+            ib.setVerified("front");
+            insertCollegeImageBox(ib);
+        }
 
-        if (userInfo.getCollegeIDs() != null) {
-            int count;
-            for (count = 0 ; count < userInfo.getCollegeIDs().size(); count++) {
-                ImageBox ib = new ImageBox(imageLayout,BorrowerDetailsActivity.this);
-                ib.setImageUrl(userInfo.getCollegeIDs().get(count));
-                ib.setPicNum(count);
-                ib.setPicType("College ID");
-                ib.setCloudinaryId("collegeId");
-                ib.setId(1);
-                ib.setVerified("invalid");
-                insertCollegeImageBox(ib);
+        if (uploadDocModel.getCollegeID().getBack().getImgUrl() != null) {
+            ImageBox ib = new ImageBox(imageLayout, BorrowerDetailsActivity.this);
+            ib.setImageUrl(uploadDocModel.getCollegeID().getBack().getImgUrl());
+            backImageCollegeId = ib.getImageUrl();
+            ib.setPicNum(++count);
+            ib.setPicType("College ID");
+            ib.setCloudinaryId("collegeId");
+            ib.setId(1);
+            ib.setVerified("back");
+            insertCollegeImageBox(ib);
+        }
+        if(uploadDocModel.getCollegeID().getFront()== null ||  uploadDocModel.getCollegeID().getBack() != null) {
+            if (uploadDocModel.getCollegeID().getImgUrls() != null) {
+                for (int i = count + 1; i < uploadDocModel.getCollegeID().getImgUrls().size(); i++) {
+                    ImageBox ib = new ImageBox(imageLayout, BorrowerDetailsActivity.this);
+                    ib.setImageUrl(uploadDocModel.getCollegeID().getImgUrls().get(count));
+                    ib.setPicNum(count);
+                    count = i;
+                    ib.setPicType("College ID");
+                    ib.setCloudinaryId("collegeId");
+                    ib.setId(1);
+                    ib.setVerified("invalid");
+                    insertCollegeImageBox(ib);
+                }
             }
-            ImageBox ib = new ImageBox(imageLayout,BorrowerDetailsActivity.this);
-            ib.setImageUrl(null);
-            ib.setPicNum(count);
-            ib.setPicType("College ID");
-            ib.setCloudinaryId("collegeId");
-            ib.setId(1);
-            ib.setVerified("invalid");
-            insertCollegeImageBox(ib);
         }
-        else{
-            ImageBox ib = new ImageBox(imageLayout,BorrowerDetailsActivity.this);
-            ib.setImageUrl(null);
-            ib.setPicNum(0);
-            ib.setPicType("College ID");
-            ib.setCloudinaryId("collegeId");
-            ib.setId(1);
-            ib.setVerified("invalid");
-            insertCollegeImageBox(ib);
-        }
+        ibx = new ImageBox(imageLayout,BorrowerDetailsActivity.this);
+        ibx.setImageUrl(null);
+        ibx.setPicNum(++count);
+        ibx.setPicType("College ID");
+        ibx.setCloudinaryId("collegeId");
+        ibx.setId(1);
+        ibx.setVerified("invalid");
+        insertCollegeImageBox(ibx);
 
         createCollegeIdLayout();
 
-        addressProofs = new ArrayList<>();
 
-        if(userInfo.getAddressProofs() != null) {
-            int count;
-            for (count = 0; count < userInfo.getAddressProofs().size(); count++) {
-                ImageBox ib = new ImageBox(imageLayout, BorrowerDetailsActivity.this);
-                ib.setImageUrl(userInfo.getAddressProofs().get(count));
-                ib.setPicNum(count);
-                ib.setPicType("Permanent Address Proof");
-                ib.setCloudinaryId("addressProof");
-                ib.setId(2);
-                ib.setVerified("invalid");
-                insertAddressProofImageBox(ib);
+
+
+        addressProof = new ArrayList<>();
+        count = -1;
+
+        if (uploadDocModel.getAddressProof().getFront()!= null) {
+            ImageBox ib = new ImageBox(imageLayout, BorrowerDetailsActivity.this);
+            ib.setImageUrl(uploadDocModel.getAddressProof().getFront().getImgUrl());
+            frontImageAddressProof = ib.getImageUrl();
+            ib.setPicNum(++count);
+            ib.setPicType("Permanent Address Proof");
+            ib.setCloudinaryId("addressProof");
+            ib.setId(2);
+            ib.setVerified("front");
+            insertAddressProofImageBox(ib);
+        }
+        if (uploadDocModel.getAddressProof().getBack() != null) {
+            ImageBox ib = new ImageBox(imageLayout, BorrowerDetailsActivity.this);
+            ib.setImageUrl(uploadDocModel.getAddressProof().getBack().getImgUrl());
+            backImageAddressProof = ib.getImageUrl();
+            ib.setPicNum(++count);
+            ib.setPicType("Permanent Address Proof");
+            ib.setCloudinaryId("addressProof");
+            ib.setId(2);
+            ib.setVerified("back");
+            insertAddressProofImageBox(ib);
+        }
+        if(uploadDocModel.getAddressProof().getFront()== null ||  uploadDocModel.getAddressProof().getBack() != null) {
+            if (uploadDocModel.getAddressProof().getImgUrls() != null) {
+                for (int i = count + 1; i < uploadDocModel.getAddressProof().getImgUrls().size(); i++) {
+                    ImageBox ib = new ImageBox(imageLayout, BorrowerDetailsActivity.this);
+                    ib.setImageUrl(uploadDocModel.getAddressProof().getImgUrls().get(count));
+                    ib.setPicNum(count);count = i;
+                    ib.setPicType("Permanent Address Proof");
+                    ib.setCloudinaryId("addressProof");
+                    ib.setId(2);
+                    ib.setVerified("invalid");
+                    insertAddressProofImageBox(ib);
+                }
             }
-            ImageBox ib = new ImageBox(imageLayout, BorrowerDetailsActivity.this);
-            ib.setImageUrl(null);
-            ib.setPicNum(count);
-            ib.setPicType("Permanent Address Proof");
-            ib.setCloudinaryId("addressProof");
-            ib.setId(2);
-            ib.setVerified("invalid");
-            insertAddressProofImageBox(ib);
         }
-        else{
-            ImageBox ib = new ImageBox(imageLayout, BorrowerDetailsActivity.this);
-            ib.setImageUrl(null);
-            ib.setPicNum(0);
-            ib.setPicType("Permanent Address Proof");
-            ib.setCloudinaryId("addressProof");
-            ib.setId(2);
-            ib.setVerified("invalid");
-            insertAddressProofImageBox(ib);
-        }
+        ibx = new ImageBox(imageLayout,BorrowerDetailsActivity.this);
+        ibx.setImageUrl(null);
+        ibx.setPicNum(++count);
+        ibx.setPicType("Permanent Address Proof");
+        ibx.setCloudinaryId("addressProof");
+        ibx.setId(2);
+        ibx.setVerified("invalid");
+        insertAddressProofImageBox(ibx);
 
         createAddressProofLayout();
 
-        gradeSheets = new ArrayList<>();
 
-        if (userInfo.getGradeSheets() != null) {
-            int count;
-            for (count = 0 ; count < userInfo.getGradeSheets().size(); count++) {
-                ImageBox ib = new ImageBox(imageLayout,BorrowerDetailsActivity.this);
-                ib.setImageUrl(userInfo.getGradeSheets().get(count));
-                ib.setPicNum(count);
+
+
+        gradeSheet = new ArrayList<>();
+        count = -1;
+
+        if (uploadDocModel.getGradeSheet().getImgUrls() != null) {
+            for (int i = count + 1; i < uploadDocModel.getGradeSheet().getImgUrls().size(); i++) {
+                ImageBox ib = new ImageBox(imageLayout, BorrowerDetailsActivity.this);
+                ib.setImageUrl(uploadDocModel.getGradeSheet().getImgUrls().get(i));
+                ib.setPicNum(i);
+                count = i;
                 ib.setPicType("Grade Sheet");
                 ib.setCloudinaryId("gradeSheet");
                 ib.setId(3);
                 ib.setVerified("invalid");
-                insertCollegeImageBox(ib);
+                insertGradeSheetImageBox(ib);
             }
-            ImageBox ib = new ImageBox(imageLayout,BorrowerDetailsActivity.this);
-            ib.setImageUrl(null);
-            ib.setPicNum(count);
-            ib.setPicType("Grade Sheet");
-            ib.setCloudinaryId("gradeSheet");
-            ib.setId(3);
-            ib.setVerified("invalid");
-            insertCollegeImageBox(ib);
         }
-        else{
-            ImageBox ib = new ImageBox(imageLayout,BorrowerDetailsActivity.this);
-            ib.setImageUrl(null);
-            ib.setPicNum(0);
-            ib.setPicType("Grade Sheet");
-            ib.setCloudinaryId("gradeSheet");
-            ib.setVerified("invalid");
-            ib.setId(3);
-            insertGradeSheetImageBox(ib);
-        }
+        ibx = new ImageBox(imageLayout,BorrowerDetailsActivity.this);
+        ibx.setImageUrl(null);
+        ibx.setPicNum(++count);
+        ibx.setPicType("Grade Sheet");
+        ibx.setCloudinaryId("gradeSheet");
+        ibx.setId(3);
+        ibx.setVerified("invalid");
+        insertGradeSheetImageBox(ibx);
 
         createGradeSheetsLayout();
 
-        bankProofs = new ArrayList<>();
 
-        if (userInfo.getBankProofs() != null) {
-            int count;
-            for (count = 0 ; count < userInfo.getBankProofs().size(); count++) {
-                ImageBox ib = new ImageBox(imageLayout,BorrowerDetailsActivity.this);
-                ib.setImageUrl(userInfo.getBankProofs().get(count));
-                ib.setPicNum(count);
+
+
+        bankProof = new ArrayList<>();
+        count = -1;
+
+        if (uploadDocModel.getBankProof().getImgUrls() != null) {
+            for (int i = count + 1; i < uploadDocModel.getBankProof().getImgUrls().size(); i++) {
+                ImageBox ib = new ImageBox(imageLayout, BorrowerDetailsActivity.this);
+                ib.setImageUrl(uploadDocModel.getBankProof().getImgUrls().get(i));
+                ib.setPicNum(i);
+                count = i;
                 ib.setPicType("Bank Proof");
                 ib.setCloudinaryId("bankProof");
                 ib.setId(4);
                 ib.setVerified("invalid");
                 insertBankProofImageBox(ib);
             }
-            ImageBox ib = new ImageBox(imageLayout,BorrowerDetailsActivity.this);
-            ib.setImageUrl(null);
-            ib.setPicNum(count);
-            ib.setPicType("Bank Proof");
-            ib.setCloudinaryId("bankProof");
-            ib.setId(4);
-            ib.setVerified("invalid");
-            insertBankProofImageBox(ib);
         }
-        else{
-            ImageBox ib = new ImageBox(imageLayout,BorrowerDetailsActivity.this);
-            ib.setImageUrl(null);
-            ib.setPicNum(0);
-            ib.setPicType("Bank Proof");
-            ib.setCloudinaryId("bankProof");
-            ib.setId(4);
-            ib.setVerified("invalid");
-            insertBankProofImageBox(ib);
-        }
+        ibx = new ImageBox(imageLayout,BorrowerDetailsActivity.this);
+        ibx.setImageUrl(null);
+        ibx.setPicNum(++count);
+        ibx.setPicType("Bank Proof");
+        ibx.setCloudinaryId("bankProof");
+        ibx.setId(4);
+        ibx.setVerified("invalid");
+        insertBankProofImageBox(ibx);
 
         createBankProofsLayout();
+
+
+
 
 
         profilePic = (CircularImageView) findViewById(R.id.profile_image);
@@ -344,51 +341,61 @@ public class BorrowerDetailsActivity extends AppCompatActivity implements Adapte
             }
         });
 
-        String userId = userInfo.getFbUserId();
+        String userId = uploadDocModel.getFbUserId();
         Picasso.with(this)
                 .load("https://graph.facebook.com/" + userId + "/picture?type=large")
                 .into(profilePic);
 
-        name.setText(userInfo.getName());
+        name.setText(uploadDocModel.getName());
 
-        phoneNum.setText(userInfo.getPhone());
+        phoneNum.setText(uploadDocModel.getPhone());
         phoneNum.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 String phone_num = (phoneNum.getText()).toString();
                 Intent callIntent = new Intent(Intent.ACTION_CALL);
                 callIntent.setData(Uri.parse("tel:" + phone_num));
-                {
+                if (ContextCompat.checkSelfPermission(BorrowerDetailsActivity.this, Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
+                    ActivityCompat.requestPermissions(BorrowerDetailsActivity.this, new String[]{Manifest.permission.CALL_PHONE},3);
+                }
+                if(ContextCompat.checkSelfPermission(BorrowerDetailsActivity.this, Manifest.permission.CALL_PHONE) == PackageManager.PERMISSION_GRANTED) {
                     startActivity(callIntent);
                 }
             }
         });
-        college.setTextSize(18 - (userInfo.getCollege().length()) / 8);
-        college.setText(userInfo.getCollege());
 
-        friendName.setText(userInfo.getFriendName());
+        college.setTextSize(18 - (uploadDocModel.getCollege().length()) / 8);
+        college.setText(uploadDocModel.getCollege());
 
-        friendPhoneNum.setText(userInfo.getFriendNumber());
+        friendName.setText(uploadDocModel.getFriendName());
+        friendPhoneNum.setText(uploadDocModel.getFriendNumber());
         friendPhoneNum.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 String phone_num = (friendPhoneNum.getText()).toString();
                 Intent callIntent = new Intent(Intent.ACTION_CALL);
                 callIntent.setData(Uri.parse("tel:" + phone_num));
-                {
+                if (ContextCompat.checkSelfPermission(BorrowerDetailsActivity.this, Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
+                    ActivityCompat.requestPermissions(BorrowerDetailsActivity.this, new String[]{Manifest.permission.CALL_PHONE},4);
+                }
+                if(ContextCompat.checkSelfPermission(BorrowerDetailsActivity.this, Manifest.permission.CALL_PHONE) == PackageManager.PERMISSION_GRANTED) {
                     startActivity(callIntent);
                 }
             }
         });
-
-        if (verInfo.getReferenceIsGoodFriend()) {
-            referenceSelection.check(R.id.goodFriendsYes);
-        } else {
-            referenceSelection.check(R.id.goodFriendsNo);
+        if(verInfo.getReferenceIsGoodFriend() != null) {
+            if (verInfo.getReferenceIsGoodFriend()) {
+                referenceSelection.check(R.id.goodFriendsYes);
+                goodFriendsRadio = "true";
+            } else {
+                referenceSelection.check(R.id.goodFriendsNo);
+                goodFriendsRadio = "false";
+            }
         }
 
         if (verInfo.getReferenceYear() != null) {
             refYear.setText(verInfo.getReferenceYear());
+
         }
 
         if (verInfo.getReferenceDepartment() != null) {
@@ -402,90 +409,86 @@ public class BorrowerDetailsActivity extends AppCompatActivity implements Adapte
         if(verInfo.getHaveYearBack() != null) {
             if (verInfo.getHaveYearBack()) {
                 yearBackSelection.check(R.id.yearBackYes);
+                yearBackRadio = "true";
             } else {
                 yearBackSelection.check(R.id.yearBackNo);
+                yearBackRadio = "false";
             }
         }
 
         if(verInfo.getGiveHimLoan() != null) {
             if (verInfo.getGiveHimLoan()) {
                 internSelection.check(R.id.internchoiceYes);
+                giveLoanRadio = "true";
             } else {
                 internSelection.check(R.id.internchoiceNo);
+                giveLoanRadio = "false";
             }
         }
 
         if(verInfo.getBorrowerIsLying() != null) {
             if (verInfo.getBorrowerIsLying()) {
                 transparentSelection.check(R.id.transparentYes);
+                transparentRadio = "true";
             } else {
                 transparentSelection.check(R.id.transparentNo);
+                transparentRadio = "false";
             }
         }
 
         spinnerPunc = (AppCompatSpinner) findViewById(R.id.punctality);
-        // Create an ArrayAdapter using the string array and a default spinner layout
-        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
-                R.array.opinions, R.layout.spinner_item);
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this, R.array.opinions, R.layout.spinner_item);
         adapter.setDropDownViewResource(R.layout.spinner_dropdown_list);
-        //spinner.setAdapter(adapter);
         spinnerPunc.setAdapter(
                 new NothingSelectedSpinnerAdapter(
                         adapter,
                         R.layout.nothing_selected_spinner,
-                        // R.layout.contact_spinner_nothing_selected_dropdown, // Optional
                         this));
         spinnerPunc.setOnItemSelectedListener(this);
 
         if(verInfo.getPunctualityInClass() != null){
             spinnerPunc.setSelection(adapter.getPosition(verInfo.getPunctualityInClass()) + 1);
-            spinnerFlag1 = true;
+            punctualityInClass = verInfo.getPunctualityInClass();
         }
 
         spinnerFinRes = (AppCompatSpinner) findViewById(R.id.finResponsibility);
-        // Create an ArrayAdapter using the string array and a default spinner layout
         spinnerFinRes.setAdapter(
                 new NothingSelectedSpinnerAdapter(
                         adapter,
                         R.layout.nothing_selected_spinner,
-                        // R.layout.contact_spinner_nothing_selected_dropdown, // Optional
                         this));
         spinnerFinRes.setOnItemSelectedListener(this);
 
         if(verInfo.getFinanciallyResponsible() != null){
             spinnerFinRes.setSelection(adapter.getPosition(verInfo.getFinanciallyResponsible()) + 1);
-            spinnerFlag2 = true;
+            financiallyResponsible = verInfo.getFinanciallyResponsible();
         }
 
         spinnerSincere = (AppCompatSpinner) findViewById(R.id.sincerity);
-        // Create an ArrayAdapter using the string array and a default spinner layout
         spinnerSincere.setAdapter(
                 new NothingSelectedSpinnerAdapter(
                         adapter,
                         R.layout.nothing_selected_spinner,
-                        // R.layout.contact_spinner_nothing_selected_dropdown, // Optional
                         this));
 
         spinnerSincere.setOnItemSelectedListener(this);
 
         if(verInfo.getSincerityInStudies() != null){
             spinnerSincere.setSelection(adapter.getPosition(verInfo.getSincerityInStudies()) + 1);
-            spinnerFlag3 = true;
+            sincerityInStudies = verInfo.getSincerityInStudies();
         }
 
         spinnerCocurricular = (AppCompatSpinner) findViewById(R.id.coCurricular);
-        // Create an ArrayAdapter using the string array and a default spinner layout
         spinnerCocurricular.setAdapter(
                 new NothingSelectedSpinnerAdapter(
                         adapter,
                         R.layout.nothing_selected_spinner,
-                        // R.layout.contact_spinner_nothing_selected_dropdown, // Optional
                         this));
         spinnerCocurricular.setOnItemSelectedListener(this);
 
         if(verInfo.getCoCurricularParticipation() != null){
             spinnerCocurricular.setSelection(adapter.getPosition(verInfo.getCoCurricularParticipation()) + 1);
-            spinnerFlag4 = true;
+            coCurricularParticipation = verInfo.getCoCurricularParticipation();
         }
 
         ArrayAdapter<CharSequence> sadapter = ArrayAdapter.createFromResource(this,
@@ -504,11 +507,7 @@ public class BorrowerDetailsActivity extends AppCompatActivity implements Adapte
 
         if(verInfo.getRepayCapacity() != null){
             spinnerLoan.setSelection(sadapter.getPosition(verInfo.getRepayCapacity()) + 1);
-            spinnerFlag5 = true;
-        }
-
-        if(spinnerFlag1 && spinnerFlag2 && spinnerFlag3 && spinnerFlag4 && spinnerFlag5) {
-            spinnerFlag = true;
+            loanRepay = verInfo.getRepayCapacity();
         }
 
     }
@@ -532,8 +531,6 @@ public class BorrowerDetailsActivity extends AppCompatActivity implements Adapte
         String localPath = settings.getString("localPath","");
         if(resultCode == RESULT_OK){
             if(requestCode == 1){
-                // If image box is null, then go check for imagebox in extended list
-                // This new pic clicked imagebox should go to state container
 
                 bp = (Bitmap) data.getExtras().get("data");
                 Cursor cursor = getContentResolver().query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, new String[]{ MediaStore.Images.Media.DATA, MediaStore.Images.Media.DATE_ADDED, MediaStore.Images.ImageColumns.ORIENTATION }, MediaStore.Images.Media.DATE_ADDED, null, "date_added ASC");
@@ -547,8 +544,6 @@ public class BorrowerDetailsActivity extends AppCompatActivity implements Adapte
                 cloudinary.uploadImage(bp, localPath, borrowerData,this);
 
             } else if (requestCode == 2) {
-                // If image box is null, then go check for imagebox in extended list
-                // This new pic clicked imagebox should go to state container
 
                 Uri selectedImageUri = data.getData();
                 Cursor cursor = getContentResolver().query(selectedImageUri, null, null, null, null);
@@ -593,8 +588,8 @@ public class BorrowerDetailsActivity extends AppCompatActivity implements Adapte
                         if(frontImageCollegeId != null && backImageCollegeId != null){
                             if(picNum == 1) {
                                 backImageCollegeId = null;
-                                imageBox1 = collegeIds.get(0);
-                                imageBox2 = collegeIds.get(1);
+                                imageBox1 = collegeID.get(0);
+                                imageBox2 = collegeID.get(1);
 
                                 imageBox1.setPicNum(1);
                                 imageBox2.setPicNum(0);
@@ -602,8 +597,8 @@ public class BorrowerDetailsActivity extends AppCompatActivity implements Adapte
                                 imageBox2.setVerified("front");
                                 imageBox1.setVerified("invalid");
 
-                                collegeIds.set(0, imageBox2);
-                                collegeIds.set(1, imageBox1);
+                                collegeID.set(0, imageBox2);
+                                collegeID.set(1, imageBox1);
 
                                 createCollegeIdLayout();
                                 ViewTreeObserver viewTreeObserver = gridView.getViewTreeObserver();
@@ -632,8 +627,8 @@ public class BorrowerDetailsActivity extends AppCompatActivity implements Adapte
                             else if(picNum == 0) {
                             }
                             else{
-                                imageBox1 = collegeIds.get(0);
-                                imageBox2 = collegeIds.get(picNum);
+                                imageBox1 = collegeID.get(0);
+                                imageBox2 = collegeID.get(picNum);
 
                                 imageBox1.setPicNum(picNum);
                                 imageBox2.setPicNum(0);
@@ -641,8 +636,8 @@ public class BorrowerDetailsActivity extends AppCompatActivity implements Adapte
                                 imageBox2.setVerified("front");
                                 imageBox1.setVerified("invalid");
 
-                                collegeIds.set(picNum, imageBox1);
-                                collegeIds.set(0, imageBox2);
+                                collegeID.set(picNum, imageBox1);
+                                collegeID.set(0, imageBox2);
 
                                 createCollegeIdLayout();
                                 ViewTreeObserver viewTreeObserver = gridView.getViewTreeObserver();
@@ -672,7 +667,7 @@ public class BorrowerDetailsActivity extends AppCompatActivity implements Adapte
                         }
                         else if(backImageCollegeId != null ) {
                             if (picNum == 0) {
-                                imageBox1 = collegeIds.get(0);
+                                imageBox1 = collegeID.get(0);
                                 imageBox1.setVerified("front");
 
                                 backImageCollegeId = null;
@@ -695,8 +690,8 @@ public class BorrowerDetailsActivity extends AppCompatActivity implements Adapte
                                     }
                                 });
                             } else if (picNum == 1) {
-                                imageBox1 = collegeIds.get(0);
-                                imageBox2 = collegeIds.get(picNum);
+                                imageBox1 = collegeID.get(0);
+                                imageBox2 = collegeID.get(picNum);
 
                                 imageBox1.setPicNum(picNum);
                                 imageBox2.setPicNum(0);
@@ -704,8 +699,8 @@ public class BorrowerDetailsActivity extends AppCompatActivity implements Adapte
                                 imageBox2.setVerified("front");
                                 imageBox1.setVerified("back");
 
-                                collegeIds.set(0, imageBox2);
-                                collegeIds.set(picNum, imageBox1);
+                                collegeID.set(0, imageBox2);
+                                collegeID.set(picNum, imageBox1);
 
                                 createCollegeIdLayout();
                                 ViewTreeObserver viewTreeObserver = gridView.getViewTreeObserver();
@@ -732,9 +727,9 @@ public class BorrowerDetailsActivity extends AppCompatActivity implements Adapte
                                     }
                                 });
                             } else {
-                                imageBox1 = collegeIds.get(0);
-                                imageBox2 = collegeIds.get(picNum);
-                                imageBox3 = collegeIds.get(1);
+                                imageBox1 = collegeID.get(0);
+                                imageBox2 = collegeID.get(picNum);
+                                imageBox3 = collegeID.get(1);
 
                                 imageBox1.setPicNum(1);
                                 imageBox2.setPicNum(0);
@@ -742,39 +737,18 @@ public class BorrowerDetailsActivity extends AppCompatActivity implements Adapte
 
                                 imageBox2.setVerified("front");
                                 imageBox1.setVerified("back");
-                                if(collegeIds.get(1).getVerified().equals("valid")) {
-                                    imageBox3.setVerified(collegeIds.get(1).getVerified());
-                                }
-                                else{
-                                    imageBox3.setVerified("invalid");
-                                }
+                                imageBox3.setVerified("invalid");
 
-                                collegeIds.set(0, imageBox2);
-                                collegeIds.set(1, imageBox1);
-                                collegeIds.set(picNum, imageBox3);
+
+                                collegeID.set(0, imageBox2);
+                                collegeID.set(1, imageBox1);
+                                collegeID.set(picNum, imageBox3);
                                 createCollegeIdLayout();
                                 ViewTreeObserver viewTreeObserver = gridView.getViewTreeObserver();
                                 viewTreeObserver.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
 
                                     @Override
                                     public void onGlobalLayout() {
-                                        if(collegeIds.get(picNum).getVerified().equals("valid")) {
-                                            LinearLayout gridChild2 = (LinearLayout) gridView.getChildAt(picNum);
-                                            imageLayout2 = (FrameLayout) gridChild2.findViewById(R.id.imageLayout);
-                                            imageLayout2.findViewWithTag(getResources().getString(R.string.unverified_status_icon)).setVisibility(View.INVISIBLE);
-                                            imageLayout2.findViewWithTag(getString(R.string.verified_status_icon)).setVisibility(View.VISIBLE);
-                                            textView = (TextView) gridChild2.findViewById(R.id.textView);
-                                            textView.setVisibility(View.INVISIBLE);
-                                        }
-                                        else{
-                                            LinearLayout gridChild2 = (LinearLayout) gridView.getChildAt(picNum);
-                                            imageLayout2 = (FrameLayout) gridChild2.findViewById(R.id.imageLayout);
-                                            imageLayout2.findViewWithTag(getResources().getString(R.string.unverified_status_icon)).setVisibility(View.VISIBLE);
-                                            imageLayout2.findViewWithTag(getString(R.string.verified_status_icon)).setVisibility(View.INVISIBLE);
-                                            textView = (TextView) gridChild2.findViewById(R.id.textView);
-                                            textView.setVisibility(View.INVISIBLE);
-                                        }
-
                                         LinearLayout gridChild = (LinearLayout) gridView.getChildAt(0);
                                         imageLayout = (FrameLayout) gridChild.findViewById(R.id.imageLayout);
                                         imageLayout.findViewWithTag(getResources().getString(R.string.unverified_status_icon)).setVisibility(View.INVISIBLE);
@@ -796,43 +770,23 @@ public class BorrowerDetailsActivity extends AppCompatActivity implements Adapte
                             }
                         }
                         else{
-                            imageBox1 = collegeIds.get(0);
-                            imageBox2 = collegeIds.get(picNum);
+                            imageBox1 = collegeID.get(0);
+                            imageBox2 = collegeID.get(picNum);
 
                             imageBox1.setPicNum(picNum);
                             imageBox2.setPicNum(0);
-                            if(collegeIds.get(1).getVerified().equals("valid")) {
-                                imageBox1.setVerified(collegeIds.get(0).getVerified());
-                            }
-                            else{
-                                imageBox1.setVerified("invalid");
-                            }
+
+                            imageBox1.setVerified("invalid");
                             imageBox2.setVerified("front");
 
-                            collegeIds.set(picNum,imageBox1);
-                            collegeIds.set(0,imageBox2);
+                            collegeID.set(picNum,imageBox1);
+                            collegeID.set(0,imageBox2);
                             createCollegeIdLayout();
                             ViewTreeObserver viewTreeObserver = gridView.getViewTreeObserver();
                             viewTreeObserver.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
 
                                 @Override
                                 public void onGlobalLayout() {
-                                    if(collegeIds.get(picNum).getVerified().equals("valid")) {
-                                        LinearLayout gridChild1 = (LinearLayout) gridView.getChildAt(picNum);
-                                        imageLayout1 = (FrameLayout) gridChild1.findViewById(R.id.imageLayout);
-                                        imageLayout1.findViewWithTag(getResources().getString(R.string.unverified_status_icon)).setVisibility(View.INVISIBLE);
-                                        imageLayout1.findViewWithTag(getString(R.string.verified_status_icon)).setVisibility(View.VISIBLE);
-                                        textView = (TextView) gridChild1.findViewById(R.id.textView);
-                                        textView.setVisibility(View.INVISIBLE);
-                                    }
-                                    else{
-                                        LinearLayout gridChild1 = (LinearLayout) gridView.getChildAt(picNum);
-                                        imageLayout1 = (FrameLayout) gridChild1.findViewById(R.id.imageLayout);
-                                        imageLayout1.findViewWithTag(getResources().getString(R.string.unverified_status_icon)).setVisibility(View.VISIBLE);
-                                        imageLayout1.findViewWithTag(getString(R.string.verified_status_icon)).setVisibility(View.INVISIBLE);
-                                        textView = (TextView) gridChild1.findViewById(R.id.textView);
-                                        textView.setVisibility(View.INVISIBLE);
-                                    }
 
                                     LinearLayout gridChild = (LinearLayout) gridView.getChildAt(0);
                                     imageLayout = (FrameLayout) gridChild.findViewById(R.id.imageLayout);
@@ -851,8 +805,8 @@ public class BorrowerDetailsActivity extends AppCompatActivity implements Adapte
 
                         if( frontImageCollegeId != null && backImageCollegeId != null) {
                             if(picNum == 0) {
-                                imageBox1 = collegeIds.get(0);
-                                imageBox2 = collegeIds.get(1);
+                                imageBox1 = collegeID.get(0);
+                                imageBox2 = collegeID.get(1);
 
                                 imageBox1.setVerified("back");
                                 imageBox2.setVerified("invalid");
@@ -885,8 +839,8 @@ public class BorrowerDetailsActivity extends AppCompatActivity implements Adapte
                             }
                             else if(picNum == 1){}
                             else{
-                                imageBox1 = collegeIds.get(1);
-                                imageBox2 = collegeIds.get(picNum);
+                                imageBox1 = collegeID.get(1);
+                                imageBox2 = collegeID.get(picNum);
 
                                 imageBox1.setPicNum(picNum);
                                 imageBox2.setPicNum(1);
@@ -894,8 +848,8 @@ public class BorrowerDetailsActivity extends AppCompatActivity implements Adapte
                                 imageBox1.setVerified("invalid");
                                 imageBox2.setVerified("back");
 
-                                collegeIds.set(picNum, imageBox1);
-                                collegeIds.set(1,imageBox2);
+                                collegeID.set(picNum, imageBox1);
+                                collegeID.set(1,imageBox2);
 
                                 createCollegeIdLayout();
 
@@ -904,12 +858,6 @@ public class BorrowerDetailsActivity extends AppCompatActivity implements Adapte
 
                                     @Override
                                     public void onGlobalLayout() {
-                                        LinearLayout gridChild1 = (LinearLayout) gridView.getChildAt(picNum);
-                                        imageLayout1 = (FrameLayout) gridChild1.findViewById(R.id.imageLayout);
-                                        imageLayout1.findViewWithTag(getResources().getString(R.string.unverified_status_icon)).setVisibility(View.VISIBLE);
-                                        imageLayout1.findViewWithTag(getString(R.string.verified_status_icon)).setVisibility(View.INVISIBLE);
-                                        textView = (TextView) gridChild1.findViewById(R.id.textView);
-                                        textView.setVisibility(View.INVISIBLE);
 
                                         LinearLayout gridChild = (LinearLayout) gridView.getChildAt(1);
                                         imageLayout = (FrameLayout) gridChild.findViewById(R.id.imageLayout);
@@ -924,7 +872,7 @@ public class BorrowerDetailsActivity extends AppCompatActivity implements Adapte
                         }
                         else if(frontImageCollegeId != null ){
                             if(picNum == 0){
-                                imageBox1 = collegeIds.get(0);
+                                imageBox1 = collegeID.get(0);
 
                                 imageBox1.setVerified("back");
                                 frontImageCollegeId = null;
@@ -947,7 +895,7 @@ public class BorrowerDetailsActivity extends AppCompatActivity implements Adapte
                                 });
                             }
                             else if(picNum == 1){
-                                imageBox1 = collegeIds.get(1);
+                                imageBox1 = collegeID.get(1);
                                 imageBox1.setVerified("back");
 
                                 createCollegeIdLayout();
@@ -967,22 +915,17 @@ public class BorrowerDetailsActivity extends AppCompatActivity implements Adapte
                                 });
                             }
                             else{
-                                imageBox1 = collegeIds.get(1);
-                                imageBox2 = collegeIds.get(picNum);
+                                imageBox1 = collegeID.get(1);
+                                imageBox2 = collegeID.get(picNum);
 
                                 imageBox1.setPicNum(picNum);
                                 imageBox2.setPicNum(1);
 
                                 imageBox2.setVerified("back");
-                                if(collegeIds.get(1).getVerified().equals("valid")) {
-                                    imageBox1.setVerified(collegeIds.get(1).getVerified());
-                                }
-                                else{
-                                    imageBox1.setVerified("invalid");
-                                }
+                                imageBox1.setVerified("invalid");
 
-                                collegeIds.set(picNum,imageBox1);
-                                collegeIds.set(1,imageBox2);
+                                collegeID.set(picNum,imageBox1);
+                                collegeID.set(1,imageBox2);
 
                                 createCollegeIdLayout();
                                 ViewTreeObserver viewTreeObserver = gridView.getViewTreeObserver();
@@ -990,22 +933,6 @@ public class BorrowerDetailsActivity extends AppCompatActivity implements Adapte
 
                                     @Override
                                     public void onGlobalLayout() {
-                                        if(collegeIds.get(picNum).getVerified().equals("valid")) {
-                                            LinearLayout gridChild1 = (LinearLayout) gridView.getChildAt(picNum);
-                                            imageLayout1 = (FrameLayout) gridChild1.findViewById(R.id.imageLayout);
-                                            imageLayout1.findViewWithTag(getResources().getString(R.string.unverified_status_icon)).setVisibility(View.INVISIBLE);
-                                            imageLayout1.findViewWithTag(getString(R.string.verified_status_icon)).setVisibility(View.VISIBLE);
-                                            textView = (TextView) gridChild1.findViewById(R.id.textView);
-                                            textView.setVisibility(View.INVISIBLE);
-                                        }
-                                        else{
-                                            LinearLayout gridChild1 = (LinearLayout) gridView.getChildAt(picNum);
-                                            imageLayout1 = (FrameLayout) gridChild1.findViewById(R.id.imageLayout);
-                                            imageLayout1.findViewWithTag(getResources().getString(R.string.unverified_status_icon)).setVisibility(View.VISIBLE);
-                                            imageLayout1.findViewWithTag(getString(R.string.verified_status_icon)).setVisibility(View.INVISIBLE);
-                                            textView = (TextView) gridChild1.findViewById(R.id.textView);
-                                            textView.setVisibility(View.INVISIBLE);
-                                        }
 
                                         LinearLayout gridChild = (LinearLayout) gridView.getChildAt(1);
                                         imageLayout = (FrameLayout) gridChild.findViewById(R.id.imageLayout);
@@ -1020,22 +947,17 @@ public class BorrowerDetailsActivity extends AppCompatActivity implements Adapte
 
                         }
                         else{
-                            imageBox1 = collegeIds.get(0);
-                            imageBox2 = collegeIds.get(picNum);
+                            imageBox1 = collegeID.get(0);
+                            imageBox2 = collegeID.get(picNum);
 
                             imageBox1.setPicNum(picNum);
                             imageBox2.setPicNum(0);
 
                             imageBox2.setVerified("back");
-                            if(collegeIds.get(1).getVerified().equals("valid")) {
-                                imageBox1.setVerified(collegeIds.get(0).getVerified());
-                            }
-                            else{
-                                imageBox1.setVerified("invalid");
-                            }
+                            imageBox1.setVerified("invalid");
 
-                            collegeIds.set(picNum,imageBox1);
-                            collegeIds.set(0,imageBox2);
+                            collegeID.set(picNum,imageBox1);
+                            collegeID.set(0,imageBox2);
 
                             createCollegeIdLayout();
                             ViewTreeObserver viewTreeObserver = gridView.getViewTreeObserver();
@@ -1043,22 +965,6 @@ public class BorrowerDetailsActivity extends AppCompatActivity implements Adapte
 
                                 @Override
                                 public void onGlobalLayout() {
-                                    if(collegeIds.get(picNum).getVerified().equals("valid")) {
-                                        LinearLayout gridChild1 = (LinearLayout) gridView.getChildAt(picNum);
-                                        imageLayout1 = (FrameLayout) gridChild1.findViewById(R.id.imageLayout);
-                                        imageLayout1.findViewWithTag(getResources().getString(R.string.unverified_status_icon)).setVisibility(View.INVISIBLE);
-                                        imageLayout1.findViewWithTag(getString(R.string.verified_status_icon)).setVisibility(View.VISIBLE);
-                                        textView = (TextView) gridChild1.findViewById(R.id.textView);
-                                        textView.setVisibility(View.INVISIBLE);
-                                    }
-                                    else{
-                                        LinearLayout gridChild1 = (LinearLayout) gridView.getChildAt(picNum);
-                                        imageLayout1 = (FrameLayout) gridChild1.findViewById(R.id.imageLayout);
-                                        imageLayout1.findViewWithTag(getResources().getString(R.string.unverified_status_icon)).setVisibility(View.VISIBLE);
-                                        imageLayout1.findViewWithTag(getString(R.string.verified_status_icon)).setVisibility(View.INVISIBLE);
-                                        textView = (TextView) gridChild1.findViewById(R.id.textView);
-                                        textView.setVisibility(View.INVISIBLE);
-                                    }
 
                                     LinearLayout gridChild = (LinearLayout) gridView.getChildAt(0);
                                     imageLayout = (FrameLayout) gridChild.findViewById(R.id.imageLayout);
@@ -1073,55 +979,6 @@ public class BorrowerDetailsActivity extends AppCompatActivity implements Adapte
                         }
                         backImageCollegeId = imageUrl;
                     }
-                    else if(check.equals("valid")){
-                            imageBox1 = collegeIds.get(picNum);
-                            imageBox1.setVerified("valid");
-                            if(imageBox1.getImageUrl().equals(frontImageCollegeId)){
-                                frontImageCollegeId = null;
-                            }
-                            if(imageBox1.getImageUrl().equals(backImageCollegeId)){
-                                backImageCollegeId = null;
-                            }
-                            createCollegeIdLayout();
-                            ViewTreeObserver viewTreeObserver = gridView.getViewTreeObserver();
-                            viewTreeObserver.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-
-                                @Override
-                                public void onGlobalLayout() {
-                                    LinearLayout gridChild = (LinearLayout) gridView.getChildAt(picNum);
-                                    imageLayout1 = (FrameLayout) gridChild.findViewById(R.id.imageLayout);
-                                    imageLayout1.findViewWithTag(getResources().getString(R.string.unverified_status_icon)).setVisibility(View.INVISIBLE);
-                                    imageLayout1.findViewWithTag(getString(R.string.verified_status_icon)).setVisibility(View.VISIBLE);
-                                    textView = (TextView) gridChild.findViewById(R.id.textView);
-                                    textView.setVisibility(View.INVISIBLE);
-
-                                }
-                            });
-                        }
-                    else if(check.equals("invalid")){
-                        imageBox1 = collegeIds.get(picNum);
-                        imageBox1.setVerified("invalid");
-                        createCollegeIdLayout();
-                        if(imageBox1.getImageUrl().equals(frontImageCollegeId)){
-                            frontImageCollegeId = null;
-                        }
-                        if(imageBox1.getImageUrl().equals(backImageCollegeId)){
-                            backImageCollegeId = null;
-                        }
-                        ViewTreeObserver viewTreeObserver = gridView.getViewTreeObserver();
-                        viewTreeObserver.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-
-                                @Override
-                                public void onGlobalLayout() {
-                                    LinearLayout gridChild = (LinearLayout) gridView.getChildAt(picNum);
-                                    imageLayout1 = (FrameLayout) gridChild.findViewById(R.id.imageLayout);
-                                    imageLayout1.findViewWithTag(getResources().getString(R.string.unverified_status_icon)).setVisibility(View.VISIBLE);
-                                    imageLayout1.findViewWithTag(getString(R.string.verified_status_icon)).setVisibility(View.INVISIBLE);
-                                    textView = (TextView) gridChild.findViewById(R.id.textView);
-                                    textView.setVisibility(View.INVISIBLE);
-                                }
-                        });
-                    }
                 }
                 else if(id == 2){
                     gridView = (GridView) findViewById(R.id.permanentAddressProofImages);
@@ -1129,8 +986,8 @@ public class BorrowerDetailsActivity extends AppCompatActivity implements Adapte
                         if(frontImageAddressProof != null && backImageAddressProof != null){
                             if(picNum == 1) {
                                 backImageAddressProof = null;
-                                imageBox1 = addressProofs.get(0);
-                                imageBox2 = addressProofs.get(1);
+                                imageBox1 = addressProof.get(0);
+                                imageBox2 = addressProof.get(1);
 
                                 imageBox1.setPicNum(1);
                                 imageBox2.setPicNum(0);
@@ -1138,8 +995,8 @@ public class BorrowerDetailsActivity extends AppCompatActivity implements Adapte
                                 imageBox2.setVerified("front");
                                 imageBox1.setVerified("invalid");
 
-                                addressProofs.set(0, imageBox2);
-                                addressProofs.set(1, imageBox1);
+                                addressProof.set(0, imageBox2);
+                                addressProof.set(1, imageBox1);
 
                                 createAddressProofLayout();
                                 ViewTreeObserver viewTreeObserver = gridView.getViewTreeObserver();
@@ -1168,8 +1025,8 @@ public class BorrowerDetailsActivity extends AppCompatActivity implements Adapte
                             else if(picNum == 0) {
                             }
                             else{
-                                imageBox1 = addressProofs.get(0);
-                                imageBox2 = addressProofs.get(picNum);
+                                imageBox1 = addressProof.get(0);
+                                imageBox2 = addressProof.get(picNum);
 
                                 imageBox1.setPicNum(picNum);
                                 imageBox2.setPicNum(0);
@@ -1177,8 +1034,8 @@ public class BorrowerDetailsActivity extends AppCompatActivity implements Adapte
                                 imageBox2.setVerified("front");
                                 imageBox1.setVerified("invalid");
 
-                                addressProofs.set(picNum, imageBox1);
-                                addressProofs.set(0, imageBox2);
+                                addressProof.set(picNum, imageBox1);
+                                addressProof.set(0, imageBox2);
 
                                 createAddressProofLayout();
                                 ViewTreeObserver viewTreeObserver = gridView.getViewTreeObserver();
@@ -1186,13 +1043,6 @@ public class BorrowerDetailsActivity extends AppCompatActivity implements Adapte
 
                                     @Override
                                     public void onGlobalLayout() {
-
-                                        LinearLayout gridChild1 = (LinearLayout) gridView.getChildAt(picNum);
-                                        imageLayout1 = (FrameLayout) gridChild1.findViewById(R.id.imageLayout);
-                                        imageLayout1.findViewWithTag(getResources().getString(R.string.unverified_status_icon)).setVisibility(View.VISIBLE);
-                                        imageLayout1.findViewWithTag(getString(R.string.verified_status_icon)).setVisibility(View.INVISIBLE);
-                                        textView = (TextView) gridChild1.findViewById(R.id.textView);
-                                        textView.setVisibility(View.INVISIBLE);
 
                                         LinearLayout gridChild = (LinearLayout) gridView.getChildAt(0);
                                         imageLayout = (FrameLayout) gridChild.findViewById(R.id.imageLayout);
@@ -1208,7 +1058,7 @@ public class BorrowerDetailsActivity extends AppCompatActivity implements Adapte
                         }
                         else if(backImageAddressProof != null ) {
                             if (picNum == 0) {
-                                imageBox1 = addressProofs.get(0);
+                                imageBox1 = addressProof.get(0);
                                 imageBox1.setVerified("front");
 
                                 backImageAddressProof = null;
@@ -1231,8 +1081,8 @@ public class BorrowerDetailsActivity extends AppCompatActivity implements Adapte
                                     }
                                 });
                             } else if (picNum == 1) {
-                                imageBox1 = addressProofs.get(0);
-                                imageBox2 = addressProofs.get(picNum);
+                                imageBox1 = addressProof.get(0);
+                                imageBox2 = addressProof.get(picNum);
 
                                 imageBox1.setPicNum(picNum);
                                 imageBox2.setPicNum(0);
@@ -1240,8 +1090,8 @@ public class BorrowerDetailsActivity extends AppCompatActivity implements Adapte
                                 imageBox2.setVerified("front");
                                 imageBox1.setVerified("back");
 
-                                addressProofs.set(0, imageBox2);
-                                addressProofs.set(picNum, imageBox1);
+                                addressProof.set(0, imageBox2);
+                                addressProof.set(picNum, imageBox1);
 
                                 createAddressProofLayout();
                                 ViewTreeObserver viewTreeObserver = gridView.getViewTreeObserver();
@@ -1268,9 +1118,9 @@ public class BorrowerDetailsActivity extends AppCompatActivity implements Adapte
                                     }
                                 });
                             } else {
-                                imageBox1 = addressProofs.get(0);
-                                imageBox2 = addressProofs.get(picNum);
-                                imageBox3 = addressProofs.get(1);
+                                imageBox1 = addressProof.get(0);
+                                imageBox2 = addressProof.get(picNum);
+                                imageBox3 = addressProof.get(1);
 
                                 imageBox1.setPicNum(1);
                                 imageBox2.setPicNum(0);
@@ -1278,38 +1128,18 @@ public class BorrowerDetailsActivity extends AppCompatActivity implements Adapte
 
                                 imageBox2.setVerified("front");
                                 imageBox1.setVerified("back");
-                                if(addressProofs.get(1).getVerified().equals("valid")) {
-                                    imageBox3.setVerified(addressProofs.get(1).getVerified());
-                                }
-                                else{
-                                    imageBox3.setVerified("invalid");
-                                }
+                                imageBox3.setVerified("invalid");
 
-                                addressProofs.set(0, imageBox2);
-                                addressProofs.set(1, imageBox1);
-                                addressProofs.set(picNum, imageBox3);
+
+                                addressProof.set(0, imageBox2);
+                                addressProof.set(1, imageBox1);
+                                addressProof.set(picNum, imageBox3);
                                 createAddressProofLayout();
                                 ViewTreeObserver viewTreeObserver = gridView.getViewTreeObserver();
                                 viewTreeObserver.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
 
                                     @Override
                                     public void onGlobalLayout() {
-                                        if(addressProofs.get(picNum).getVerified().equals("valid")) {
-                                            LinearLayout gridChild2 = (LinearLayout) gridView.getChildAt(picNum);
-                                            imageLayout2 = (FrameLayout) gridChild2.findViewById(R.id.imageLayout);
-                                            imageLayout2.findViewWithTag(getResources().getString(R.string.unverified_status_icon)).setVisibility(View.INVISIBLE);
-                                            imageLayout2.findViewWithTag(getString(R.string.verified_status_icon)).setVisibility(View.VISIBLE);
-                                            textView = (TextView) gridChild2.findViewById(R.id.textView);
-                                            textView.setVisibility(View.INVISIBLE);
-                                        }
-                                        else{
-                                            LinearLayout gridChild2 = (LinearLayout) gridView.getChildAt(picNum);
-                                            imageLayout2 = (FrameLayout) gridChild2.findViewById(R.id.imageLayout);
-                                            imageLayout2.findViewWithTag(getResources().getString(R.string.unverified_status_icon)).setVisibility(View.VISIBLE);
-                                            imageLayout2.findViewWithTag(getString(R.string.verified_status_icon)).setVisibility(View.INVISIBLE);
-                                            textView = (TextView) gridChild2.findViewById(R.id.textView);
-                                            textView.setVisibility(View.INVISIBLE);
-                                        }
 
                                         LinearLayout gridChild = (LinearLayout) gridView.getChildAt(0);
                                         imageLayout = (FrameLayout) gridChild.findViewById(R.id.imageLayout);
@@ -1332,43 +1162,22 @@ public class BorrowerDetailsActivity extends AppCompatActivity implements Adapte
                             }
                         }
                         else{
-                            imageBox1 = addressProofs.get(0);
-                            imageBox2 = addressProofs.get(picNum);
+                            imageBox1 = addressProof.get(0);
+                            imageBox2 = addressProof.get(picNum);
 
                             imageBox1.setPicNum(picNum);
                             imageBox2.setPicNum(0);
-                            if(addressProofs.get(1).getVerified().equals("valid")) {
-                                imageBox1.setVerified(addressProofs.get(0).getVerified());
-                            }
-                            else{
-                                imageBox1.setVerified("invalid");
-                            }
+                            imageBox1.setVerified("invalid");
                             imageBox2.setVerified("front");
 
-                            addressProofs.set(picNum,imageBox1);
-                            addressProofs.set(0,imageBox2);
-                            createCollegeIdLayout();
+                            addressProof.set(picNum,imageBox1);
+                            addressProof.set(0,imageBox2);
+                            createAddressProofLayout();
                             ViewTreeObserver viewTreeObserver = gridView.getViewTreeObserver();
                             viewTreeObserver.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
 
                                 @Override
                                 public void onGlobalLayout() {
-                                    if(addressProofs.get(picNum).getVerified().equals("valid")) {
-                                        LinearLayout gridChild1 = (LinearLayout) gridView.getChildAt(picNum);
-                                        imageLayout1 = (FrameLayout) gridChild1.findViewById(R.id.imageLayout);
-                                        imageLayout1.findViewWithTag(getResources().getString(R.string.unverified_status_icon)).setVisibility(View.INVISIBLE);
-                                        imageLayout1.findViewWithTag(getString(R.string.verified_status_icon)).setVisibility(View.VISIBLE);
-                                        textView = (TextView) gridChild1.findViewById(R.id.textView);
-                                        textView.setVisibility(View.INVISIBLE);
-                                    }
-                                    else{
-                                        LinearLayout gridChild1 = (LinearLayout) gridView.getChildAt(picNum);
-                                        imageLayout1 = (FrameLayout) gridChild1.findViewById(R.id.imageLayout);
-                                        imageLayout1.findViewWithTag(getResources().getString(R.string.unverified_status_icon)).setVisibility(View.VISIBLE);
-                                        imageLayout1.findViewWithTag(getString(R.string.verified_status_icon)).setVisibility(View.INVISIBLE);
-                                        textView = (TextView) gridChild1.findViewById(R.id.textView);
-                                        textView.setVisibility(View.INVISIBLE);
-                                    }
 
                                     LinearLayout gridChild = (LinearLayout) gridView.getChildAt(0);
                                     imageLayout = (FrameLayout) gridChild.findViewById(R.id.imageLayout);
@@ -1387,8 +1196,8 @@ public class BorrowerDetailsActivity extends AppCompatActivity implements Adapte
 
                         if( frontImageAddressProof != null && backImageAddressProof != null) {
                             if(picNum == 0) {
-                                imageBox1 = addressProofs.get(0);
-                                imageBox2 = addressProofs.get(1);
+                                imageBox1 = addressProof.get(0);
+                                imageBox2 = addressProof.get(1);
 
                                 imageBox1.setVerified("back");
                                 imageBox2.setVerified("invalid");
@@ -1421,8 +1230,8 @@ public class BorrowerDetailsActivity extends AppCompatActivity implements Adapte
                             }
                             else if(picNum == 1){}
                             else{
-                                imageBox1 = addressProofs.get(1);
-                                imageBox2 = addressProofs.get(picNum);
+                                imageBox1 = addressProof.get(1);
+                                imageBox2 = addressProof.get(picNum);
 
                                 imageBox1.setPicNum(picNum);
                                 imageBox2.setPicNum(1);
@@ -1430,8 +1239,8 @@ public class BorrowerDetailsActivity extends AppCompatActivity implements Adapte
                                 imageBox1.setVerified("invalid");
                                 imageBox2.setVerified("back");
 
-                                addressProofs.set(picNum, imageBox1);
-                                addressProofs.set(1,imageBox2);
+                                addressProof.set(picNum, imageBox1);
+                                addressProof.set(1,imageBox2);
 
                                 createAddressProofLayout();
 
@@ -1460,11 +1269,11 @@ public class BorrowerDetailsActivity extends AppCompatActivity implements Adapte
                         }
                         else if(frontImageAddressProof != null ){
                             if(picNum == 0){
-                                imageBox1 = addressProofs.get(0);
+                                imageBox1 = addressProof.get(0);
 
                                 imageBox1.setVerified("back");
                                 frontImageAddressProof = null;
-                                createCollegeIdLayout();
+                                createAddressProofLayout();
                                 ViewTreeObserver viewTreeObserver = gridView.getViewTreeObserver();
                                 viewTreeObserver.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
 
@@ -1483,7 +1292,7 @@ public class BorrowerDetailsActivity extends AppCompatActivity implements Adapte
                                 });
                             }
                             else if(picNum == 1){
-                                imageBox1 = addressProofs.get(1);
+                                imageBox1 = addressProof.get(1);
                                 imageBox1.setVerified("back");
 
                                 createAddressProofLayout();
@@ -1503,22 +1312,18 @@ public class BorrowerDetailsActivity extends AppCompatActivity implements Adapte
                                 });
                             }
                             else{
-                                imageBox1 = addressProofs.get(1);
-                                imageBox2 = addressProofs.get(picNum);
+                                imageBox1 = addressProof.get(1);
+                                imageBox2 = addressProof.get(picNum);
 
                                 imageBox1.setPicNum(picNum);
                                 imageBox2.setPicNum(1);
 
                                 imageBox2.setVerified("back");
-                                if(addressProofs.get(1).getVerified().equals("valid")) {
-                                    imageBox1.setVerified(addressProofs.get(1).getVerified());
-                                }
-                                else{
-                                    imageBox1.setVerified("invalid");
-                                }
+                                imageBox1.setVerified("invalid");
 
-                                addressProofs.set(picNum,imageBox1);
-                                addressProofs.set(1,imageBox2);
+
+                                addressProof.set(picNum,imageBox1);
+                                addressProof.set(1,imageBox2);
 
                                 createAddressProofLayout();
                                 ViewTreeObserver viewTreeObserver = gridView.getViewTreeObserver();
@@ -1526,22 +1331,6 @@ public class BorrowerDetailsActivity extends AppCompatActivity implements Adapte
 
                                     @Override
                                     public void onGlobalLayout() {
-                                        if(addressProofs.get(picNum).getVerified().equals("valid")) {
-                                            LinearLayout gridChild1 = (LinearLayout) gridView.getChildAt(picNum);
-                                            imageLayout1 = (FrameLayout) gridChild1.findViewById(R.id.imageLayout);
-                                            imageLayout1.findViewWithTag(getResources().getString(R.string.unverified_status_icon)).setVisibility(View.INVISIBLE);
-                                            imageLayout1.findViewWithTag(getString(R.string.verified_status_icon)).setVisibility(View.VISIBLE);
-                                            textView = (TextView) gridChild1.findViewById(R.id.textView);
-                                            textView.setVisibility(View.INVISIBLE);
-                                        }
-                                        else{
-                                            LinearLayout gridChild1 = (LinearLayout) gridView.getChildAt(picNum);
-                                            imageLayout1 = (FrameLayout) gridChild1.findViewById(R.id.imageLayout);
-                                            imageLayout1.findViewWithTag(getResources().getString(R.string.unverified_status_icon)).setVisibility(View.VISIBLE);
-                                            imageLayout1.findViewWithTag(getString(R.string.verified_status_icon)).setVisibility(View.INVISIBLE);
-                                            textView = (TextView) gridChild1.findViewById(R.id.textView);
-                                            textView.setVisibility(View.INVISIBLE);
-                                        }
 
                                         LinearLayout gridChild = (LinearLayout) gridView.getChildAt(1);
                                         imageLayout = (FrameLayout) gridChild.findViewById(R.id.imageLayout);
@@ -1556,22 +1345,18 @@ public class BorrowerDetailsActivity extends AppCompatActivity implements Adapte
 
                         }
                         else{
-                            imageBox1 = addressProofs.get(0);
-                            imageBox2 = addressProofs.get(picNum);
+                            imageBox1 = addressProof.get(0);
+                            imageBox2 = addressProof.get(picNum);
 
                             imageBox1.setPicNum(picNum);
                             imageBox2.setPicNum(0);
 
                             imageBox2.setVerified("back");
-                            if(addressProofs.get(1).getVerified().equals("valid")) {
-                                imageBox1.setVerified(addressProofs.get(0).getVerified());
-                            }
-                            else{
-                                imageBox1.setVerified("invalid");
-                            }
+                            imageBox1.setVerified("invalid");
 
-                            addressProofs.set(picNum,imageBox1);
-                            addressProofs.set(0,imageBox2);
+
+                            addressProof.set(picNum,imageBox1);
+                            addressProof.set(0,imageBox2);
 
                             createAddressProofLayout();
                             ViewTreeObserver viewTreeObserver = gridView.getViewTreeObserver();
@@ -1579,22 +1364,6 @@ public class BorrowerDetailsActivity extends AppCompatActivity implements Adapte
 
                                 @Override
                                 public void onGlobalLayout() {
-                                    if(addressProofs.get(picNum).getVerified().equals("valid")) {
-                                        LinearLayout gridChild1 = (LinearLayout) gridView.getChildAt(picNum);
-                                        imageLayout1 = (FrameLayout) gridChild1.findViewById(R.id.imageLayout);
-                                        imageLayout1.findViewWithTag(getResources().getString(R.string.unverified_status_icon)).setVisibility(View.INVISIBLE);
-                                        imageLayout1.findViewWithTag(getString(R.string.verified_status_icon)).setVisibility(View.VISIBLE);
-                                        textView = (TextView) gridChild1.findViewById(R.id.textView);
-                                        textView.setVisibility(View.INVISIBLE);
-                                    }
-                                    else{
-                                        LinearLayout gridChild1 = (LinearLayout) gridView.getChildAt(picNum);
-                                        imageLayout1 = (FrameLayout) gridChild1.findViewById(R.id.imageLayout);
-                                        imageLayout1.findViewWithTag(getResources().getString(R.string.unverified_status_icon)).setVisibility(View.VISIBLE);
-                                        imageLayout1.findViewWithTag(getString(R.string.verified_status_icon)).setVisibility(View.INVISIBLE);
-                                        textView = (TextView) gridChild1.findViewById(R.id.textView);
-                                        textView.setVisibility(View.INVISIBLE);
-                                    }
 
                                     LinearLayout gridChild = (LinearLayout) gridView.getChildAt(0);
                                     imageLayout = (FrameLayout) gridChild.findViewById(R.id.imageLayout);
@@ -1609,60 +1378,11 @@ public class BorrowerDetailsActivity extends AppCompatActivity implements Adapte
                         }
                         backImageAddressProof = imageUrl;
                     }
-                    else if(check.equals("valid")){
-                        imageBox1 = addressProofs.get(picNum);
-                        imageBox1.setVerified("valid");
-                        createAddressProofLayout();
-                        if(imageBox1.getImageUrl().equals(frontImageAddressProof)){
-                            frontImageAddressProof = null;
-                        }
-                        if(imageBox1.getImageUrl().equals(backImageAddressProof)){
-                            backImageAddressProof = null;
-                        }
-                        ViewTreeObserver viewTreeObserver = gridView.getViewTreeObserver();
-                        viewTreeObserver.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-
-                            @Override
-                            public void onGlobalLayout() {
-                                LinearLayout gridChild = (LinearLayout) gridView.getChildAt(picNum);
-                                imageLayout1 = (FrameLayout) gridChild.findViewById(R.id.imageLayout);
-                                imageLayout1.findViewWithTag(getResources().getString(R.string.unverified_status_icon)).setVisibility(View.INVISIBLE);
-                                imageLayout1.findViewWithTag(getString(R.string.verified_status_icon)).setVisibility(View.VISIBLE);
-                                textView = (TextView) gridChild.findViewById(R.id.textView);
-                                textView.setVisibility(View.INVISIBLE);
-
-                            }
-                        });
-                    }
-                    else if(check.equals("invalid")){
-                        imageBox1 = addressProofs.get(picNum);
-                        imageBox1.setVerified("invalid");
-                        createAddressProofLayout();
-                        if(imageBox1.getImageUrl().equals(frontImageAddressProof)){
-                            frontImageAddressProof = null;
-                        }
-                        if(imageBox1.getImageUrl().equals(backImageAddressProof)){
-                            backImageAddressProof = null;
-                        }
-                        ViewTreeObserver viewTreeObserver = gridView.getViewTreeObserver();
-                        viewTreeObserver.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-
-                            @Override
-                            public void onGlobalLayout() {
-                                LinearLayout gridChild = (LinearLayout) gridView.getChildAt(picNum);
-                                imageLayout1 = (FrameLayout) gridChild.findViewById(R.id.imageLayout);
-                                imageLayout1.findViewWithTag(getResources().getString(R.string.unverified_status_icon)).setVisibility(View.VISIBLE);
-                                imageLayout1.findViewWithTag(getString(R.string.verified_status_icon)).setVisibility(View.INVISIBLE);
-                                textView = (TextView) gridChild.findViewById(R.id.textView);
-                                textView.setVisibility(View.INVISIBLE);
-                            }
-                        });
-                    }
                 }
                 else if(id == 3){
                     gridView = (GridView) findViewById(R.id.gradeSheetImages);
                     if(check.equals("valid")){
-                        imageBox1 = gradeSheets.get(picNum);
+                        imageBox1 = gradeSheet.get(picNum);
                         imageBox1.setVerified("valid");
                         createGradeSheetsLayout();
                         ViewTreeObserver viewTreeObserver = gridView.getViewTreeObserver();
@@ -1681,7 +1401,7 @@ public class BorrowerDetailsActivity extends AppCompatActivity implements Adapte
                         });
                     }
                     else if(check.equals("invalid")){
-                        imageBox1 = gradeSheets.get(picNum);
+                        imageBox1 = gradeSheet.get(picNum);
                         imageBox1.setVerified("invalid");
                         createGradeSheetsLayout();
                         ViewTreeObserver viewTreeObserver = gridView.getViewTreeObserver();
@@ -1703,7 +1423,7 @@ public class BorrowerDetailsActivity extends AppCompatActivity implements Adapte
                 else if(id == 4){
                     gridView = (GridView) findViewById(R.id.bankProofImages);
                     if(check.equals("valid")){
-                        imageBox1 = bankProofs.get(picNum);
+                        imageBox1 = bankProof.get(picNum);
                         imageBox1.setVerified("valid");
                         createBankProofsLayout();
                         ViewTreeObserver viewTreeObserver = gridView.getViewTreeObserver();
@@ -1722,7 +1442,7 @@ public class BorrowerDetailsActivity extends AppCompatActivity implements Adapte
                         });
                     }
                     else if(check.equals("invalid")){
-                        imageBox1 = bankProofs.get(picNum);
+                        imageBox1 = bankProof.get(picNum);
                         imageBox1.setVerified("invalid");
                         createBankProofsLayout();
                         ViewTreeObserver viewTreeObserver = gridView.getViewTreeObserver();
@@ -1761,47 +1481,47 @@ public class BorrowerDetailsActivity extends AppCompatActivity implements Adapte
     }
 
     public void insertCollegeImageBox(ImageBox imageBox){
-        collegeIds.add(imageBox);
+        collegeID.add(imageBox);
     }
 
     public void insertAddressProofImageBox(ImageBox imageBox){
-        addressProofs.add(imageBox);
+        addressProof.add(imageBox);
     }
 
-    public void insertGradeSheetImageBox(ImageBox imageBox){ gradeSheets.add(imageBox); }
+    public void insertGradeSheetImageBox(ImageBox imageBox){ gradeSheet.add(imageBox); }
 
-    public void insertBankProofImageBox(ImageBox imageBox){ bankProofs.add(imageBox); }
+    public void insertBankProofImageBox(ImageBox imageBox){ bankProof.add(imageBox); }
 
-    public void removeGradeSheetImageBox(){ gradeSheets.remove(gradeSheets.size()-1); }
+    public void removeGradeSheetImageBox(){ gradeSheet.remove(gradeSheet.size()-1); }
 
-    public void removeBankProofImageBox(){ bankProofs.remove(bankProofs.size()-1); }
+    public void removeBankProofImageBox(){ bankProof.remove(bankProof.size()-1); }
 
     public void removeCollegeImageBox(){
-        collegeIds.remove(collegeIds.size()-1);
+        collegeID.remove(collegeID.size()-1);
     }
 
     public void removeAddressProofImageBox(){
-        addressProofs.remove(addressProofs.size()-1);
+        addressProof.remove(addressProof.size()-1);
     }
 
     public void createCollegeIdLayout(){
         ExpandableHeightGridView gridView = (ExpandableHeightGridView) findViewById(R.id.collegeIdImages);
-        gridView.setAdapter(new GridViewAdapter(this,collegeIds));
+        gridView.setAdapter(new GridViewAdapter(this,collegeID));
     }
 
     public void createAddressProofLayout(){
         ExpandableHeightGridView gridView = (ExpandableHeightGridView) findViewById(R.id.permanentAddressProofImages);
-        gridView.setAdapter(new GridViewAdapter(this,addressProofs));
+        gridView.setAdapter(new GridViewAdapter(this,addressProof));
     }
 
     public void createGradeSheetsLayout(){
         ExpandableHeightGridView gridView = (ExpandableHeightGridView) findViewById(R.id.gradeSheetImages);
-        gridView.setAdapter(new GridViewAdapter(this,gradeSheets));
+        gridView.setAdapter(new GridViewAdapter(this,gradeSheet));
     }
 
     public void createBankProofsLayout(){
         ExpandableHeightGridView gridView = (ExpandableHeightGridView) findViewById(R.id.bankProofImages);
-        gridView.setAdapter(new GridViewAdapter(this,bankProofs));
+        gridView.setAdapter(new GridViewAdapter(this,bankProof));
     }
 
     public String getFrontImageCollegeId() { return frontImageCollegeId; }
@@ -1818,32 +1538,28 @@ public class BorrowerDetailsActivity extends AppCompatActivity implements Adapte
 
     public String getYearBackRadio() { return yearBackRadio;}
 
-    public String repayBackLoan() { return loanRepay;}
+    public String getRepayBackLoan() { return loanRepay;}
+
+    public String getDate() { return uploadDocModel.getDate(); }
 
     public ArrayList<ImageBox> getCollegeIDs() {
-        return collegeIds;
+        return collegeID;
     }
 
-    public ArrayList<ImageBox> getAddressProofs() { return addressProofs; }
+    public ArrayList<ImageBox> getAddressProofs() { return addressProof; }
 
-    public ArrayList<ImageBox> getGradeSheets() { return gradeSheets; }
+    public ArrayList<ImageBox> getGradeSheets() { return gradeSheet; }
 
-    public ArrayList<ImageBox> getBankProofs() { return bankProofs; }
+    public ArrayList<ImageBox> getBankProofs() { return bankProof; }
 
     public String getTransparentRadio() { return transparentRadio;}
 
     public String getGiveLoanRadio() { return giveLoanRadio;}
 
-    public ImageBox getCollegeIdBackImageBox() {
-        return collegeIdBackImageBox;
-    }
+    public UploadDocModel getUploadDocModel() { return uploadDocModel;}
 
     public BorrowerData getBorrowerData() {
         return borrowerData;
-    }
-
-    public UserInfo getUserInfo() {
-        return userInfo;
     }
 
     public VerificationInfo getVerInfo() {
@@ -1866,13 +1582,13 @@ public class BorrowerDetailsActivity extends AppCompatActivity implements Adapte
         return college;
     }
 
-    public int getNumCollegeIds() { return collegeIds.size()-1;}
+    public int getNumCollegeIds() { return collegeID.size()-1;}
 
-    public int getNumAddressProofs() { return addressProofs.size()-1;}
+    public int getNumAddressProofs() { return addressProof.size()-1;}
 
-    public int getNumGradeSheets() { return gradeSheets.size()-1; }
+    public int getNumGradeSheets() { return gradeSheet.size()-1; }
 
-    public int getNumBankProofs() { return bankProofs.size()-1; }
+    public int getNumBankProofs() { return bankProof.size()-1; }
 
     public Button getSubmitButton() { return submitButton; }
 
@@ -1886,12 +1602,12 @@ public class BorrowerDetailsActivity extends AppCompatActivity implements Adapte
 
     public RadioGroup getInternSelection() {return internSelection; }
 
-    public EditText getRefYear() {
-        return refYear;
+    public String getRefYear() {
+        return refYear.getText().toString();
     }
 
-    public EditText getRefDept() {
-        return refDept;
+    public String getRefDept() {
+        return refDept.getText().toString();
     }
 
     public EditText getOtherNotes() {
@@ -1920,10 +1636,6 @@ public class BorrowerDetailsActivity extends AppCompatActivity implements Adapte
 
     public void setImageLayout(FrameLayout imageLayout) {this.imageLayout = imageLayout; }
 
-    public Map<Integer, ImageBox> getAllImageBoxes() {
-        return allImageBoxes;
-    }
-
     public String getSpinnerPunc() {
         return punctualityInClass;
     }
@@ -1948,25 +1660,9 @@ public class BorrowerDetailsActivity extends AppCompatActivity implements Adapte
         return Im;
     }
 
-    public boolean getSpinnerFlag() {
-        return spinnerFlag;
-    }
 
 
-    /**
-     * <p>Callback method to be invoked when an item in this view has been
-     * selected. This callback is invoked only when the newly selected
-     * position is different from the previously selected position or if
-     * there was no selected item.</p>
-     * <p/>
-     * Impelmenters can call getItemAtPosition(position) if they need to access the
-     * data associated with the selected item.
-     *
-     * @param parent   The AdapterView where the selection happened
-     * @param view     The view within the AdapterView that was clicked
-     * @param position The position of the view in the adapter
-     * @param id       The row id of the item that is selected
-     */
+
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
         String selectItem;
@@ -1980,29 +1676,14 @@ public class BorrowerDetailsActivity extends AppCompatActivity implements Adapte
         }
         switch (parent.getId())
         {
-            case R.id.punctality: punctualityInClass = selectItem; spinnerFlag1 = true; break;
-            case R.id.finResponsibility: financiallyResponsible = selectItem; spinnerFlag2 = true;  break;
-            case R.id.sincerity: sincerityInStudies = selectItem; spinnerFlag3 = true; break;
-            case R.id.coCurricular: coCurricularParticipation = selectItem; spinnerFlag4 = true; break;
-            case R.id.Loan_repay: loanRepay = selectItem; spinnerFlag5 = true; break;
+            case R.id.punctality: punctualityInClass = selectItem;  break;
+            case R.id.finResponsibility: financiallyResponsible = selectItem;  break;
+            case R.id.sincerity: sincerityInStudies = selectItem;  break;
+            case R.id.coCurricular: coCurricularParticipation = selectItem;  break;
+            case R.id.Loan_repay: loanRepay = selectItem;  break;
         }
-        if(spinnerFlag1 && spinnerFlag2 && spinnerFlag3 && spinnerFlag4 && spinnerFlag5) {
-            spinnerFlag = true;
-        }
-        else {
-
-        }
-
-
     }
 
-    /**
-     * Callback method to be invoked when the selection disappears from this
-     * view. The selection can disappear for instance when touch is activated
-     * or when the adapter becomes empty.
-     *
-     * @param parent The AdapterView that now contains no selected item.
-     */
     @Override
     public void onNothingSelected(AdapterView<?> parent) {
 
@@ -2024,12 +1705,12 @@ public class BorrowerDetailsActivity extends AppCompatActivity implements Adapte
             imageBox.setImageUrl(imageurl);
             imageBox.setVerified("invalid");
             removeCollegeImageBox();
-            imageBox.setPicNum(collegeIds.size());
+            imageBox.setPicNum(collegeID.size());
             insertCollegeImageBox(imageBox);
             imageBoxtemp.setPicType("College ID");
             imageBoxtemp.setCloudinaryId("collegeId");
             imageBoxtemp.setImageUrl(null);
-            imageBoxtemp.setPicNum(collegeIds.size());
+            imageBoxtemp.setPicNum(collegeID.size());
             insertCollegeImageBox(imageBoxtemp);
             createCollegeIdLayout();
         }
@@ -2039,12 +1720,12 @@ public class BorrowerDetailsActivity extends AppCompatActivity implements Adapte
             imageBox.setImageUrl(imageurl);
             imageBox.setVerified("invalid");
             removeAddressProofImageBox();
-            imageBox.setPicNum(addressProofs.size());
+            imageBox.setPicNum(addressProof.size());
             insertAddressProofImageBox(imageBox);
             imageBoxtemp.setPicType("Permanent Address Proof");
             imageBoxtemp.setCloudinaryId("addressProof");
             imageBoxtemp.setImageUrl(null);
-            imageBoxtemp.setPicNum(addressProofs.size());
+            imageBoxtemp.setPicNum(addressProof.size());
             insertAddressProofImageBox(imageBoxtemp);
             createAddressProofLayout();
         }
@@ -2054,12 +1735,12 @@ public class BorrowerDetailsActivity extends AppCompatActivity implements Adapte
             imageBox.setImageUrl(imageurl);
             imageBox.setVerified("invalid");
             removeGradeSheetImageBox();
-            imageBox.setPicNum(gradeSheets.size());
+            imageBox.setPicNum(gradeSheet.size());
             insertGradeSheetImageBox(imageBox);
             imageBoxtemp.setPicType("Grade Sheet");
             imageBoxtemp.setCloudinaryId("gradeSheet");
             imageBoxtemp.setImageUrl(null);
-            imageBoxtemp.setPicNum(gradeSheets.size());
+            imageBoxtemp.setPicNum(gradeSheet.size());
             insertGradeSheetImageBox(imageBoxtemp);
             createGradeSheetsLayout();
         }
@@ -2069,12 +1750,12 @@ public class BorrowerDetailsActivity extends AppCompatActivity implements Adapte
             imageBox.setImageUrl(imageurl);
             imageBox.setVerified("invalid");
             removeBankProofImageBox();
-            imageBox.setPicNum(bankProofs.size());
+            imageBox.setPicNum(bankProof.size());
             insertBankProofImageBox(imageBox);
             imageBoxtemp.setPicType("Bank Proof");
             imageBoxtemp.setCloudinaryId("bankProof");
             imageBoxtemp.setImageUrl(null);
-            imageBoxtemp.setPicNum(bankProofs.size());
+            imageBoxtemp.setPicNum(bankProof.size());
             insertBankProofImageBox(imageBoxtemp);
             createBankProofsLayout();
         }
@@ -2085,4 +1766,41 @@ public class BorrowerDetailsActivity extends AppCompatActivity implements Adapte
         borrowerDataUpdater.updateToApi();
         super.onBackPressed();
     }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults){
+        if(requestCode == 1){
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                Intent intent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
+                this.startActivityForResult(intent, 1);
+            }
+        }
+        else if(requestCode == 2){
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                Intent intent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                intent.setType("image/*");
+                this.startActivityForResult(intent, 2);
+            }
+        }
+        else if(requestCode == 3){
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
+                String phone_num = (phoneNum.getText()).toString();
+                Intent callIntent = new Intent(Intent.ACTION_CALL);
+                callIntent.setData(Uri.parse("tel:" + phone_num));
+                {startActivity(callIntent);}
+            }
+        }
+        else if(requestCode == 3){
+            if(grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
+                String phone_num = (friendPhoneNum.getText()).toString();
+                Intent callIntent = new Intent(Intent.ACTION_CALL);
+                callIntent.setData(Uri.parse("tel:" + phone_num));
+                {startActivity(callIntent);}
+            }
+        }
+
+
+    }
+
+
 }

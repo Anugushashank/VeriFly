@@ -83,9 +83,9 @@ public class CardAdapter extends RecyclerView.Adapter<CardAdapter.CardViewHolder
         }
 
         public void setData(BorrowerData currentObj, int position){
-            this.name.setText(currentObj.getUserInfo().getName());
-            this.college.setText(currentObj.getUserInfo().getCollege());
-            this.date.setText(currentObj.getUserInfo().getDate());
+            this.name.setText(currentObj.getUploadDocModel().getName());
+            this.college.setText(currentObj.getUploadDocModel().getCollege());
+            this.date.setText(currentObj.getUploadDocModel().getDate());
             this.position = position;
             this.current = currentObj;
         }
