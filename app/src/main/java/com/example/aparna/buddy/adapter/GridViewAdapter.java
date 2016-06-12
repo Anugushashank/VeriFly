@@ -25,8 +25,8 @@ import java.util.ArrayList;
 
 public class GridViewAdapter extends BaseAdapter{
 
-    private ImageBox imageBox;
-    private FrameLayout imageLayout;
+    ImageBox imageBox;
+    FrameLayout imageLayout;
     ArrayList<ImageBox> imageBoxArrayList = new ArrayList<>();
     BorrowerDetailsActivity activity;
     private static LayoutInflater inflater = null;
@@ -55,9 +55,8 @@ public class GridViewAdapter extends BaseAdapter{
     }
     @Override
     public View getView(final int position, View convertView, ViewGroup parent) {
-        LinearLayout item = (LinearLayout) (convertView == null
-                ? LayoutInflater.from(activity).inflate(R.layout.imagelayout_item, parent, false)
-                : convertView);
+        LinearLayout item = (LinearLayout) (convertView == null ? LayoutInflater.from(activity).inflate(R.layout.imagelayout_item, parent, false) : convertView);
+
         imageLayout = (FrameLayout)item.findViewById(R.id.imageLayout);
         imageBox = new ImageBox(imageLayout,activity);
         imageBox.setImageUrl(imageBoxArrayList.get(position).getImageUrl());
@@ -65,24 +64,61 @@ public class GridViewAdapter extends BaseAdapter{
         imageBox.setPicNum(imageBoxArrayList.get(position).getPicNum());
         imageBox.setCloudinaryId(imageBoxArrayList.get(position).getCloudinaryId());
         imageBox.setId(imageBoxArrayList.get(position).getId());
-        imageBox.setVerified(imageBoxArrayList.get(position).getVerified());
-        if(imageBoxArrayList.get(position).getVerified().equals("front")){
-            imageLayout.findViewWithTag(activity.getResources().getString(R.string.unverified_status_icon)).setVisibility(View.INVISIBLE);
-            imageLayout.findViewWithTag(activity.getResources().getString(R.string.verified_status_icon)).setVisibility(View.VISIBLE);
-            TextView textView = (TextView) item.findViewById(R.id.textView);
-            textView.setText("FrontSide");
-            textView.setVisibility(View.VISIBLE);
+        imageBox.setMatch(imageBoxArrayList.get(position).getMatch());
+        imageBox.setIsVerified(imageBoxArrayList.get(position).getIsVerified());
+
+        if(imageBoxArrayList.get(position).getIsVerified()) {
+            if (imageBoxArrayList.get(position).getMatch().equals("front")) {
+                imageLayout.findViewWithTag(activity.getResources().getString(R.string.verified_status_icon)).setVisibility(View.VISIBLE);
+                TextView textView = (TextView) item.findViewById(R.id.textView);
+                textView.setText("FrontSide");
+                textView.setVisibility(View.VISIBLE);
+            }
+            if (imageBoxArrayList.get(position).getMatch().equals("back")) {
+                imageLayout.findViewWithTag(activity.getResources().getString(R.string.verified_status_icon)).setVisibility(View.VISIBLE);
+                TextView textView = (TextView) item.findViewById(R.id.textView);
+                textView.setText("BackSide");
+                textView.setVisibility(View.VISIBLE);
+            }
+            if (imageBoxArrayList.get(position).getMatch().equals("valid")) {
+                imageLayout.findViewWithTag(activity.getResources().getString(R.string.verified_status_icon)).setVisibility(View.VISIBLE);
+                TextView textView = (TextView) item.findViewById(R.id.textView);
+                textView.setVisibility(View.INVISIBLE);
+            }
+            if (imageBoxArrayList.get(position).getMatch().equals("invalid")) {
+                imageLayout.findViewWithTag(activity.getResources().getString(R.string.invalid_status_icon)).setVisibility(View.VISIBLE);
+                TextView textView = (TextView) item.findViewById(R.id.textView);
+                textView.setVisibility(View.INVISIBLE);
+            }
         }
-        if(imageBoxArrayList.get(position).getVerified().equals("back")){
-            imageLayout.findViewWithTag(activity.getResources().getString(R.string.unverified_status_icon)).setVisibility(View.INVISIBLE);
-            imageLayout.findViewWithTag(activity.getResources().getString(R.string.verified_status_icon)).setVisibility(View.VISIBLE);
-            TextView textView = (TextView) item.findViewById(R.id.textView);
-            textView.setText("BackSide");
-            textView.setVisibility(View.VISIBLE);
-        }
-        if(position == imageBoxArrayList.size()-1){
-            ImageView imageView = (ImageView) imageLayout.findViewWithTag(activity.getResources().getString(R.string.unverified_status_icon));
-            imageView.setVisibility(View.INVISIBLE);
+        else {
+            if (imageBoxArrayList.get(position).getMatch().equals("front")) {
+                imageLayout.findViewWithTag(activity.getResources().getString(R.string.unverified_status_icon)).setVisibility(View.VISIBLE);
+                TextView textView = (TextView) item.findViewById(R.id.textView);
+                textView.setText("FrontSide");
+                textView.setVisibility(View.VISIBLE);
+            }
+            if (imageBoxArrayList.get(position).getMatch().equals("back")) {
+                imageLayout.findViewWithTag(activity.getResources().getString(R.string.unverified_status_icon)).setVisibility(View.VISIBLE);
+                TextView textView = (TextView) item.findViewById(R.id.textView);
+                textView.setText("BackSide");
+                textView.setVisibility(View.VISIBLE);
+            }
+            if (imageBoxArrayList.get(position).getMatch().equals("valid")) {
+                imageLayout.findViewWithTag(activity.getResources().getString(R.string.unverified_status_icon)).setVisibility(View.VISIBLE);
+                TextView textView = (TextView) item.findViewById(R.id.textView);
+                textView.setVisibility(View.INVISIBLE);
+            }
+            if (imageBoxArrayList.get(position).getMatch().equals("invalid")) {
+                imageLayout.findViewWithTag(activity.getResources().getString(R.string.unverified_status_icon)).setVisibility(View.VISIBLE);
+                TextView textView = (TextView) item.findViewById(R.id.textView);
+                textView.setVisibility(View.INVISIBLE);
+            }
+            if(imageBoxArrayList.get(position).getMatch().equals("img")){
+                imageLayout.findViewWithTag(activity.getResources().getString(R.string.unverified_status_icon)).setVisibility(View.VISIBLE);
+                TextView textView = (TextView) item.findViewById(R.id.textView);
+                textView.setVisibility(View.INVISIBLE);
+            }
         }
         imageBox.inflate();
         return item;

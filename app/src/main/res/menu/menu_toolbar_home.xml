@@ -3,7 +3,12 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="com.example.aparna.buddy.app.HomeActivity">
-
+    <item
+        android:id="@+id/intercom"
+        android:icon="@drawable/intercom"
+        android:title="Logout"
+        app:showAsAction="always"
+        />
     <item
         android:id="@+id/logouticon"
         android:icon="@drawable/logout"

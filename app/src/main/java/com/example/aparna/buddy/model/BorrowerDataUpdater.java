@@ -117,7 +117,7 @@ public class BorrowerDataUpdater {
         }
 
         if(friendVerificationNotes != null){
-            verificationInfo.setFriendVerificationNotes(friendVerificationNotes);
+            verificationInfo.setFinalVerificationNotes(friendVerificationNotes);
             conformVerify++;
         }
 
@@ -167,7 +167,6 @@ public class BorrowerDataUpdater {
         else{
             verificationInfo.setTaskStatus("new");
         }
-        verificationInfo.setTaskStatus("completed");
 
 
 
@@ -187,6 +186,7 @@ public class BorrowerDataUpdater {
 
             nonFrontAndBackDocsBankProof.setInvalidImgUrls(bankProofs);
             nonFrontAndBackDocsBankProof.setValidImgUrls(bankProofs);
+            nonFrontAndBackDocsBankProof.setImgUrls(bankProofs);
             nonFrontAndBackDocsBankProof.setVerifiedBy(username);
             nonFrontAndBackDocsBankProof.setIsVerified(true);
             uploadDocModel.setBankProof(nonFrontAndBackDocsBankProof);
@@ -199,6 +199,7 @@ public class BorrowerDataUpdater {
 
             nonFrontAndBackDocsGradeSheet.setInvalidImgUrls(gradeSheets);
             nonFrontAndBackDocsGradeSheet.setValidImgUrls(gradeSheets);
+            nonFrontAndBackDocsGradeSheet.setImgUrls(gradeSheets);
             nonFrontAndBackDocsGradeSheet.setVerifiedBy(username);
             nonFrontAndBackDocsGradeSheet.setIsVerified(true);
             uploadDocModel.setGradeSheet(nonFrontAndBackDocsGradeSheet);
@@ -215,8 +216,8 @@ public class BorrowerDataUpdater {
 
             if(activity.getBackImageCollegeId() != null) {
                 frontBackImageBack.setImgUrl(activity.getBackImageCollegeId());
-                frontBackImageFront.setVerifiedBy(username);
-                frontBackImageFront.setIsVerified(true);
+                frontBackImageBack.setVerifiedBy(username);
+                frontBackImageBack.setIsVerified(true);
                 frontAndBackDocsCollegeId.setBack(frontBackImageBack);
             }
             if(activity.getFrontImageCollegeId() != null) {
@@ -225,11 +226,12 @@ public class BorrowerDataUpdater {
                 frontBackImageFront.setIsVerified(true);
                 frontAndBackDocsCollegeId.setFront(frontBackImageFront);
             }
+            frontAndBackDocsCollegeId.setImgUrls(collegeIds);
             uploadDocModel.setCollegeID(frontAndBackDocsCollegeId);
             conformDocs++;
         }
 
-        if(addressProofs.size() > 1) {
+        if(addressProofs != null) {
 
             UploadDocModel.FrontAndBackDocs frontAndBackDocsAddressProof = uploadDocModel.new FrontAndBackDocs();
 
@@ -246,9 +248,10 @@ public class BorrowerDataUpdater {
             if(activity.getBackImageAddressProof() != null) {
                 frontBackImageBack.setImgUrl(activity.getBackImageAddressProof());
                 frontBackImageBack.setVerifiedBy(username);
-                frontBackImageFront.setIsVerified(true);
+                frontBackImageBack.setIsVerified(true);
                 frontAndBackDocsAddressProof.setBack(frontBackImageBack);
             }
+            frontAndBackDocsAddressProof.setImgUrls(addressProofs);
             uploadDocModel.setAddressProof(frontAndBackDocsAddressProof);
             conformDocs++;
         }
@@ -295,6 +298,7 @@ public class BorrowerDataUpdater {
 
                         OkHttpClient client = new OkHttpClient();
                         String jsonString = new Gson().toJson(uploadDocModel);
+                        Log.i("sdhjfhdjfdf",jsonString.toString());
 
                         HttpUrl url = new HttpUrl.Builder()
                                 .scheme("http")
@@ -374,6 +378,7 @@ public class BorrowerDataUpdater {
 
                         OkHttpClient client = new OkHttpClient();
                         String jsonString = new Gson().toJson(verificationInfo);
+                        Log.i("ksjgfdsgf",jsonString.toString());
 
                         HttpUrl url = new HttpUrl.Builder()
                                 .scheme("http")

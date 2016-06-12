@@ -30,13 +30,14 @@ public class ImageViewActivity extends AppCompatActivity {
     TextView picNumDisplay;
     String title, imageUrl;
     Bundle extras;
-    String verified;
+    String match;
     int picNum, id, size;
     FrameLayout frameLayout;
     LinearLayout linearLayout;
     RadioGroup imageSelection, imageVerification;
     private BorrowerDetailsActivity activity;
     Boolean imageCheckValid = false, imageCheckInvalid = false, imageCheckFront = false, imageCheckBack = false, imageValid = false, imageInvalid = false;
+    Boolean isVerified;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,7 +46,8 @@ public class ImageViewActivity extends AppCompatActivity {
         extras     = getIntent().getExtras();
 
         id = extras.getInt("id");
-        verified = extras.getString("verified");
+        match = extras.getString("match");
+        isVerified = extras.getBoolean("isVerified");
         title = extras.getString("picType");
         picNum = extras.getInt("picNum");
         size = extras.getInt("size");
@@ -84,12 +86,14 @@ public class ImageViewActivity extends AppCompatActivity {
                     linearLayout.setVisibility(View.VISIBLE);
 
                     imageSelection = (RadioGroup) linearLayout.findViewById(R.id.imageCheck);
-                    if (verified.equals("front")) {
-                        imageSelection.check(R.id.matchFront);
-                    } else if (verified.equals("back")) {
-                        imageSelection.check(R.id.matchBack);
-                    } else if (verified.equals("invalid")) {
-                        imageSelection.check(R.id.matchInvalid);
+                    if(isVerified) {
+                        if (match.equals("front")) {
+                            imageSelection.check(R.id.matchFront);
+                        } else if (match.equals("back")) {
+                            imageSelection.check(R.id.matchBack);
+                        } else if (match.equals("invalid")) {
+                            imageSelection.check(R.id.matchInvalid);
+                        }
                     }
 
                     imageSelection.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
@@ -110,11 +114,14 @@ public class ImageViewActivity extends AppCompatActivity {
                     linearLayout.setVisibility(View.VISIBLE);
 
                     imageVerification = (RadioGroup) linearLayout.findViewById(R.id.imageValid);
-                    if (verified.equals("valid")) {
-                        imageVerification.check(R.id.valid);
-                    } else if (verified.equals("invalid")) {
-                        imageVerification.check(R.id.invalid);
+                    if (isVerified) {
+                        if (match.equals("valid")) {
+                            imageVerification.check(R.id.valid);
+                        } else if (match.equals("invalid")) {
+                            imageVerification.check(R.id.invalid);
+                        }
                     }
+
 
                     imageVerification.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
                         @Override
@@ -137,9 +144,7 @@ public class ImageViewActivity extends AppCompatActivity {
         intent.putExtra("imageUrl",imageUrl);
         intent.putExtra("picNum",picNum);
         if(id == 1 ) {
-            if (imageCheckValid) {
-                intent.putExtra("check", "valid");
-            }else if(imageCheckInvalid){
+            if(imageCheckInvalid){
                 intent.putExtra("check", "invalid");
             } else if (imageCheckFront) {
                 intent.putExtra("check", "front");

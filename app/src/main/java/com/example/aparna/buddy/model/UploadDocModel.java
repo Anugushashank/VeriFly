@@ -92,17 +92,25 @@ public class UploadDocModel {
         private String verifiedBy;
 
         public void setValidImgUrls(ArrayList<ImageBox> arrayList){
-            for(int i=0 ; i < arrayList.size()-1 ; i++){
-                if(!arrayList.get(i).getVerified().equals("invalid")) {
+            for(int i=0 ; i < arrayList.size(); i++){
+                if(arrayList.get(i).getMatch().equals("valid")) {
                     this.validImgUrls.add(arrayList.get(i).getImageUrl());
                 }
             }
         }
 
         public void setInvalidImgUrls(ArrayList<ImageBox> arrayList){
-            for(int i=0 ; i < arrayList.size()-1 ; i++){
-                if(arrayList.get(i).getVerified().equals("invalid")) {
+            for(int i=0 ; i < arrayList.size(); i++){
+                if(arrayList.get(i).getMatch().equals("invalid")) {
                     this.invalidImgUrls.add(arrayList.get(i).getImageUrl());
+                }
+            }
+        }
+
+        public void setImgUrls(ArrayList<ImageBox> arrayList){
+            for(int i=0 ; i<arrayList.size(); i++) {
+                if (arrayList.get(i).getMatch().equals("img")) {
+                    this.imgUrls.add(arrayList.get(i).getImageUrl());
                 }
             }
         }
@@ -152,6 +160,14 @@ public class UploadDocModel {
         public FrontBackImage getBack() { return back; }
 
         public List<String> getImgUrls(){ return imgUrls; }
+
+        public void setImgUrls(ArrayList<ImageBox> arrayList){
+            for(int i=0 ; i<arrayList.size(); i++) {
+                if (arrayList.get(i).getMatch().equals("img")) {
+                    this.imgUrls.add(arrayList.get(i).getImageUrl());
+                }
+            }
+        }
 
     }
 

@@ -134,8 +134,9 @@
                 <ImageView
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
-                    android:id="@+id/IdIcon"
-                    android:src="@drawable/cross"/>
+                    android:tag="@string/invalid_status_icon"
+                    android:src="@drawable/cross"
+                    android:visibility="invisible"/>
             </LinearLayout>
 
             <com.example.aparna.buddy.model.ExpandableHeightGridView
@@ -162,15 +163,12 @@
                     android:textSize="16sp"
                     android:layout_marginRight="12dp"
                     android:layout_marginEnd="12dp"/>
-                <TextView
+                <ImageView
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
-                    android:text="(Upload Only If Not Present)"
-                    android:textColor="@color/colorPrimary"
-                    android:textSize="8sp"
-                    android:layout_marginTop="6dp"
-                    android:layout_marginRight="12dp"
-                    android:layout_marginEnd="12dp"/>
+                    android:tag="@string/invalid_status_icon"
+                    android:src="@drawable/cross"
+                    android:visibility="invisible"/>
             </LinearLayout>
 
             <com.example.aparna.buddy.model.ExpandableHeightGridView
@@ -195,6 +193,12 @@
                     android:textColor="@color/colorPrimary"
                     android:textSize="16sp"
                     android:layout_marginRight="12dp" />
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:tag="@string/invalid_status_icon"
+                    android:src="@drawable/cross"
+                    android:visibility="invisible"/>
             </LinearLayout>
 
             <com.example.aparna.buddy.model.ExpandableHeightGridView
@@ -219,6 +223,12 @@
                     android:textColor="@color/colorPrimary"
                     android:textSize="16sp"
                     android:layout_marginRight="12dp" />
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:tag="@string/invalid_status_icon"
+                    android:src="@drawable/cross"
+                    android:visibility="invisible"/>
             </LinearLayout>
 
             <com.example.aparna.buddy.model.ExpandableHeightGridView
@@ -253,7 +263,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
                     android:id="@+id/friendImageIcon"
-                    android:src="@drawable/location"
+                    android:src="@drawable/friend"
                     android:layout_marginRight="10dp"
                     android:background="?attr/selectableItemBackground" />
                 <TextView
@@ -292,14 +302,26 @@
                     android:clickable="true" />
             </LinearLayout>
 
-            <TextView
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/good_friends_prompt"
-                android:textSize="18sp"
                 android:layout_marginBottom="12dp"
                 android:layout_marginLeft="16dp"
-                android:layout_marginTop="30dp"/>
+                android:layout_marginTop="30dp"
+                android:orientation="horizontal">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/good_friends_prompt"
+                    android:textSize="16sp"
+                    android:layout_marginRight="12dp"/>
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:tag="@string/invalid_status_icon"
+                    android:src="@drawable/cross"
+                    android:visibility="invisible"/>
+            </LinearLayout>
 
             <RadioGroup
                 android:layout_width="match_parent"

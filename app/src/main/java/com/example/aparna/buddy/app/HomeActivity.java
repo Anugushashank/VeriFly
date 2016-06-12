@@ -8,6 +8,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.ConnectivityManager;
 import android.os.AsyncTask;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
@@ -58,123 +59,111 @@ public class HomeActivity extends AppCompatActivity {
     private final List<String> taskTypes = Arrays.asList("new", "ongoing", "completed");
     private Context context;
     Intent intent;
+    android.support.v7.app.AlertDialog alertDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
 
-        toolBar   = (Toolbar) findViewById(R.id.toolbar);
+        toolBar = (Toolbar) findViewById(R.id.toolbar);
         tabLayout = (TabLayout) findViewById(R.id.tabs);
         viewPager = (ViewPager) findViewById(R.id.viewpager);
-        context   = getApplicationContext();
+        context = getApplicationContext();
         intent = getIntent();
 
-        toolBar.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                try {
-                    Intercom.client().displayConversationsList();
-                } catch (Exception e) {
-
-                }
-
-            }
-        });
 
         SharedPreferences settings = getSharedPreferences(BuddyConstants.PREFS_FILE, 0);
-        username = settings.getString("username","");
+        username = settings.getString("username", "");
 
         // Earnings does not has an API now just setting some
-        TextView earnings = (TextView)toolBar.findViewById(R.id.earnings);
-        String earns ="Earnings ".concat(getString(R.string.Rs)).concat("3200");
-        if (earnings != null) {
-            earnings.setText(earns);
-        }
+        final TextView earnings = (TextView) toolBar.findViewById(R.id.earnings);
+        final String earns = "Earnings ".concat(getString(R.string.Rs)).concat("3200");
 
+        if (isNetworkConnected()) {
+            new AsyncTask<String, String, String>() {
+                MaterialDialog materialDialog;
+                Exception apiException;
 
-        new AsyncTask<String, String, String>() {
-            MaterialDialog materialDialog;
-            Exception apiException;
+                @Override
+                protected void onPreExecute() {
+                    super.onPreExecute();
+                    materialDialog = new MaterialDialog.Builder(HomeActivity.this)
+                            .content(getResources().getString(R.string.loading_tasks))
+                            .progress(true, 0)
+                            .show();
+                }
 
-            @Override
-            protected void onPreExecute() {
-                super.onPreExecute();
-                materialDialog = new MaterialDialog.Builder(HomeActivity.this)
-                                     .content(getResources().getString(R.string.loading_tasks))
-                                     .progress(true, 0)
-                                     .show();
-            }
+                @Override
+                protected String doInBackground(String... params) {
+                    final String token = TokenService.getToken(getApplicationContext(), HomeActivity.this);
+                    HttpUrl url;
+                    Request request;
+                    Response response;
+                    String apiResponse;
+                    JSONObject responseReader;
+                    JSONArray dataList;
+                    OkHttpClient client = new OkHttpClient();
+                    int position = 0;
 
-            @Override
-            protected String doInBackground(String... params) {
-                final String token = TokenService.getToken(getApplicationContext(), HomeActivity.this);
-                HttpUrl url;
-                Request request;
-                Response response;
-                String apiResponse;
-                JSONObject responseReader;
-                JSONArray dataList;
-                OkHttpClient client = new OkHttpClient();
-                int position = 0;
+                    for (String task : taskTypes) {
 
-                for (String task: taskTypes) {
+                        url = new HttpUrl.Builder()
+                                .scheme("http")
+                                .host(context.getResources().getString(R.string.api_host))
+                                .addPathSegments(context.getResources().getString(R.string.tasks_path))
+                                .addQueryParameter("assignedTo", username)
+                                .addQueryParameter("taskStatus", task)
+                                .build();
 
-                    url = new HttpUrl.Builder()
-                                     .scheme("http")
-                                     .host(context.getResources().getString(R.string.api_host))
-                                     .addPathSegments(context.getResources().getString(R.string.tasks_path))
-                                     .addQueryParameter("assignedTo", username)
-                                     .addQueryParameter("taskStatus", task)
-                                     .build();
+                        request = new Request.Builder()
+                                .url(url)
+                                .get()
+                                .addHeader("x-access-token", token)
+                                .addHeader("content-type", "application/json")
+                                .build();
 
-                    request = new Request.Builder()
-                                         .url(url)
-                                         .get()
-                                         .addHeader("x-access-token", token)
-                                         .addHeader("content-type", "application/json")
-                                         .build();
+                        try {
+                            response = client.newCall(request).execute();
 
-                    try {
-                        response = client.newCall(request).execute();
+                            if (!response.isSuccessful()) {
+                                throw new IOException("Unexpected code " + response);
+                            }
 
-                        if (!response.isSuccessful()) {
-                            throw new IOException("Unexpected code " + response);
-                        }
+                            apiResponse = response.body().string();
 
-                        apiResponse = response.body().string();
-                        Log.i("Status",apiResponse);
-                        ApiResponse apiResponse1 = new Gson().fromJson(apiResponse, ApiResponse.class);
-                        if(apiResponse1.getStatus().equals("error")){
-                            allTabsData.put(position, null);
+                            ApiResponse apiResponse1 = new Gson().fromJson(apiResponse, ApiResponse.class);
+
+                            if (apiResponse1.getStatus().equals("error")) {
+
+                                allTabsData.put(position, null);
+                                position++;
+                            } else {
+
+                                responseReader = new JSONObject(apiResponse);
+                                dataList = responseReader.getJSONArray("data");
+
+                                allTabsData.put(position, dataList.toString());
+                                position++;
+                            }
+                        } catch (Exception e) {
+                            apiException = e;
+                            Log.d("Tasks", e.getMessage());
                             position++;
                         }
-                        else {
-
-                            responseReader = new JSONObject(apiResponse);
-                            dataList = responseReader.getJSONArray("data");
-
-                            allTabsData.put(position, dataList.toString());
-                            position++;
-                        }
-                    } catch (Exception e) {
-                        apiException = e;
-                        Log.d("Tasks", e.getMessage());
-                        position++;
                     }
-                }
-                return null;
-            }
-
-            @Override
-            protected void onPostExecute(String s) {
-                if (materialDialog.isShowing()) {
-                    materialDialog.hide();
+                    return null;
                 }
 
-                if (apiException != null) {
-                    // something went wrote, maybe reload the activity
-                }
+                @Override
+                protected void onPostExecute(String s) {
+                    if (materialDialog.isShowing()) {
+                        materialDialog.hide();
+                    }
+
+                    if (apiException != null) {
+                        // something went wrote, maybe reload the activity
+                    }
 
                 /*
                 Creating Adapter and setting that adapter to the viewPager
@@ -182,36 +171,40 @@ public class HomeActivity extends AppCompatActivity {
                 the default action bar thus making the toolbar work like a normal
                 action bar.
                 */
-                ViewPagerAdapter viewPagerAdapter = new ViewPagerAdapter(getSupportFragmentManager(), HomeActivity.this, allTabsData);
-                viewPager.setAdapter(viewPagerAdapter);
-                setSupportActionBar(toolBar);
-                toolBar.setLogo(R.drawable.buddylogosmall);
+                    ViewPagerAdapter viewPagerAdapter = new ViewPagerAdapter(getSupportFragmentManager(), HomeActivity.this, allTabsData);
+                    viewPager.setAdapter(viewPagerAdapter);
+                    setSupportActionBar(toolBar);
+                    if (earnings != null) {
+                        earnings.setText(earns);
+                        earnings.setVisibility(View.VISIBLE);
+                    }
+                    toolBar.setLogo(R.drawable.buddylogosmall);
 
-                if (getSupportActionBar() != null) {
-                    getSupportActionBar().setTitle("");
-                }
+                    if (getSupportActionBar() != null) {
+                        getSupportActionBar().setTitle("");
+                    }
 
                 /*
                 TabLayout.newTab() method creates a tab view, Now a Tab view is not the view
                 which is below the tabs, its the tab itself.
                 */
-                final TabLayout.Tab newTask = tabLayout.newTab();
-                final TabLayout.Tab ongoingTask = tabLayout.newTab();
-                final TabLayout.Tab completedTask = tabLayout.newTab();
+                    final TabLayout.Tab newTask = tabLayout.newTab();
+                    final TabLayout.Tab ongoingTask = tabLayout.newTab();
+                    final TabLayout.Tab completedTask = tabLayout.newTab();
 
-                // Setting Title text for our tabs respectively. Later take number of tasks from API and add
-                newTask.setText("New");
-                ongoingTask.setText("Ongoing");
-                completedTask.setText("Completed");
+                    // Setting Title text for our tabs respectively. Later take number of tasks from API and add
+                    newTask.setText("New");
+                    ongoingTask.setText("Ongoing");
+                    completedTask.setText("Completed");
 
                 /*
                 Adding the tab view to our tablayout at appropriate positions
                 As I want home at first position I am passing home and 0 as argument to
                 the tablayout and like wise for other tabs as well
                 */
-                tabLayout.addTab(newTask, 0);
-                tabLayout.addTab(ongoingTask, 1);
-                tabLayout.addTab(completedTask, 2);
+                    tabLayout.addTab(newTask, 0);
+                    tabLayout.addTab(ongoingTask, 1);
+                    tabLayout.addTab(completedTask, 2);
 
                 /*
                 TabTextColor sets the color for the title of the tabs, passing a ColorStateList here makes
@@ -219,19 +212,23 @@ public class HomeActivity extends AppCompatActivity {
                 TabIndicatorColor sets the color for the indiactor below the tabs
                 */
 
-                tabLayout.setTabTextColors(ContextCompat.getColorStateList(HomeActivity.this, R.color.tab_selector));
-                tabLayout.setSelectedTabIndicatorColor(ContextCompat.getColor(HomeActivity.this, R.color.indicator));
-                tabLayout.setSelectedTabIndicatorHeight(10);
+                    tabLayout.setTabTextColors(ContextCompat.getColorStateList(HomeActivity.this, R.color.tab_selector));
+                    tabLayout.setSelectedTabIndicatorColor(ContextCompat.getColor(HomeActivity.this, R.color.indicator));
+                    tabLayout.setSelectedTabIndicatorHeight(10);
 
                 /*
                 Adding a onPageChangeListener to the viewPager
                 1st we add the PageChangeListener and pass a TabLayoutPageChangeListener so that Tabs Selection
                 changes when a viewpager page changes.
                 */
-                viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
-                tabLayout.setOnTabSelectedListener(new TabLayout.ViewPagerOnTabSelectedListener(viewPager));
-            }
-        }.execute();
+                    viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
+                    tabLayout.setOnTabSelectedListener(new TabLayout.ViewPagerOnTabSelectedListener(viewPager));
+                }
+            }.execute();
+        }
+        else{
+            alertBox();
+        }
     }
 
     @Override
@@ -278,6 +275,13 @@ public class HomeActivity extends AppCompatActivity {
                     .setNegativeButton("No", null)						//Do nothing on no
                     .show();
         }
+        if(id == R.id.intercom ){
+            try {
+                Intercom.client().displayConversationsList();
+            } catch (Exception e) {
+
+            }
+        }
 
         return super.onOptionsItemSelected(item);
     }
@@ -315,6 +319,36 @@ public class HomeActivity extends AppCompatActivity {
         public int getCount() {
             return 3;
         }
+    }
+
+    private boolean isNetworkConnected() {
+        ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        return cm.getActiveNetworkInfo() != null;
+    }
+    private void alertBox(){
+        alertDialog = new android.support.v7.app.AlertDialog.Builder(this)
+                .setTitle("Check your Network Connection")
+                .setMessage("Try connecting again")
+                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        Intent intent=new Intent(getApplicationContext(),LoginActivity.class);
+                        if(isNetworkConnected()) {
+                            startActivity(intent);
+                        }
+                        else{
+                            alertBox();
+                        }
+                    }
+                })
+                .setIcon(android.R.drawable.ic_dialog_alert)
+                .show();
+        alertDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+            @Override
+            public void onCancel(DialogInterface dialog) {
+                finish();
+            }
+
+        });
     }
 
     @Override

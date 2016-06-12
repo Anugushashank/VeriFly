@@ -61,7 +61,7 @@ public class CardAdapter extends RecyclerView.Adapter<CardAdapter.CardViewHolder
 
     class CardViewHolder extends RecyclerView.ViewHolder {
         int position;
-        private TextView name, college, date;
+        private TextView name, college, date, tasktype;
         private BorrowerData current;
 
         public CardViewHolder(View itemView) {
@@ -69,6 +69,7 @@ public class CardAdapter extends RecyclerView.Adapter<CardAdapter.CardViewHolder
             name = (TextView)itemView.findViewById(R.id.borrowerName);
             college = (TextView)itemView.findViewById(R.id.borrowerCollege);
             date = (TextView)itemView.findViewById(R.id.dueDate);
+            tasktype = (TextView)itemView.findViewById(R.id.taskType);
 
 
                 itemView.setOnClickListener(new View.OnClickListener() {
@@ -90,7 +91,8 @@ public class CardAdapter extends RecyclerView.Adapter<CardAdapter.CardViewHolder
         public void setData(BorrowerData currentObj, int position){
             this.name.setText(currentObj.getUploadDocModel().getName());
             this.college.setText(currentObj.getUploadDocModel().getCollege());
-            this.date.setText(currentObj.getUploadDocModel().getDate());
+            this.date.setText(currentObj.getScheduleDate().substring(0,10));
+            this.tasktype.setText(currentObj.getTaskType());
             this.position = position;
             this.current = currentObj;
         }

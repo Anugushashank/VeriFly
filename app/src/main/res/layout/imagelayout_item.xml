@@ -33,7 +33,7 @@
             android:layout_gravity="right"
             android:layout_marginRight="8dp"
             android:layout_marginTop="8dp"
-            android:visibility="visible"
+            android:visibility="invisible"
             android:tag="@string/unverified_status_icon" />
         <ImageView
             android:layout_width="18dp"
@@ -45,6 +45,17 @@
             android:layout_marginTop="8dp"
             android:visibility="invisible"
             android:tag="@string/verified_status_icon" />
+        <ImageView
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:src="@drawable/cross"
+            android:layout_gravity="end"
+            android:layout_marginEnd="8dp"
+            android:layout_marginRight="12dp"
+            android:layout_marginTop="8dp"
+            android:visibility="invisible"
+            android:tag="@string/invalid_status_icon" />
+
     </FrameLayout>
     <TextView
         android:id="@id/textView"

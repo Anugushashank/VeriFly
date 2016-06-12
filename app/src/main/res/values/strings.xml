@@ -43,6 +43,7 @@
     <string name="plus_icon">plus_icon</string>
     <string name="unverified_status_icon">unverified_status_icon</string>
     <string name="verified_status_icon">verified_status_icon</string>
+    <string name="invalid_status_icon">invalid_status_icon</string>
     <!-- URLs and HTTP data -->
     <string name="base_auth_token">Basic YnVkZHlhcGlhZG1pbjptZW1vbmdvc2gx</string>
     <string name="protocol_scheme">http</string>
@@ -52,6 +53,7 @@
     <string name="tasks_path">api/user/verify/tasks</string>
     <string name="uploadDoc_path">api/v1/user/profile/docs/verify</string>
     <string name="uploadVerify_path">api/user/verify</string>
+
 
     <!-- Dialog Box Texts -->
     <string name="login_dialogue">Logging In&#8230;</string>

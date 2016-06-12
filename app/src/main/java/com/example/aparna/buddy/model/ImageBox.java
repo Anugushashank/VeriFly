@@ -33,7 +33,8 @@ public class ImageBox {
     private RoundedImageView roundedImageView;
     private ImageView plusIcon, unverifiedIcon, verifiedIcon;
     private String imageUrl, roundedImageViewTag, plusIconTag, unverifiedIconTag, verifiedIconTag;
-    private String verified ;
+    private String match;
+    private Boolean isVerified;
 
     public ImageBox(FrameLayout view, BorrowerDetailsActivity activity) {
         imageBoxLayout = view;
@@ -133,7 +134,8 @@ public class ImageBox {
         intent.putExtra("picType", picType);
         intent.putExtra("id", getId());
         intent.putExtra("picNum", picNum);
-        intent.putExtra("verified",getVerified());
+        intent.putExtra("isVerified",getIsVerified());
+        intent.putExtra("match",getMatch());
         if(getId() == 1) {
             intent.putExtra("size", activity.getNumCollegeIds());
         }
@@ -217,10 +219,15 @@ public class ImageBox {
                 .show();
     }
 
-    public void setVerified(String verified) {
-        this.verified = verified;
+    public void setIsVerified(Boolean isVerified) {
+        this.isVerified = isVerified;
     }
 
-    public String getVerified() { return verified; }
+    public Boolean getIsVerified() { return isVerified; }
+
+    public void setMatch(String match) { this.match = match; }
+
+    public String getMatch() { return match; }
+
 
 }

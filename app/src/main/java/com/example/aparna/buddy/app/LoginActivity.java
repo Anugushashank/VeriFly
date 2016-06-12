@@ -1,5 +1,6 @@
 package com.example.aparna.buddy.app;
 
+import android.app.Activity;
 import android.app.Application;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -12,6 +13,7 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -38,6 +40,7 @@ import okhttp3.Response;
 public class LoginActivity extends AppCompatActivity {
     EditText phone, password;
     String username;
+    AlertDialog alertDialog;
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
@@ -183,7 +186,7 @@ public class LoginActivity extends AppCompatActivity {
         return cm.getActiveNetworkInfo() != null;
     }
     private void alertBox(){
-        new AlertDialog.Builder(this)
+        alertDialog = new AlertDialog.Builder(this)
                 .setTitle("Check your Network Connection")
                 .setMessage("Try connecting again")
                 .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
@@ -191,6 +194,7 @@ public class LoginActivity extends AppCompatActivity {
                         Intent intent=new Intent(getApplicationContext(),LoginActivity.class);
                         if(isNetworkConnected()) {
                             startActivity(intent);
+                            finish();
                         }
                         else{
                             alertBox();
@@ -199,13 +203,15 @@ public class LoginActivity extends AppCompatActivity {
                 })
                 .setIcon(android.R.drawable.ic_dialog_alert)
                 .show();
+        alertDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+            @Override
+            public void onCancel(DialogInterface dialog) {
+                finish();
+            }
+
+        });
     }
 
-    @Override
-    public void onBackPressed(){
-        LoginActivity.this.finish();
-        super.onBackPressed();
-    }
     private void successfulLogin(String username){
         // …
         // Registering with Intercom is easy. For best results, use a unique
