@@ -13,15 +13,8 @@ import com.example.aparna.buddy.app.HomeActivity;
 import com.example.aparna.buddy.app.R;
 import com.example.aparna.buddy.app.TokenService;
 import com.google.gson.Gson;
-import com.google.gson.JsonArray;
-import com.google.gson.reflect.TypeToken;
-
-import org.json.JSONObject;
-
 import java.io.IOException;
-import java.lang.reflect.Type;
 import java.util.ArrayList;
-import java.util.Map;
 
 import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
@@ -34,7 +27,6 @@ import okhttp3.Response;
  */
 public class BorrowerDataUpdater {
     BorrowerDetailsActivity activity;
-    UserInfo userInfo;
     UploadDocModel uploadDocModel;
     VerificationInfo verificationInfo;
     BorrowerStateContainer borrowerStateContainer;
@@ -167,8 +159,7 @@ public class BorrowerDataUpdater {
         else{
             verificationInfo.setTaskStatus("new");
         }
-
-
+       
 
 
 
@@ -215,15 +206,25 @@ public class BorrowerDataUpdater {
             UploadDocModel.FrontBackImage frontBackImageBack = uploadDocModel.new FrontBackImage();
 
             if(activity.getBackImageCollegeId() != null) {
+                for(int i=0 ; i < collegeIds.size() ; i++){
+                    if(collegeIds.get(i).getMatch().equals("back")){
+                        frontBackImageBack.setIsVerified(collegeIds.get(i).getIsVerified());
+                        break;
+                    }
+                }
                 frontBackImageBack.setImgUrl(activity.getBackImageCollegeId());
                 frontBackImageBack.setVerifiedBy(username);
-                frontBackImageBack.setIsVerified(true);
                 frontAndBackDocsCollegeId.setBack(frontBackImageBack);
             }
             if(activity.getFrontImageCollegeId() != null) {
+                for(int i=0 ; i < collegeIds.size() ; i++){
+                    if(collegeIds.get(i).getMatch().equals("front")){
+                        frontBackImageFront.setIsVerified(collegeIds.get(i).getIsVerified());
+                        break;
+                    }
+                }
                 frontBackImageFront.setImgUrl(activity.getFrontImageCollegeId());
                 frontBackImageFront.setVerifiedBy(username);
-                frontBackImageFront.setIsVerified(true);
                 frontAndBackDocsCollegeId.setFront(frontBackImageFront);
             }
             frontAndBackDocsCollegeId.setImgUrls(collegeIds);
@@ -240,24 +241,28 @@ public class BorrowerDataUpdater {
             UploadDocModel.FrontBackImage frontBackImageBack = uploadDocModel.new FrontBackImage();
 
             if(activity.getFrontImageAddressProof() != null) {
+                for(int i=0 ; i < addressProofs.size() ; i++){
+                    if(addressProofs.get(i).getMatch().equals("front")){
+                        frontBackImageFront.setIsVerified(addressProofs.get(i).getIsVerified());
+                        break;
+                    }
+                }
                 frontBackImageFront.setImgUrl(activity.getFrontImageAddressProof());
                 frontBackImageFront.setVerifiedBy(username);
-                frontBackImageFront.setIsVerified(true);
                 frontAndBackDocsAddressProof.setFront(frontBackImageFront);
             }
             if(activity.getBackImageAddressProof() != null) {
+                for(int i=0 ; i < addressProofs.size() ; i++){
+                    if(addressProofs.get(i).getMatch().equals("back")){
+                        frontBackImageBack.setIsVerified(addressProofs.get(i).getIsVerified());
+                    }
+                }
                 frontBackImageBack.setImgUrl(activity.getBackImageAddressProof());
                 frontBackImageBack.setVerifiedBy(username);
-                frontBackImageBack.setIsVerified(true);
                 frontAndBackDocsAddressProof.setBack(frontBackImageBack);
             }
             frontAndBackDocsAddressProof.setImgUrls(addressProofs);
             uploadDocModel.setAddressProof(frontAndBackDocsAddressProof);
-            conformDocs++;
-        }
-
-        if(activity.getBackImageAddressProof() != null && activity.getFrontImageAddressProof() != null &&
-                activity.getFrontImageCollegeId() != null && activity.getBackImageCollegeId() != null){
             conformDocs++;
         }
 
@@ -342,7 +347,9 @@ public class BorrowerDataUpdater {
                         Toast toast = Toast.makeText(context, text, duration);
                         toast.show();
                     } else {
-                        activity.finish();
+                        if(submit.equals("back") || submit.equals("button")) {
+                            activity.finish();
+                        }
                     }
                 }
             }.execute();
@@ -423,7 +430,9 @@ public class BorrowerDataUpdater {
                         Toast toast = Toast.makeText(context, text, duration);
                         toast.show();
                     } else {
-                        activity.finish();
+                        if(submit.equals("back") || submit.equals("button")) {
+                            activity.finish();
+                        }
                     }
                 }
             }.execute();

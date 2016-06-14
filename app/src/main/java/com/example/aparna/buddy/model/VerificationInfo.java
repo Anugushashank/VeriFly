@@ -1,6 +1,5 @@
 package com.example.aparna.buddy.model;
 
-import java.util.List;
 
 /**
  * Created by Aparna on 18/4/16.
@@ -11,7 +10,7 @@ public class VerificationInfo {
             initalVerificationNotes, referenceYear, referenceDepartment,
             punctualityInClass, sincerityInStudies, coCurricularParticipation,
             financiallyResponsible, repayCapacity, friendVerificationNotes,
-            familyVerificationNotes, status, finalVerificationNotes, taskStatus;
+            familyVerificationNotes, status, finalVerificationNotes, taskStatus, completionDate;
 
     Boolean collegeIdVerified, gpaVerified, borrowerIsLying, finacaillySound,
             canRepay, docsSigned, referenceIsGoodFriend, collegeVerified,
@@ -26,6 +25,10 @@ public class VerificationInfo {
     public void set_id(String _id) { this._id = _id; }
 
     public String getTaskStatus() { return taskStatus; }
+
+    public String getCompletionDate() { return completionDate; }
+
+    public void setCompletionDate(String completionDate){ this.completionDate = completionDate; }
 
     public void setTaskStatus(String taskStatus) { this.taskStatus = taskStatus; }
 

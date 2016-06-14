@@ -144,8 +144,6 @@ public class UploadDocModel {
         private FrontBackImage front;
         private FrontBackImage back;
         private List<String> imgUrls = new ArrayList<>();
-        private List<String> validImgUrls = new ArrayList<>();
-        private List<String> invalidImgUrls = new ArrayList<>();
 
         public void setFront(FrontBackImage front){
             this.front = front;

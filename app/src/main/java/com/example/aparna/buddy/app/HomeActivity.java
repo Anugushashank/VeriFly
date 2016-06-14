@@ -29,15 +29,12 @@ import com.afollestad.materialdialogs.MaterialDialog;
 import com.example.aparna.buddy.model.ApiResponse;
 import com.example.aparna.buddy.model.BuddyConstants;
 import com.google.gson.Gson;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
-import com.google.gson.reflect.TypeToken;
+
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.IOException;
-import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -144,6 +141,7 @@ public class HomeActivity extends AppCompatActivity {
                                 dataList = responseReader.getJSONArray("data");
 
                                 allTabsData.put(position, dataList.toString());
+                                Log.i("status",dataList.toString());
                                 position++;
                             }
                         } catch (Exception e) {
@@ -277,7 +275,7 @@ public class HomeActivity extends AppCompatActivity {
         }
         if(id == R.id.intercom ){
             try {
-                Intercom.client().displayConversationsList();
+                Intercom.client().displayMessageComposer();
             } catch (Exception e) {
 
             }
@@ -353,8 +351,8 @@ public class HomeActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed(){
-        this.finish();
         super.onBackPressed();
+        this.finish();
     }
 
     @Override

@@ -16,13 +16,13 @@ public class BorrowerStateContainer {
     }
 
     public Boolean isCompleted() {
-        if(activity.getFrontImageCollegeId() !=null && activity.getBackImageCollegeId() != null && activity.getFrontImageAddressProof() != null
-                && activity.getBackImageAddressProof() != null && activity.getGoodFriendsRadio() != null && activity.getYearBackRadio() != null
-                && activity.getRefDept() != null && activity.getRefYear() != null && activity.getRepayBackLoan() != null &&
-                activity.getTransparentRadio() != null && activity.getGiveLoanRadio() != null && activity.getSpinnerCocurricular() != null
-                && activity.getSpinnerFinRes() != null && activity.getSpinnerPunc() != null && activity.getSpinnerSincere() != null &&
-                activity.getNumBankProofs() > 0 && activity.getNumGradeSheets() > 0 ){
-
+        if(activity.getFrontImageCollegeId() !=null && activity.getBackImageCollegeId() != null && checkBankProofs() &&  checkGradeSheets()&&
+                activity.getGoodFriendsRadio() != null
+                && activity.getYearBackRadio() != null && !activity.getRefDept().equals("")  && !activity.getRefYear().equals("") &&
+                activity.getRepayBackLoan() != null && activity.getTransparentRadio() != null && activity.getGiveLoanRadio() != null &&
+                activity.getSpinnerCocurricular() != null && activity.getSpinnerFinRes() != null && activity.getSpinnerPunc() != null
+                && activity.getSpinnerSincere() != null && activity.getNumBankProofs() > 0 && activity.getNumGradeSheets() > 0 ){
+            Log.i("djfgfsd",activity.getRefDept()+activity.getRefYear()+"            hhhhf");
             return true;
         }
         else{
@@ -42,5 +42,23 @@ public class BorrowerStateContainer {
         else{
             return false;
         }
+    }
+
+    public Boolean checkBankProofs() {
+        for (int i = 0; i < activity.getBankProofs().size()-1; i++) {
+            if (!activity.getBankProofs().get(i).getMatch().equals("valid") && !activity.getBankProofs().get(i).getMatch().equals("invalid")){
+                return false;
+            }
+        }
+        return  true;
+    }
+
+    public Boolean checkGradeSheets() {
+        for(int i = 0 ; i < activity.getGradeSheets().size()-1; i++){
+            if(!activity.getGradeSheets().get(i).getMatch().equals("valid") && !activity.getGradeSheets().get(i).getMatch().equals("invalid")){
+                return false;
+            }
+        }
+        return true;
     }
 }

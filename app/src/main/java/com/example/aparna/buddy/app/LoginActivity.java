@@ -45,6 +45,7 @@ public class LoginActivity extends AppCompatActivity {
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
 
         Intercom.initialize((Application) getApplicationContext(), "android_sdk-a252775c0f9cdd6cd922b6420a558fd2eb3f89b0", "utga6z2r");
         SharedPreferences settings = getSharedPreferences(BuddyConstants.PREFS_FILE, 0);
@@ -62,7 +63,6 @@ public class LoginActivity extends AppCompatActivity {
             startActivity(intent);
             this.finish();
         }
-        setContentView(R.layout.activity_main);
 
         phone    = (EditText) findViewById(R.id.editText);
         password = (EditText) findViewById(R.id.editText2);

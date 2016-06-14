@@ -4,18 +4,13 @@ package com.example.aparna.buddy.adapter;
  * Created by Shashank on 31-05-2016.
  */
 import android.content.Context;
-import android.text.Layout;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.FrameLayout;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.example.aparna.buddy.app.BorrowerDetailsActivity;
 import com.example.aparna.buddy.app.R;
@@ -46,7 +41,7 @@ public class GridViewAdapter extends BaseAdapter{
 
     @Override
     public Object getItem(int position) {
-        return position;
+        return imageBoxArrayList.get(position);
     }
 
     @Override
@@ -67,7 +62,7 @@ public class GridViewAdapter extends BaseAdapter{
         imageBox.setMatch(imageBoxArrayList.get(position).getMatch());
         imageBox.setIsVerified(imageBoxArrayList.get(position).getIsVerified());
 
-        if(imageBoxArrayList.get(position).getIsVerified()) {
+        if(imageBoxArrayList.get(position).getIsVerified() && imageBoxArrayList.get(position).getId()!=2) {
             if (imageBoxArrayList.get(position).getMatch().equals("front")) {
                 imageLayout.findViewWithTag(activity.getResources().getString(R.string.verified_status_icon)).setVisibility(View.VISIBLE);
                 TextView textView = (TextView) item.findViewById(R.id.textView);
@@ -91,8 +86,8 @@ public class GridViewAdapter extends BaseAdapter{
                 textView.setVisibility(View.INVISIBLE);
             }
         }
-        else {
-            if (imageBoxArrayList.get(position).getMatch().equals("front")) {
+        else if(imageBoxArrayList.get(position).getId() != 2){
+            if (imageBoxArrayList.get(position).getMatch().equals("front") ) {
                 imageLayout.findViewWithTag(activity.getResources().getString(R.string.unverified_status_icon)).setVisibility(View.VISIBLE);
                 TextView textView = (TextView) item.findViewById(R.id.textView);
                 textView.setText("FrontSide");

@@ -1,8 +1,8 @@
 package com.example.aparna.buddy.app;
 
 import android.Manifest;
-import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -13,28 +13,33 @@ import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.provider.MediaStore;
-import android.provider.Settings;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.AppCompatSpinner;
+import android.support.v7.widget.ListPopupWindow;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewTreeObserver;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
-import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.PopupWindow;
+import android.widget.RadioButton;
 import android.widget.RadioGroup;
-import android.widget.Spinner;
+import android.widget.RelativeLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.aparna.buddy.adapter.GridViewAdapter;
 import com.example.aparna.buddy.adapter.NothingSelectedSpinnerAdapter;
@@ -46,30 +51,24 @@ import com.example.aparna.buddy.model.CloudinaryAPI;
 import com.example.aparna.buddy.model.ExpandableHeightGridView;
 import com.example.aparna.buddy.model.ImageBox;
 import com.example.aparna.buddy.model.UploadDocModel;
-import com.example.aparna.buddy.model.UserInfo;
 import com.example.aparna.buddy.model.VerificationInfo;
 import com.github.siyamed.shapeimageview.CircularImageView;
-import com.github.siyamed.shapeimageview.RoundedImageView;
 import com.google.gson.Gson;
 import com.squareup.picasso.Picasso;
-
-import java.io.ByteArrayOutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+
 
 
 public class BorrowerDetailsActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener,CloudinaryAPI.UploadCallBack,Serializable {
 
     private BorrowerData borrowerData;
     private BorrowerDataUpdater borrowerDataUpdater;
+    private BorrowerStateContainer borrowerStateContainer;
     private UploadDocModel uploadDocModel;
     private VerificationInfo verInfo;
     private Toolbar toolBar;
-    private TextView phoneNum, name, college, friendPhoneNum, friendName, textView;
+    private TextView phoneNum, name, college, friendPhoneNum, friendName, textView, close, mainText;
     private RadioGroup referenceSelection, yearBackSelection, transparentSelection, internSelection;
     private EditText refYear, refDept, otherNotes;
     private ImageView phoneIcon, IdIcon, IdIconPlusFront, IdIconPlusBack, Im;
@@ -83,7 +82,11 @@ public class BorrowerDetailsActivity extends AppCompatActivity implements Adapte
     private String frontImageCollegeId, backImageCollegeId, frontImageAddressProof, backImageAddressProof;
     private String punctualityInClass, sincerityInStudies, coCurricularParticipation, financiallyResponsible, loanRepay, friendVerificationNotes;
     private String imageurl;
-    private int count;
+    private int count, i,numCollegeID, numAddressProof, numGradeSheet, numBankProof;
+    private RadioButton radioButton;
+    private PopupWindow popupWindow;
+    ScrollView scrollView;
+    RelativeLayout linearLayout,relativeLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -94,7 +97,7 @@ public class BorrowerDetailsActivity extends AppCompatActivity implements Adapte
 
         Bundle extras = getIntent().getExtras();
 
-
+        borrowerStateContainer = new BorrowerStateContainer(this);
         borrowerData = new Gson().fromJson(extras.getString("borrowerData"), BorrowerData.class);
         uploadDocModel = borrowerData.getUploadDocModel();
         verInfo = borrowerData.getVerificationInfo();
@@ -114,7 +117,7 @@ public class BorrowerDetailsActivity extends AppCompatActivity implements Adapte
         referenceSelection = (RadioGroup) findViewById(R.id.goodFriendsCheck);
         submitButton = (Button) findViewById(R.id.submitButton);
         toolBar = (Toolbar) findViewById(R.id.borrower_details_tool_bar);
-
+        relativeLayout = (RelativeLayout) findViewById(R.id.external_layout);
 
 
         setSupportActionBar(toolBar);
@@ -143,6 +146,11 @@ public class BorrowerDetailsActivity extends AppCompatActivity implements Adapte
         college.setTextSize(18 - (uploadDocModel.getCollege().length()) / 8);
         college.setText(uploadDocModel.getCollege());
 
+        linearLayout = (RelativeLayout) findViewById(R.id.rootLayoutMain);
+
+        scrollView = (ScrollView)linearLayout.findViewById(R.id.scrollView);
+
+
         phoneNum.setText(uploadDocModel.getPhone());
         phoneNum.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -162,50 +170,53 @@ public class BorrowerDetailsActivity extends AppCompatActivity implements Adapte
 
 
         collegeID = new ArrayList<>();
-        count = -1;
+        count = 0 ; numCollegeID = 0;
         if(uploadDocModel.getCollegeID() != null) {
             if (uploadDocModel.getCollegeID().getFront() != null) {
                 ImageBox ib = new ImageBox(imageLayout, BorrowerDetailsActivity.this);
                 ib.setImageUrl(uploadDocModel.getCollegeID().getFront().getImgUrl());
                 frontImageCollegeId = ib.getImageUrl();
-                ib.setPicNum(++count);
+                ib.setPicNum(count++);
                 ib.setPicType("College ID");
                 ib.setCloudinaryId("collegeId");
                 ib.setId(1);
                 ib.setMatch("front");
                 ib.setIsVerified(uploadDocModel.getCollegeID().getFront().getIsVerified());
+                numCollegeID++;
                 insertCollegeImageBox(ib);
             }
             if (uploadDocModel.getCollegeID().getBack() != null) {
                 ImageBox ib = new ImageBox(imageLayout, BorrowerDetailsActivity.this);
                 ib.setImageUrl(uploadDocModel.getCollegeID().getBack().getImgUrl());
                 backImageCollegeId = ib.getImageUrl();
-                ib.setPicNum(++count);
+                ib.setPicNum(count++);
                 ib.setPicType("College ID");
                 ib.setCloudinaryId("collegeId");
                 ib.setId(1);
                 ib.setMatch("back");
                 ib.setIsVerified(uploadDocModel.getCollegeID().getBack().getIsVerified());
+                numCollegeID++;
                 insertCollegeImageBox(ib);
             }
             if (uploadDocModel.getCollegeID().getFront() == null || uploadDocModel.getCollegeID().getBack() == null) {
                 if (uploadDocModel.getCollegeID().getImgUrls() != null) {
-                    for (int i = count + 1; i < uploadDocModel.getCollegeID().getImgUrls().size(); i++) {
+                    for (i = 0; i < uploadDocModel.getCollegeID().getImgUrls().size(); i++) {
                         ImageBox ib = new ImageBox(imageLayout, BorrowerDetailsActivity.this);
                         ib.setImageUrl(uploadDocModel.getCollegeID().getImgUrls().get(i));
-                        ib.setPicNum(i);
-                        count = i;
+                        ib.setPicNum(i+count);
                         ib.setPicType("College ID");
                         ib.setCloudinaryId("collegeId");
                         ib.setId(1);
                         ib.setMatch("img");
                         ib.setIsVerified(false);
+                        numCollegeID++;
                         insertCollegeImageBox(ib);
                     }
+                    count+=i;
                 }
                 ibx = new ImageBox(imageLayout, BorrowerDetailsActivity.this);
                 ibx.setImageUrl(null);
-                ibx.setPicNum(++count);
+                ibx.setPicNum(count++);
                 ibx.setPicType("College ID");
                 ibx.setCloudinaryId("collegeId");
                 ibx.setId(1);
@@ -217,7 +228,7 @@ public class BorrowerDetailsActivity extends AppCompatActivity implements Adapte
         else {
             ibx = new ImageBox(imageLayout, BorrowerDetailsActivity.this);
             ibx.setImageUrl(null);
-            ibx.setPicNum(++count);
+            ibx.setPicNum(count++);
             ibx.setPicType("College ID");
             ibx.setCloudinaryId("collegeId");
             ibx.setId(1);
@@ -232,50 +243,53 @@ public class BorrowerDetailsActivity extends AppCompatActivity implements Adapte
 
 
         addressProof = new ArrayList<>();
-        count = -1;
+        count = 0; numAddressProof = 0;
         if(uploadDocModel.getAddressProof() != null) {
             if (uploadDocModel.getAddressProof().getFront() != null) {
                 ImageBox ib = new ImageBox(imageLayout, BorrowerDetailsActivity.this);
                 ib.setImageUrl(uploadDocModel.getAddressProof().getFront().getImgUrl());
                 frontImageAddressProof = ib.getImageUrl();
-                ib.setPicNum(++count);
+                ib.setPicNum(count++);
                 ib.setPicType("Permanent Address Proof");
                 ib.setCloudinaryId("addressProof");
                 ib.setId(2);
                 ib.setMatch("front");
                 ib.setIsVerified(uploadDocModel.getAddressProof().getFront().getIsVerified());
+                numAddressProof++;
                 insertAddressProofImageBox(ib);
             }
             if (uploadDocModel.getAddressProof().getBack() != null) {
                 ImageBox ib = new ImageBox(imageLayout, BorrowerDetailsActivity.this);
                 ib.setImageUrl(uploadDocModel.getAddressProof().getBack().getImgUrl());
                 backImageAddressProof = ib.getImageUrl();
-                ib.setPicNum(++count);
+                ib.setPicNum(count++);
                 ib.setPicType("Permanent Address Proof");
                 ib.setCloudinaryId("addressProof");
                 ib.setId(2);
                 ib.setMatch("back");
                 ib.setIsVerified(uploadDocModel.getAddressProof().getBack().getIsVerified());
+                numAddressProof++;
                 insertAddressProofImageBox(ib);
             }
             if (uploadDocModel.getAddressProof().getFront() == null || uploadDocModel.getAddressProof().getBack() == null) {
                 if (uploadDocModel.getAddressProof().getImgUrls() != null) {
-                    for (int i = count + 1; i < uploadDocModel.getAddressProof().getImgUrls().size(); i++) {
+                    for (i = 0; i < uploadDocModel.getAddressProof().getImgUrls().size() ; i++) {
                         ImageBox ib = new ImageBox(imageLayout, BorrowerDetailsActivity.this);
                         ib.setImageUrl(uploadDocModel.getAddressProof().getImgUrls().get(i));
-                        ib.setPicNum(i);
-                        count = i;
+                        ib.setPicNum(i + count);
                         ib.setPicType("Permanent Address Proof");
                         ib.setCloudinaryId("addressProof");
                         ib.setId(2);
                         ib.setMatch("img");
                         ib.setIsVerified(false);
+                        numAddressProof++;
                         insertAddressProofImageBox(ib);
                     }
+                    count+=i;
                 }
                 ibx = new ImageBox(imageLayout,BorrowerDetailsActivity.this);
                 ibx.setImageUrl(null);
-                ibx.setPicNum(++count);
+                ibx.setPicNum(count++);
                 ibx.setPicType("Permanent Address Proof");
                 ibx.setCloudinaryId("addressProof");
                 ibx.setId(2);
@@ -287,7 +301,7 @@ public class BorrowerDetailsActivity extends AppCompatActivity implements Adapte
         else {
             ibx = new ImageBox(imageLayout, BorrowerDetailsActivity.this);
             ibx.setImageUrl(null);
-            ibx.setPicNum(++count);
+            ibx.setPicNum(count++);
             ibx.setPicType("Permanent Address Proof");
             ibx.setCloudinaryId("addressProof");
             ibx.setId(2);
@@ -302,54 +316,57 @@ public class BorrowerDetailsActivity extends AppCompatActivity implements Adapte
 
 
         gradeSheet = new ArrayList<>();
-        count = -1;
+        count = 0;
         if(uploadDocModel.getGradeSheet() != null) {
             if(uploadDocModel.getGradeSheet().getValidImgUrls() != null){
-                for (int i = count + 1; i < uploadDocModel.getGradeSheet().getValidImgUrls().size(); i++) {
+                for (i = 0; i < uploadDocModel.getGradeSheet().getValidImgUrls().size(); i++) {
                     ImageBox ib = new ImageBox(imageLayout, BorrowerDetailsActivity.this);
                     ib.setImageUrl(uploadDocModel.getGradeSheet().getValidImgUrls().get(i));
-                    ib.setPicNum(i);
-                    count = i;
+                    ib.setPicNum(i + count);
                     ib.setPicType("Grade Sheet");
                     ib.setCloudinaryId("gradeSheet");
                     ib.setId(3);
                     ib.setMatch("valid");
                     ib.setIsVerified(true);
+                    numGradeSheet++;
                     insertGradeSheetImageBox(ib);
                 }
+                count+=i;
             }
             if(uploadDocModel.getGradeSheet().getInvalidImgUrls() != null){
-                for (int i = count + 1; i < uploadDocModel.getGradeSheet().getInvalidImgUrls().size(); i++) {
+                for (i = 0; i < uploadDocModel.getGradeSheet().getInvalidImgUrls().size(); i++) {
                     ImageBox ib = new ImageBox(imageLayout, BorrowerDetailsActivity.this);
                     ib.setImageUrl(uploadDocModel.getGradeSheet().getInvalidImgUrls().get(i));
-                    ib.setPicNum(i);
-                    count = i;
+                    ib.setPicNum(i+count);
                     ib.setPicType("Grade Sheet");
                     ib.setCloudinaryId("gradeSheet");
                     ib.setId(3);
                     ib.setMatch("invalid");
                     ib.setIsVerified(true);
+                    numGradeSheet++;
                     insertGradeSheetImageBox(ib);
                 }
+                count+=i;
             }
             if (uploadDocModel.getGradeSheet().getImgUrls() != null) {
-                for (int i = count + 1; i < uploadDocModel.getGradeSheet().getImgUrls().size(); i++) {
+                for (i = 0; i < uploadDocModel.getGradeSheet().getImgUrls().size(); i++) {
                     ImageBox ib = new ImageBox(imageLayout, BorrowerDetailsActivity.this);
                     ib.setImageUrl(uploadDocModel.getGradeSheet().getImgUrls().get(i));
-                    ib.setPicNum(i);
-                    count = i;
+                    ib.setPicNum(i+count);
                     ib.setPicType("Grade Sheet");
                     ib.setCloudinaryId("gradeSheet");
                     ib.setId(3);
                     ib.setMatch("img");
                     ib.setIsVerified(false);
+                    numGradeSheet++;
                     insertGradeSheetImageBox(ib);
                 }
+                count+=i;
             }
         }
         ibx = new ImageBox(imageLayout,BorrowerDetailsActivity.this);
         ibx.setImageUrl(null);
-        ibx.setPicNum(++count);
+        ibx.setPicNum(count++);
         ibx.setPicType("Grade Sheet");
         ibx.setCloudinaryId("gradeSheet");
         ibx.setId(3);
@@ -363,54 +380,57 @@ public class BorrowerDetailsActivity extends AppCompatActivity implements Adapte
 
 
         bankProof = new ArrayList<>();
-        count = -1;
+        count = 0;
         if(uploadDocModel.getBankProof() != null) {
             if (uploadDocModel.getBankProof().getValidImgUrls() != null) {
-                for (int i = count + 1; i < uploadDocModel.getBankProof().getValidImgUrls().size(); i++) {
+                for (i = 0; i < uploadDocModel.getBankProof().getValidImgUrls().size(); i++) {
                     ImageBox ib = new ImageBox(imageLayout, BorrowerDetailsActivity.this);
                     ib.setImageUrl(uploadDocModel.getBankProof().getValidImgUrls().get(i));
-                    ib.setPicNum(i);
-                    count = i;
+                    ib.setPicNum(count+i);
                     ib.setPicType("Bank Proof");
                     ib.setCloudinaryId("bankProof");
                     ib.setId(4);
                     ib.setMatch("valid");
                     ib.setIsVerified(true);
+                    numBankProof++;
                     insertBankProofImageBox(ib);
                 }
+                count+=i;
             }
             if (uploadDocModel.getBankProof().getInvalidImgUrls() != null) {
-                for (int i = count + 1; i < uploadDocModel.getBankProof().getInvalidImgUrls().size(); i++) {
+                for (i = 0; i < uploadDocModel.getBankProof().getInvalidImgUrls().size(); i++) {
                     ImageBox ib = new ImageBox(imageLayout, BorrowerDetailsActivity.this);
                     ib.setImageUrl(uploadDocModel.getBankProof().getInvalidImgUrls().get(i));
-                    ib.setPicNum(i);
-                    count = i;
+                    ib.setPicNum(count+i);
                     ib.setPicType("Bank Proof");
                     ib.setCloudinaryId("bankProof");
                     ib.setId(4);
                     ib.setMatch("invalid");
                     ib.setIsVerified(true);
+                    numBankProof++;
                     insertBankProofImageBox(ib);
                 }
+                count+=i;
             }
             if (uploadDocModel.getBankProof().getImgUrls() != null) {
-                for (int i = count + 1; i < uploadDocModel.getBankProof().getImgUrls().size(); i++) {
+                for (i = 0; i < uploadDocModel.getBankProof().getImgUrls().size(); i++) {
                     ImageBox ib = new ImageBox(imageLayout, BorrowerDetailsActivity.this);
                     ib.setImageUrl(uploadDocModel.getBankProof().getImgUrls().get(i));
-                    ib.setPicNum(i);
-                    count = i;
+                    ib.setPicNum(count+i);
                     ib.setPicType("Bank Proof");
                     ib.setCloudinaryId("bankProof");
                     ib.setId(4);
                     ib.setMatch("img");
                     ib.setIsVerified(false);
+                    numBankProof++;
                     insertBankProofImageBox(ib);
                 }
+                count+=i;
             }
         }
         ibx = new ImageBox(imageLayout,BorrowerDetailsActivity.this);
         ibx.setImageUrl(null);
-        ibx.setPicNum(++count);
+        ibx.setPicNum(count++);
         ibx.setPicType("Bank Proof");
         ibx.setCloudinaryId("bankProof");
         ibx.setId(4);
@@ -443,7 +463,17 @@ public class BorrowerDetailsActivity extends AppCompatActivity implements Adapte
 
 
 
-
+        if(verInfo.getReferenceIsGoodFriend() != null) {
+            if (verInfo.getReferenceIsGoodFriend()) {
+                radioButton = (RadioButton) referenceSelection.getChildAt(1);
+                radioButton.setChecked(true);
+                goodFriendsRadio = "true";
+            } else {
+                radioButton = (RadioButton) referenceSelection.getChildAt(0);
+                radioButton.setChecked(true);
+                goodFriendsRadio = "false";
+            }
+        }
         referenceSelection.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(RadioGroup group, int checkedId) {
@@ -454,15 +484,6 @@ public class BorrowerDetailsActivity extends AppCompatActivity implements Adapte
                 }
             }
         });
-        if(verInfo.getReferenceIsGoodFriend() != null) {
-            if (verInfo.getReferenceIsGoodFriend()) {
-                referenceSelection.check(R.id.goodFriendsYes);
-                goodFriendsRadio = "true";
-            } else {
-                referenceSelection.check(R.id.goodFriendsNo);
-                goodFriendsRadio = "false";
-            }
-        }
 
 
         if (verInfo.getReferenceYear() != null) {
@@ -548,10 +569,12 @@ public class BorrowerDetailsActivity extends AppCompatActivity implements Adapte
         });
         if(verInfo.getHaveYearBack() != null) {
             if (verInfo.getHaveYearBack()) {
-                yearBackSelection.check(R.id.yearBackYes);
+                radioButton = (RadioButton) yearBackSelection.getChildAt(1);
+                radioButton.setChecked(true);
                 yearBackRadio = "true";
             } else {
-                yearBackSelection.check(R.id.yearBackNo);
+                radioButton = (RadioButton) yearBackSelection.getChildAt(0);
+                radioButton.setChecked(true);
                 yearBackRadio = "false";
             }
         }
@@ -594,10 +617,12 @@ public class BorrowerDetailsActivity extends AppCompatActivity implements Adapte
         });
         if(verInfo.getBorrowerIsLying() != null) {
             if (verInfo.getBorrowerIsLying()) {
-                transparentSelection.check(R.id.transparentYes);
+                radioButton = (RadioButton) transparentSelection.getChildAt(1);
+                radioButton.setChecked(true);
                 transparentRadio = "true";
             } else {
-                transparentSelection.check(R.id.transparentNo);
+                radioButton = (RadioButton) transparentSelection.getChildAt(0);
+                radioButton.setChecked(true);
                 transparentRadio = "false";
             }
         }
@@ -619,10 +644,12 @@ public class BorrowerDetailsActivity extends AppCompatActivity implements Adapte
         });
         if(verInfo.getGiveHimLoan() != null) {
             if (verInfo.getGiveHimLoan()) {
-                internSelection.check(R.id.internchoiceYes);
+                radioButton = (RadioButton) internSelection.getChildAt(1);
+                radioButton.setChecked(true);
                 giveLoanRadio = "true";
             } else {
-                internSelection.check(R.id.internchoiceNo);
+                radioButton = (RadioButton) internSelection.getChildAt(0);
+                radioButton.setChecked(true);
                 giveLoanRadio = "false";
             }
         }
@@ -632,6 +659,7 @@ public class BorrowerDetailsActivity extends AppCompatActivity implements Adapte
         if (verInfo.getFinalVerificationNotes() != null) {
             otherNotes.setText(verInfo.getFinalVerificationNotes());
         }
+
 
     }
 
@@ -704,52 +732,39 @@ public class BorrowerDetailsActivity extends AppCompatActivity implements Adapte
                 String check = data.getExtras().getString("check");
                 String imageUrl = data.getExtras().getString("imageUrl");
                 ImageBox imageBox1, imageBox2, imageBox3;
-                final GridView gridView;
 
                 if(id == 1){
-                    gridView = (GridView) findViewById(R.id.collegeIdImages);
+
                     if(check.equals("front")){
                         if(frontImageCollegeId != null && backImageCollegeId != null){
                             if(picNum == 1) {
                                 backImageCollegeId = null;
                                 imageBox1 = collegeID.get(0);
                                 imageBox2 = collegeID.get(1);
-
                                 imageBox1.setPicNum(1);
                                 imageBox2.setPicNum(0);
-
                                 imageBox2.setMatch("front");
                                 imageBox2.setIsVerified(true);
                                 imageBox1.setMatch("invalid");
                                 imageBox1.setIsVerified(false);
-
                                 collegeID.set(0, imageBox2);
                                 collegeID.set(1, imageBox1);
-
-                                createCollegeIdLayout();
                             }
                             else if(picNum == 0) {
                                 imageBox1 = collegeID.get(0);
                                 imageBox1.setIsVerified(true);
-
-                                createCollegeIdLayout();
                             }
                             else{
                                 imageBox1 = collegeID.get(0);
                                 imageBox2 = collegeID.get(picNum);
-
                                 imageBox1.setPicNum(picNum);
                                 imageBox2.setPicNum(0);
-
                                 imageBox2.setMatch("front");
                                 imageBox2.setIsVerified(true);
                                 imageBox1.setMatch("invalid");
                                 imageBox1.setIsVerified(false);
-
                                 collegeID.set(picNum, imageBox1);
                                 collegeID.set(0, imageBox2);
-
-                                createCollegeIdLayout();
                             }
                         }
                         else if(backImageCollegeId != null ) {
@@ -757,68 +772,47 @@ public class BorrowerDetailsActivity extends AppCompatActivity implements Adapte
                                 imageBox1 = collegeID.get(0);
                                 imageBox1.setMatch("front");
                                 imageBox1.setIsVerified(true);
-
                                 backImageCollegeId = null;
-
-                                createCollegeIdLayout();
-
                             } else if (picNum == 1) {
                                 imageBox1 = collegeID.get(0);
                                 imageBox2 = collegeID.get(picNum);
-
                                 imageBox1.setPicNum(picNum);
                                 imageBox2.setPicNum(0);
-
                                 imageBox2.setMatch("front");
                                 imageBox2.setIsVerified(true);
                                 imageBox1.setMatch("back");
                                 imageBox1.setIsVerified(true);
-
                                 collegeID.set(0, imageBox2);
                                 collegeID.set(picNum, imageBox1);
-
-                                createCollegeIdLayout();
-
                             } else {
                                 imageBox1 = collegeID.get(0);
                                 imageBox2 = collegeID.get(picNum);
                                 imageBox3 = collegeID.get(1);
-
                                 imageBox1.setPicNum(1);
                                 imageBox2.setPicNum(0);
                                 imageBox3.setPicNum(picNum);
-
                                 imageBox2.setMatch("front");
                                 imageBox2.setIsVerified(true);
                                 imageBox1.setMatch("back");
                                 imageBox1.setIsVerified(false);
                                 imageBox3.setMatch("invalid");
                                 imageBox3.setIsVerified(false);
-
-
                                 collegeID.set(0, imageBox2);
                                 collegeID.set(1, imageBox1);
                                 collegeID.set(picNum, imageBox3);
-                                createCollegeIdLayout();
-
                             }
                         }
                         else{
                             imageBox1 = collegeID.get(0);
                             imageBox2 = collegeID.get(picNum);
-
                             imageBox1.setPicNum(picNum);
                             imageBox2.setPicNum(0);
-
                             imageBox1.setMatch("invalid");
                             imageBox1.setIsVerified(false);
                             imageBox2.setMatch("front");
                             imageBox2.setIsVerified(true);
-
                             collegeID.set(picNum,imageBox1);
                             collegeID.set(0,imageBox2);
-                            createCollegeIdLayout();
-
                         }
                         frontImageCollegeId = imageUrl;
                     }
@@ -828,95 +822,65 @@ public class BorrowerDetailsActivity extends AppCompatActivity implements Adapte
                             if(picNum == 0) {
                                 imageBox1 = collegeID.get(0);
                                 imageBox2 = collegeID.get(1);
-
                                 imageBox1.setMatch("back");
                                 imageBox1.setIsVerified(true);
                                 imageBox2.setMatch("invalid");
                                 imageBox2.setIsVerified(false);
-
-                                createCollegeIdLayout();
-
                                 frontImageCollegeId = null;
                             }
                             else if(picNum == 1){
                                 imageBox1 = collegeID.get(1);
-
                                 imageBox1.setIsVerified(true);
-
-                                createCollegeIdLayout();
                             }
                             else{
                                 imageBox1 = collegeID.get(1);
                                 imageBox2 = collegeID.get(picNum);
-
                                 imageBox1.setPicNum(picNum);
                                 imageBox2.setPicNum(1);
-
                                 imageBox1.setMatch("invalid");
                                 imageBox1.setIsVerified(false);
                                 imageBox2.setMatch("back");
                                 imageBox2.setIsVerified(true);
-
                                 collegeID.set(picNum, imageBox1);
                                 collegeID.set(1,imageBox2);
-
-                                createCollegeIdLayout();
-
                             }
                         }
                         else if(frontImageCollegeId != null ){
                             if(picNum == 0){
                                 imageBox1 = collegeID.get(0);
-
                                 imageBox1.setMatch("back");
                                 imageBox1.setIsVerified(true);
-
                                 frontImageCollegeId = null;
-                                createCollegeIdLayout();
                             }
                             else if(picNum == 1){
                                 imageBox1 = collegeID.get(1);
                                 imageBox1.setMatch("back");
                                 imageBox1.setIsVerified(true);
-
-                                createCollegeIdLayout();
                             }
                             else{
                                 imageBox1 = collegeID.get(1);
                                 imageBox2 = collegeID.get(picNum);
-
                                 imageBox1.setPicNum(picNum);
                                 imageBox2.setPicNum(1);
-
                                 imageBox2.setMatch("back");
                                 imageBox2.setIsVerified(true);
                                 imageBox1.setMatch("invalid");
                                 imageBox1.setIsVerified(false);
-
                                 collegeID.set(picNum,imageBox1);
                                 collegeID.set(1,imageBox2);
-
-                                createCollegeIdLayout();
                             }
-
                         }
                         else{
                             imageBox1 = collegeID.get(0);
                             imageBox2 = collegeID.get(picNum);
-
                             imageBox1.setPicNum(picNum);
                             imageBox2.setPicNum(0);
-
                             imageBox2.setMatch("back");
                             imageBox2.setIsVerified(true);
                             imageBox1.setMatch("invalid");
                             imageBox1.setIsVerified(false);
-
                             collegeID.set(picNum,imageBox1);
                             collegeID.set(0,imageBox2);
-
-                            createCollegeIdLayout();
-
                         }
                         backImageCollegeId = imageUrl;
                     }
@@ -925,180 +889,126 @@ public class BorrowerDetailsActivity extends AppCompatActivity implements Adapte
                             if(picNum == 0) {
                                 imageBox1 = collegeID.get(0);
                                 imageBox2 = collegeID.get(1);
-
                                 imageBox1.setMatch("invalid");
                                 imageBox1.setIsVerified(true);
-
                                 collegeID.set(0,imageBox2);
                                 collegeID.set(1,imageBox1);
-
-                                createCollegeIdLayout();
-
                                 frontImageCollegeId = null;
                             }
                             else if(picNum == 1){
                                 imageBox1 = collegeID.get(1);
-
                                 imageBox1.setMatch("invalid");
                                 imageBox1.setIsVerified(true);
-
                                 backImageCollegeId = null;
-
-                                createCollegeIdLayout();
                             }
                             else{
                                 imageBox1 = collegeID.get(picNum);
-
                                 imageBox1.setMatch("invalid");
                                 imageBox1.setIsVerified(true);
-
-                                createCollegeIdLayout();
                             }
                         }
                         else if(frontImageCollegeId != null ){
                             if(picNum == 0){
                                 imageBox1 = collegeID.get(0);
-
                                 imageBox1.setMatch("invalid");
                                 imageBox1.setIsVerified(true);
-
                                 frontImageCollegeId = null;
-                                createCollegeIdLayout();
                             }
                             else {
                                 imageBox1 = collegeID.get(picNum);
                                 imageBox1.setMatch("invalid");
                                 imageBox1.setIsVerified(true);
-
-                                createCollegeIdLayout();
                             }
 
                         }
                         else if(backImageCollegeId != null){
                             if(picNum == 0){
                                 imageBox1 = collegeID.get(0);
-
                                 imageBox1.setMatch("invalid");
                                 imageBox1.setIsVerified(true);
-
                                 backImageCollegeId = null;
-                                createCollegeIdLayout();
                             }
                             else {
                                 imageBox1 = collegeID.get(picNum);
-
                                 imageBox1.setMatch("invalid");
                                 imageBox1.setIsVerified(true);
-
-                                createCollegeIdLayout();
                             }
-
                         }
                         else{
-
                             imageBox2 = collegeID.get(picNum);
-
                             imageBox2.setMatch("invalid");
                             imageBox2.setIsVerified(true);
-
-                            createCollegeIdLayout();
                         }
                     }
+                    createCollegeIdLayout();
                 }
                 else if(id == 6){
-                    gridView = (GridView) findViewById(R.id.permanentAddressProofImages);
+
                     if(check.equals("front")){
                         if(frontImageAddressProof != null && backImageAddressProof != null){
                             if(picNum == 1) {
                                 backImageAddressProof = null;
                                 imageBox1 = addressProof.get(0);
                                 imageBox2 = addressProof.get(1);
-
                                 imageBox1.setPicNum(1);
                                 imageBox2.setPicNum(0);
-
                                 imageBox2.setMatch("front");
                                 imageBox1.setMatch("invalid");
-
                                 addressProof.set(0, imageBox2);
                                 addressProof.set(1, imageBox1);
-
-                                createAddressProofLayout();
                             }
                             else if(picNum == 0) {
                             }
                             else{
                                 imageBox1 = addressProof.get(0);
                                 imageBox2 = addressProof.get(picNum);
-
                                 imageBox1.setPicNum(picNum);
                                 imageBox2.setPicNum(0);
-
                                 imageBox2.setMatch("front");
                                 imageBox1.setMatch("invalid");
-
                                 addressProof.set(picNum, imageBox1);
                                 addressProof.set(0, imageBox2);
-
-                                createAddressProofLayout();
                             }
                         }
                         else if(backImageAddressProof != null ) {
                             if (picNum == 0) {
                                 imageBox1 = addressProof.get(0);
                                 imageBox1.setMatch("front");
-
                                 backImageAddressProof = null;
-
-                                createAddressProofLayout();
                             } else if (picNum == 1) {
                                 imageBox1 = addressProof.get(0);
                                 imageBox2 = addressProof.get(picNum);
-
                                 imageBox1.setPicNum(picNum);
                                 imageBox2.setPicNum(0);
-
                                 imageBox2.setMatch("front");
                                 imageBox1.setMatch("back");
-
                                 addressProof.set(0, imageBox2);
                                 addressProof.set(picNum, imageBox1);
-
-                                createAddressProofLayout();
-                            } else {
+                            }
+                            else {
                                 imageBox1 = addressProof.get(0);
                                 imageBox2 = addressProof.get(picNum);
                                 imageBox3 = addressProof.get(1);
-
                                 imageBox1.setPicNum(1);
                                 imageBox2.setPicNum(0);
                                 imageBox3.setPicNum(picNum);
-
                                 imageBox2.setMatch("front");
                                 imageBox1.setMatch("back");
                                 imageBox3.setMatch("invalid");
-
-
                                 addressProof.set(0, imageBox2);
                                 addressProof.set(1, imageBox1);
                                 addressProof.set(picNum, imageBox3);
-                                createAddressProofLayout();
-
                             }
                         }
                         else{
                             imageBox1 = addressProof.get(0);
                             imageBox2 = addressProof.get(picNum);
-
                             imageBox1.setPicNum(picNum);
                             imageBox2.setPicNum(0);
                             imageBox1.setMatch("invalid");
                             imageBox2.setMatch("front");
-
                             addressProof.set(picNum,imageBox1);
                             addressProof.set(0,imageBox2);
-                            createAddressProofLayout();
-
                         }
                         frontImageAddressProof = imageUrl;
                     }
@@ -1108,120 +1018,82 @@ public class BorrowerDetailsActivity extends AppCompatActivity implements Adapte
                             if(picNum == 0) {
                                 imageBox1 = addressProof.get(0);
                                 imageBox2 = addressProof.get(1);
-
                                 imageBox1.setMatch("back");
                                 imageBox2.setMatch("invalid");
-
-                                createAddressProofLayout();
-
                                 frontImageCollegeId = null;
-
                             }
                             else if(picNum == 1){}
                             else{
                                 imageBox1 = addressProof.get(1);
                                 imageBox2 = addressProof.get(picNum);
-
                                 imageBox1.setPicNum(picNum);
                                 imageBox2.setPicNum(1);
-
                                 imageBox1.setMatch("invalid");
                                 imageBox2.setMatch("back");
-
                                 addressProof.set(picNum, imageBox1);
                                 addressProof.set(1,imageBox2);
-
-                                createAddressProofLayout();
-
                             }
                         }
                         else if(frontImageAddressProof != null ){
                             if(picNum == 0){
                                 imageBox1 = addressProof.get(0);
-
                                 imageBox1.setMatch("back");
                                 frontImageAddressProof = null;
-                                createAddressProofLayout();
-
                             }
                             else if(picNum == 1){
                                 imageBox1 = addressProof.get(1);
                                 imageBox1.setMatch("back");
-
-                                createAddressProofLayout();
-
                             }
                             else{
                                 imageBox1 = addressProof.get(1);
                                 imageBox2 = addressProof.get(picNum);
-
                                 imageBox1.setPicNum(picNum);
                                 imageBox2.setPicNum(1);
-
                                 imageBox2.setMatch("back");
                                 imageBox1.setMatch("invalid");
-
-
                                 addressProof.set(picNum,imageBox1);
                                 addressProof.set(1,imageBox2);
-
-                                createAddressProofLayout();
-
                             }
-
                         }
                         else{
                             imageBox1 = addressProof.get(0);
                             imageBox2 = addressProof.get(picNum);
-
                             imageBox1.setPicNum(picNum);
                             imageBox2.setPicNum(0);
-
                             imageBox2.setMatch("back");
                             imageBox1.setMatch("invalid");
-
-
                             addressProof.set(picNum,imageBox1);
                             addressProof.set(0,imageBox2);
-
-                            createAddressProofLayout();
-
                         }
                         backImageAddressProof = imageUrl;
                     }
+                    createAddressProofLayout();
                 }
                 else if(id == 3){
                     if(check.equals("valid")){
                         imageBox1 = gradeSheet.get(picNum);
                         imageBox1.setMatch("valid");
                         imageBox1.setIsVerified(true);
-
-                        createGradeSheetsLayout();
-
                     }
-                    else if(check.equals("invalid")){
+                    else if(check.equals("invalid")) {
                         imageBox1 = gradeSheet.get(picNum);
                         imageBox1.setMatch("invalid");
                         imageBox1.setIsVerified(true);
-
-                        createGradeSheetsLayout();
                     }
+                    createGradeSheetsLayout();
                 }
                 else if(id == 4){
                     if(check.equals("valid")){
                         imageBox1 = bankProof.get(picNum);
                         imageBox1.setMatch("valid");
                         imageBox1.setIsVerified(true);
-
-                        createBankProofsLayout();
                     }
-                    else if(check.equals("invalid")){
+                    else if(check.equals("invalid")) {
                         imageBox1 = bankProof.get(picNum);
                         imageBox1.setMatch("invalid");
                         imageBox1.setIsVerified(true);
-
-                        createBankProofsLayout();
                     }
+                    createBankProofsLayout();
                 }
 
             }
@@ -1229,17 +1101,76 @@ public class BorrowerDetailsActivity extends AppCompatActivity implements Adapte
     }
 
     public void confirmSubmit(View view) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setMessage("Are you sure the details entered are correct?")
-                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        borrowerDataUpdater.updateToApi();
-                    }
+        if(borrowerStateContainer.isCompleted()) {
+            borrowerDataUpdater = new BorrowerDataUpdater(this, "button");
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setMessage("Are you sure the details entered are correct?")
+                    .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            borrowerDataUpdater.updateToApi();
+                        }
 
 
-                })
-                .setNegativeButton("No", null)						//Do nothing on no
-                .show();
+                    })
+                    .setNegativeButton("No", null)                        //Do nothing on no
+                    .show();
+        }
+        else{
+            String text = "Fill all the details";
+            int duration = Toast.LENGTH_SHORT;
+
+            Toast toast = Toast.makeText(this, text, duration);
+            toast.show();
+        }
+    }
+
+    private void popupWindow() {
+        try {
+            LayoutInflater inflater = (LayoutInflater) BorrowerDetailsActivity.this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            View layout = inflater.inflate(R.layout.popup_layout, (ViewGroup) findViewById(R.id.popup_element));
+            popupWindow = new PopupWindow(layout);
+            popupWindow.setWidth(ListPopupWindow.WRAP_CONTENT);
+            popupWindow.setHeight(ListPopupWindow.WRAP_CONTENT);
+            popupWindow.showAtLocation(layout, Gravity.CENTER, 0, 0);
+
+            close = (TextView) layout.findViewById(R.id.close);
+            mainText = (TextView) layout.findViewById(R.id.mainText);
+            close.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    popupWindow.dismiss();
+                    relativeLayout.setVisibility(View.INVISIBLE);
+                }
+            });
+
+            relativeLayout.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    popupWindow.dismiss();
+                    relativeLayout.setVisibility(View.INVISIBLE);
+                }
+            });
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void popUp(View view){
+        popupWindow();
+        relativeLayout.setVisibility(View.VISIBLE);
+        if(view.getId() == R.id.addressID){
+            mainText.setText(getResources().getString(R.string.address_popup));
+        }
+        else if(view.getId() == R.id.collegeID){
+            mainText.setText(getResources().getString(R.string.college_popup));
+        }
+        else if(view.getId() == R.id.gradeID){
+            mainText.setText(getResources().getString(R.string.grade_popup));
+        }
+        else if(view.getId() == R.id.bankID){
+            mainText.setText(getResources().getString(R.string.bank_popup));
+        }
     }
 
     public void insertCollegeImageBox(ImageBox imageBox){
@@ -1302,7 +1233,7 @@ public class BorrowerDetailsActivity extends AppCompatActivity implements Adapte
 
     public String getRepayBackLoan() { return loanRepay;}
 
-    public String getDate() { return uploadDocModel.getDate(); }
+    public String getScheduleDate() { return borrowerData.getScheduleDate(); }
 
     public ArrayList<ImageBox> getCollegeIDs() {
         return collegeID;
@@ -1328,41 +1259,17 @@ public class BorrowerDetailsActivity extends AppCompatActivity implements Adapte
         return verInfo;
     }
 
-    public Toolbar getToolBar() {
-        return toolBar;
-    }
-
-    public TextView getPhoneNum() {
-        return phoneNum;
-    }
-
     public TextView getName() {
         return name;
     }
 
-    public TextView getCollege() {
-        return college;
-    }
+    public int getNumCollegeIds() { return numCollegeID; }
 
-    public int getNumCollegeIds() { return collegeID.size()-1;}
+    public int getNumAddressProofs() { return numAddressProof; }
 
-    public int getNumAddressProofs() { return addressProof.size()-1;}
+    public int getNumGradeSheets() { return numGradeSheet; }
 
-    public int getNumGradeSheets() { return gradeSheet.size()-1; }
-
-    public int getNumBankProofs() { return bankProof.size()-1; }
-
-    public Button getSubmitButton() { return submitButton; }
-
-    public RadioGroup getReferenceSelection() {
-        return referenceSelection;
-    }
-
-    public RadioGroup getYearBackSelection() {return yearBackSelection; }
-
-    public RadioGroup getTransparentSelection() {return transparentSelection; }
-
-    public RadioGroup getInternSelection() {return internSelection; }
+    public int getNumBankProofs() { return numBankProof; }
 
     public String getRefYear() {
         return refYear.getText().toString();
@@ -1373,28 +1280,6 @@ public class BorrowerDetailsActivity extends AppCompatActivity implements Adapte
     }
 
     public String getOtherNotes() { return otherNotes.getText().toString();}
-
-    public ImageView getPhoneIcon() {
-        return phoneIcon;
-    }
-
-    public ImageView getIdIcon() {
-        return IdIcon;
-    }
-
-    public ImageView getIdIconPlusFront() {
-        return IdIconPlusFront;
-    }
-
-    public ImageView getIdIconPlusBack() {
-        return IdIconPlusBack;
-    }
-
-    public FrameLayout getImageLayout() {
-        return imageLayout;
-    }
-
-    public void setImageLayout(FrameLayout imageLayout) {this.imageLayout = imageLayout; }
 
     public String getSpinnerPunc() {
         return punctualityInClass;
@@ -1411,15 +1296,6 @@ public class BorrowerDetailsActivity extends AppCompatActivity implements Adapte
     public String getSpinnerFinRes() {
         return financiallyResponsible;
     }
-
-    public CircularImageView getProfilePic() {
-        return profilePic;
-    }
-
-    public ImageView getIm() {
-        return Im;
-    }
-
 
 
 
@@ -1465,6 +1341,7 @@ public class BorrowerDetailsActivity extends AppCompatActivity implements Adapte
             imageBox.setImageUrl(imageurl);
             imageBox.setMatch("img");
             imageBox.setIsVerified(false);
+            numCollegeID++;
             removeCollegeImageBox();
             imageBox.setPicNum(collegeID.size());
             insertCollegeImageBox(imageBox);
@@ -1483,6 +1360,7 @@ public class BorrowerDetailsActivity extends AppCompatActivity implements Adapte
             imageBox.setImageUrl(imageurl);
             imageBox.setMatch("img");
             imageBox.setIsVerified(false);
+            numAddressProof++;
             removeAddressProofImageBox();
             imageBox.setPicNum(addressProof.size());
             insertAddressProofImageBox(imageBox);
@@ -1501,6 +1379,7 @@ public class BorrowerDetailsActivity extends AppCompatActivity implements Adapte
             imageBox.setImageUrl(imageurl);
             imageBox.setMatch("img");
             imageBox.setIsVerified(false);
+            numGradeSheet++;
             removeGradeSheetImageBox();
             imageBox.setPicNum(gradeSheet.size());
             insertGradeSheetImageBox(imageBox);
@@ -1519,6 +1398,7 @@ public class BorrowerDetailsActivity extends AppCompatActivity implements Adapte
             imageBox.setImageUrl(imageurl);
             imageBox.setMatch("img");
             imageBox.setIsVerified(false);
+            numBankProof++;
             removeBankProofImageBox();
             imageBox.setPicNum(bankProof.size());
             insertBankProofImageBox(imageBox);
@@ -1532,16 +1412,19 @@ public class BorrowerDetailsActivity extends AppCompatActivity implements Adapte
             createBankProofsLayout();
         }
     }
+
+
     @Override
-    public void onBackPressed() {
-        borrowerDataUpdater = new BorrowerDataUpdater(this, "back");
+    public void onPause(){
+        super.onPause();
+        borrowerDataUpdater = new BorrowerDataUpdater(this, "home");
         borrowerDataUpdater.updateToApi();
-        super.onBackPressed();
     }
 
     @Override
     public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults){
-        if(requestCode == 1){
+        if(requestCode == 1
+                ){
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 Intent intent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
                 this.startActivityForResult(intent, 1);
@@ -1571,7 +1454,14 @@ public class BorrowerDetailsActivity extends AppCompatActivity implements Adapte
             }
         }
 
-
+    }
+    private  void focusOnView(final View view){
+        new Handler().post(new Runnable() {
+            @Override
+            public void run() {
+                scrollView.smoothScrollTo(0, view.getBottom());
+            }
+        });
     }
 
 

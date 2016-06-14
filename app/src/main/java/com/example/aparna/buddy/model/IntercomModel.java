@@ -13,22 +13,27 @@ import io.intercom.android.sdk.Intercom;
  * Created by Shashank on 10-06-2016.
  */
 public class IntercomModel {
-    String username;
-    BorrowerDetailsActivity activity;
-    public IntercomModel(BorrowerDetailsActivity activity){
-        this.activity = activity;
+    BorrowerData borrowerData;
+    public IntercomModel(BorrowerData borrowerData){
+        this.borrowerData = borrowerData;
     }
     public void sendData(){
-        SharedPreferences settings = activity.getSharedPreferences(BuddyConstants.PREFS_FILE, 0);
-        username = settings.getString("username","");
 
         Map userMap = new HashMap ();
-        userMap.put("userid",username);
+        userMap.put("assignedTo",borrowerData.getAssignedTo());
+        userMap.put("assignedToName",borrowerData.getAssignedToName());
+        userMap.put("assignedToCollege",borrowerData.getAssignedToCollege());
+        userMap.put("taskType",borrowerData.getTaskType());
+        userMap.put("scheduleDate", borrowerData.getScheduleDate());
+        userMap.put("assignDate", borrowerData.getAssignDate());
         Map customAttributes = new HashMap ();
-        customAttributes.put("phone",activity.getPhoneNum());
-        customAttributes.put("scheduledOn", activity.getDate());
-        customAttributes.put("monthly_spend", 155.5);
-        customAttributes.put("team_mates", 3);
+        customAttributes.put("name",borrowerData.getUploadDocModel().getName());
+        customAttributes.put("phone",borrowerData.getUploadDocModel().getPhone());
+        customAttributes.put("userCollege", borrowerData.getUploadDocModel().getCollege());
+        customAttributes.put("friendName",borrowerData.getUploadDocModel().getFriendName());
+        customAttributes.put("friendNumber",borrowerData.getUploadDocModel().getFriendNumber());
+        customAttributes.put("referenceYear",borrowerData.getVerificationInfo().getReferenceYear());
+        customAttributes.put("referenceDepartment",borrowerData.getVerificationInfo().getReferenceDepartment());
         userMap.put("custom_attributes", customAttributes);
         Intercom.client().updateUser(userMap);
     }
