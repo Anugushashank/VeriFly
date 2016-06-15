@@ -1,40 +1,81 @@
 package com.example.aparna.buddy.model;
 
-import android.content.SharedPreferences;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
-import com.example.aparna.buddy.app.BorrowerDetailsActivity;
-
+import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import io.intercom.android.sdk.Intercom;
+import io.intercom.android.sdk.identity.Registration;
+
 
 /**
  * Created by Shashank on 10-06-2016.
  */
 public class IntercomModel {
     BorrowerData borrowerData;
-    public IntercomModel(BorrowerData borrowerData){
-        this.borrowerData = borrowerData;
-    }
-    public void sendData(){
+    List<BorrowerData> allUsersData = new ArrayList<>();
 
-        Map userMap = new HashMap ();
-        userMap.put("assignedTo",borrowerData.getAssignedTo());
-        userMap.put("assignedToName",borrowerData.getAssignedToName());
-        userMap.put("assignedToCollege",borrowerData.getAssignedToCollege());
-        userMap.put("taskType",borrowerData.getTaskType());
-        userMap.put("scheduleDate", borrowerData.getScheduleDate());
-        userMap.put("assignDate", borrowerData.getAssignDate());
-        Map customAttributes = new HashMap ();
-        customAttributes.put("name",borrowerData.getUploadDocModel().getName());
-        customAttributes.put("phone",borrowerData.getUploadDocModel().getPhone());
-        customAttributes.put("userCollege", borrowerData.getUploadDocModel().getCollege());
-        customAttributes.put("friendName",borrowerData.getUploadDocModel().getFriendName());
-        customAttributes.put("friendNumber",borrowerData.getUploadDocModel().getFriendNumber());
-        customAttributes.put("referenceYear",borrowerData.getVerificationInfo().getReferenceYear());
-        customAttributes.put("referenceDepartment",borrowerData.getVerificationInfo().getReferenceDepartment());
-        userMap.put("custom_attributes", customAttributes);
-        Intercom.client().updateUser(userMap);
+    public IntercomModel(){}
+
+    public void sendData(Map<Integer, String> allTabsData){
+
+        for(int i = 0 ; i < 3 ; i++){
+
+            Type type = new TypeToken<List<BorrowerData>>(){}.getType();
+            List<BorrowerData> cardDataList = new Gson().fromJson(allTabsData.get(i), type);
+
+            if(cardDataList != null) {
+                for (int j = 0; j < cardDataList.size(); j++) {
+
+                    allUsersData.add(cardDataList.get(j));
+                }
+            }
+        }
+
+        Intercom.client().reset();
+
+        for(int i = 0 ; i < allUsersData.size(); i++) {
+
+            borrowerData = allUsersData.get(i);
+
+            Intercom.client().registerIdentifiedUser(new Registration().withUserId(borrowerData.getUserId()));
+
+            Map userMap = new HashMap();
+
+            Map customAttributes = new HashMap();
+
+            customAttributes.put("_id", borrowerData.get_id());
+            customAttributes.put("name", borrowerData.getUploadDocModel().getName());
+            customAttributes.put("phone",borrowerData.getUploadDocModel().getPhone());
+            customAttributes.put("college",borrowerData.getUploadDocModel().getCollege());
+            customAttributes.put("friendName", borrowerData.getUploadDocModel().getFriendName());
+            customAttributes.put("friendNumber", borrowerData.getUploadDocModel().getFriendNumber());
+            customAttributes.put("distanceBwColleges", borrowerData.getDistanceBwColleges());
+            customAttributes.put("differentColleges", borrowerData.getDifferentColleges());
+            customAttributes.put("updatedAt", borrowerData.getUpdatedAt());
+            customAttributes.put("completionDate", borrowerData.getCompletionDate());
+            customAttributes.put("fbUserId", borrowerData.getUploadDocModel().getFbUserId());
+            customAttributes.put("taskStatus", borrowerData.getTaskStatus());
+            customAttributes.put("assignedTo", borrowerData.getAssignedTo());
+            customAttributes.put("assignedToName", borrowerData.getAssignedToName());
+            customAttributes.put("assignedToCollege", borrowerData.getAssignedToCollege());
+            customAttributes.put("taskType", borrowerData.getTaskType());
+            customAttributes.put("scheduleDate", borrowerData.getScheduleDate());
+            customAttributes.put("assignDate", borrowerData.getAssignDate());
+            customAttributes.put("referenceYear", borrowerData.getVerificationInfo().getReferenceYear());
+            customAttributes.put("referenceDepartment", borrowerData.getVerificationInfo().getReferenceDepartment());
+
+            userMap.put("custom_attributes", customAttributes);
+
+            Intercom.client().updateUser(userMap);
+
+            Intercom.client().reset();
+        }
+        Intercom.client().registerIdentifiedUser(new Registration().withUserId(borrowerData.getAssignedTo()));
     }
 }

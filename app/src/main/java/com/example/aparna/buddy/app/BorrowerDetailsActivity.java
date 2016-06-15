@@ -85,7 +85,6 @@ public class BorrowerDetailsActivity extends AppCompatActivity implements Adapte
     private int count, i,numCollegeID, numAddressProof, numGradeSheet, numBankProof;
     private RadioButton radioButton;
     private PopupWindow popupWindow;
-    ScrollView scrollView;
     RelativeLayout linearLayout,relativeLayout;
 
     @Override
@@ -97,7 +96,6 @@ public class BorrowerDetailsActivity extends AppCompatActivity implements Adapte
 
         Bundle extras = getIntent().getExtras();
 
-        borrowerStateContainer = new BorrowerStateContainer(this);
         borrowerData = new Gson().fromJson(extras.getString("borrowerData"), BorrowerData.class);
         uploadDocModel = borrowerData.getUploadDocModel();
         verInfo = borrowerData.getVerificationInfo();
@@ -148,7 +146,6 @@ public class BorrowerDetailsActivity extends AppCompatActivity implements Adapte
 
         linearLayout = (RelativeLayout) findViewById(R.id.rootLayoutMain);
 
-        scrollView = (ScrollView)linearLayout.findViewById(R.id.scrollView);
 
 
         phoneNum.setText(uploadDocModel.getPhone());
@@ -957,9 +954,7 @@ public class BorrowerDetailsActivity extends AppCompatActivity implements Adapte
                                 addressProof.set(0, imageBox2);
                                 addressProof.set(1, imageBox1);
                             }
-                            else if(picNum == 0) {
-                            }
-                            else{
+                            else if(picNum != 0){
                                 imageBox1 = addressProof.get(0);
                                 imageBox2 = addressProof.get(picNum);
                                 imageBox1.setPicNum(picNum);
@@ -1022,8 +1017,7 @@ public class BorrowerDetailsActivity extends AppCompatActivity implements Adapte
                                 imageBox2.setMatch("invalid");
                                 frontImageCollegeId = null;
                             }
-                            else if(picNum == 1){}
-                            else{
+                            else if(picNum != 1){
                                 imageBox1 = addressProof.get(1);
                                 imageBox2 = addressProof.get(picNum);
                                 imageBox1.setPicNum(picNum);
@@ -1101,6 +1095,7 @@ public class BorrowerDetailsActivity extends AppCompatActivity implements Adapte
     }
 
     public void confirmSubmit(View view) {
+        borrowerStateContainer = new BorrowerStateContainer(BorrowerDetailsActivity.this);
         if(borrowerStateContainer.isCompleted()) {
             borrowerDataUpdater = new BorrowerDataUpdater(this, "button");
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -1297,6 +1292,8 @@ public class BorrowerDetailsActivity extends AppCompatActivity implements Adapte
         return financiallyResponsible;
     }
 
+    public String getSpinnerLoanRepay() { return loanRepay; }
+
 
 
     @Override
@@ -1455,14 +1452,5 @@ public class BorrowerDetailsActivity extends AppCompatActivity implements Adapte
         }
 
     }
-    private  void focusOnView(final View view){
-        new Handler().post(new Runnable() {
-            @Override
-            public void run() {
-                scrollView.smoothScrollTo(0, view.getBottom());
-            }
-        });
-    }
-
 
 }

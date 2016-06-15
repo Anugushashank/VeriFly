@@ -6,8 +6,9 @@ package com.example.aparna.buddy.model;
  */
 public class BorrowerData {
 
-    String _id,  assignDate, scheduleDate, assignedTo, assignedToName, assignedToCollege, userId, userCollege, distanceBwColleges, taskStatus,
-            taskType, differentColleges, updatedAt;
+    String _id,  assignDate, scheduleDate, assignedTo, assignedToName, assignedToCollege, userId, userName, userCollege, distanceBwColleges, taskStatus,
+            taskType, updatedAt, completionDate, taskStartDate, taskInProgressDate, taskCompletionDate;
+    Boolean differentColleges;
     UploadDocModel userInfo;
     VerificationInfo verificationInfo;
 
@@ -38,13 +39,17 @@ public class BorrowerData {
 
     public String getUserCollege() { return userCollege; }
 
+    public String getUserName() { return userName; }
+
     public String getDistanceBwColleges() { return distanceBwColleges; }
 
     public String getTaskStatus() { return taskStatus; }
 
     public String getTaskType() { return taskType; }
 
-    public String getDifferentColleges() { return differentColleges; }
+    public Boolean getDifferentColleges() { return differentColleges; }
 
     public String getUpdatedAt() { return updatedAt; }
+
+    public String getCompletionDate() { return completionDate; }
 }

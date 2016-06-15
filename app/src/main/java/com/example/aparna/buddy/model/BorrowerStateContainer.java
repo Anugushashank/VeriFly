@@ -16,13 +16,13 @@ public class BorrowerStateContainer {
     }
 
     public Boolean isCompleted() {
-        if(activity.getFrontImageCollegeId() !=null && activity.getBackImageCollegeId() != null && checkBankProofs() &&  checkGradeSheets()&&
-                activity.getGoodFriendsRadio() != null
-                && activity.getYearBackRadio() != null && !activity.getRefDept().equals("")  && !activity.getRefYear().equals("") &&
-                activity.getRepayBackLoan() != null && activity.getTransparentRadio() != null && activity.getGiveLoanRadio() != null &&
-                activity.getSpinnerCocurricular() != null && activity.getSpinnerFinRes() != null && activity.getSpinnerPunc() != null
-                && activity.getSpinnerSincere() != null && activity.getNumBankProofs() > 0 && activity.getNumGradeSheets() > 0 ){
-            Log.i("djfgfsd",activity.getRefDept()+activity.getRefYear()+"            hhhhf");
+        if(!activity.getFrontImageCollegeId().equals("")  && !activity.getBackImageCollegeId().equals("") && checkBankProofs() &&  checkGradeSheets()&&
+                !activity.getGoodFriendsRadio().equals("")
+                && !activity.getYearBackRadio().equals("") && !activity.getRefDept().equals("")  && !activity.getRefYear().equals("") &&
+                !activity.getRepayBackLoan().equals("") && !activity.getTransparentRadio().equals("") && !activity.getGiveLoanRadio().equals("") &&
+                !activity.getSpinnerCocurricular().equals("") && !activity.getSpinnerFinRes().equals("")  && !activity.getSpinnerPunc().equals("")
+                && !activity.getSpinnerSincere().equals("") && !activity.getSpinnerLoanRepay().equals("")  && activity.getNumBankProofs() > 0
+                && activity.getNumGradeSheets() > 0 ){
             return true;
         }
         else{
@@ -31,11 +31,11 @@ public class BorrowerStateContainer {
     }
 
     public Boolean isOngoing() {
-        if(     activity.getGoodFriendsRadio() != null || activity.getYearBackRadio() != null || activity.getRefDept() != null ||
-                activity.getRefYear() != null || activity.getRepayBackLoan() != null ||
-                activity.getTransparentRadio() != null || activity.getGiveLoanRadio() != null || activity.getSpinnerCocurricular() != null
-                && activity.getSpinnerFinRes() != null || activity.getSpinnerPunc() != null || activity.getSpinnerSincere() != null ||
-                activity.getNumBankProofs() > 0 || activity.getNumGradeSheets() > 0 ){
+        if( !activity.getGoodFriendsRadio().equals("") || !activity.getYearBackRadio().equals("") || !activity.getRefDept().equals("")
+                || !activity.getRefYear().equals("") || !activity.getRepayBackLoan().equals("") || !activity.getTransparentRadio().equals("")
+                || !activity.getGiveLoanRadio().equals("") || !activity.getSpinnerCocurricular().equals("") || !activity.getSpinnerFinRes().equals("")
+                || !activity.getSpinnerPunc().equals("") || !activity.getSpinnerSincere().equals("") || !activity.getSpinnerLoanRepay().equals("")
+                || activity.getNumBankProofs() > 0 || activity.getNumGradeSheets() > 0     ){
 
             return true;
         }

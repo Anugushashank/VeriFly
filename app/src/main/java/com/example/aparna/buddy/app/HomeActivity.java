@@ -28,6 +28,7 @@ import android.widget.TextView;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.example.aparna.buddy.model.ApiResponse;
 import com.example.aparna.buddy.model.BuddyConstants;
+import com.example.aparna.buddy.model.IntercomModel;
 import com.google.gson.Gson;
 
 
@@ -39,8 +40,10 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import io.intercom.android.sdk.Intercom;
+import io.intercom.android.sdk.identity.Registration;
 import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -56,6 +59,7 @@ public class HomeActivity extends AppCompatActivity {
     private final List<String> taskTypes = Arrays.asList("new", "ongoing", "completed");
     private Context context;
     Intent intent;
+    IntercomModel intercomModel;
     android.support.v7.app.AlertDialog alertDialog;
 
     @Override
@@ -100,55 +104,65 @@ public class HomeActivity extends AppCompatActivity {
                     String apiResponse;
                     JSONObject responseReader;
                     JSONArray dataList;
-                    OkHttpClient client = new OkHttpClient();
-                    int position = 0;
+                    try {
 
-                    for (String task : taskTypes) {
-
-                        url = new HttpUrl.Builder()
-                                .scheme("http")
-                                .host(context.getResources().getString(R.string.api_host))
-                                .addPathSegments(context.getResources().getString(R.string.tasks_path))
-                                .addQueryParameter("assignedTo", username)
-                                .addQueryParameter("taskStatus", task)
-                                .build();
-
-                        request = new Request.Builder()
-                                .url(url)
-                                .get()
-                                .addHeader("x-access-token", token)
-                                .addHeader("content-type", "application/json")
-                                .build();
-
-                        try {
-                            response = client.newCall(request).execute();
-
-                            if (!response.isSuccessful()) {
-                                throw new IOException("Unexpected code " + response);
-                            }
-
-                            apiResponse = response.body().string();
-
-                            ApiResponse apiResponse1 = new Gson().fromJson(apiResponse, ApiResponse.class);
-
-                            if (apiResponse1.getStatus().equals("error")) {
-
-                                allTabsData.put(position, null);
-                                position++;
-                            } else {
-
-                                responseReader = new JSONObject(apiResponse);
-                                dataList = responseReader.getJSONArray("data");
-
-                                allTabsData.put(position, dataList.toString());
-                                Log.i("status",dataList.toString());
-                                position++;
-                            }
-                        } catch (Exception e) {
-                            apiException = e;
-                            Log.d("Tasks", e.getMessage());
-                            position++;
+                        if (token == null) {
+                            throw new Exception();
                         }
+
+                        OkHttpClient client = new OkHttpClient.Builder()
+                                .connectTimeout(5, TimeUnit.SECONDS)
+                                .readTimeout(5, TimeUnit.SECONDS)
+                                .build();
+
+                        int position = 0;
+
+                        for (String task : taskTypes) {
+
+                            url = new HttpUrl.Builder()
+                                    .scheme("http")
+                                    .host(context.getResources().getString(R.string.api_host))
+                                    .addPathSegments(context.getResources().getString(R.string.tasks_path))
+                                    .addQueryParameter("assignedTo", username)
+                                    .addQueryParameter("taskStatus", task)
+                                    .build();
+
+                            request = new Request.Builder()
+                                    .url(url)
+                                    .get()
+                                    .addHeader("x-access-token", token)
+                                    .addHeader("content-type", "application/json")
+                                    .build();
+                            try {
+                                response = client.newCall(request).execute();
+                                if (!response.isSuccessful()) {
+                                    throw new IOException("Unexpected code " + response);
+                                }
+                                apiResponse = response.body().string();
+
+                                ApiResponse apiResponse1 = new Gson().fromJson(apiResponse, ApiResponse.class);
+
+                                if (apiResponse1.getStatus().equals("error")) {
+
+                                    allTabsData.put(position, null);
+                                    position++;
+                                } else {
+
+                                    responseReader = new JSONObject(apiResponse);
+                                    dataList = responseReader.getJSONArray("data");
+
+                                    allTabsData.put(position, dataList.toString());
+                                    Log.i("status", dataList.toString());
+                                    position++;
+                                }
+                            } catch (Exception e) {
+                                apiException = e;
+                                break;
+                            }
+                        }
+                    }
+                    catch (Exception e) {
+                        apiException = e;
                     }
                     return null;
                 }
@@ -161,6 +175,9 @@ public class HomeActivity extends AppCompatActivity {
 
                     if (apiException != null) {
                         // something went wrote, maybe reload the activity
+                        materialDialog.dismiss();
+                        connectionTimeOut();
+                        return;
                     }
 
                 /*
@@ -169,6 +186,9 @@ public class HomeActivity extends AppCompatActivity {
                 the default action bar thus making the toolbar work like a normal
                 action bar.
                 */
+                    intercomModel = new IntercomModel();
+                    intercomModel.sendData(allTabsData);
+
                     ViewPagerAdapter viewPagerAdapter = new ViewPagerAdapter(getSupportFragmentManager(), HomeActivity.this, allTabsData);
                     viewPager.setAdapter(viewPagerAdapter);
                     setSupportActionBar(toolBar);
@@ -221,6 +241,7 @@ public class HomeActivity extends AppCompatActivity {
                 */
                     viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
                     tabLayout.setOnTabSelectedListener(new TabLayout.ViewPagerOnTabSelectedListener(viewPager));
+
                 }
             }.execute();
         }
@@ -246,6 +267,8 @@ public class HomeActivity extends AppCompatActivity {
         //noinspection SimplifiableIfStatement
         final Intent intent = new Intent(this,LoginActivity.class);
 
+        Exception exception;
+
         if (id == R.id.logouticon) {
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
             builder.setMessage("Are you sure you want to log out?")
@@ -260,7 +283,7 @@ public class HomeActivity extends AppCompatActivity {
                             Intercom.client().reset();
 
                             // Commit the edits!
-                            editor.commit();
+                            editor.apply();
                             startActivity(intent);
                             HomeActivity.this.finish();
 
@@ -277,7 +300,7 @@ public class HomeActivity extends AppCompatActivity {
             try {
                 Intercom.client().displayMessageComposer();
             } catch (Exception e) {
-
+                exception = e;
             }
         }
 
@@ -332,6 +355,33 @@ public class HomeActivity extends AppCompatActivity {
                         Intent intent=new Intent(getApplicationContext(),LoginActivity.class);
                         if(isNetworkConnected()) {
                             startActivity(intent);
+                            HomeActivity.this.finish();
+                        }
+                        else{
+                            alertBox();
+                        }
+                    }
+                })
+                .setIcon(android.R.drawable.ic_dialog_alert)
+                .show();
+        alertDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+            @Override
+            public void onCancel(DialogInterface dialog) {
+                finish();
+            }
+
+        });
+    }
+    private void connectionTimeOut(){
+        alertDialog = new android.support.v7.app.AlertDialog.Builder(this)
+                .setTitle("Connection Time Out")
+                .setMessage("Try connecting again")
+                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        Intent intent=new Intent(getApplicationContext(),LoginActivity.class);
+                        if(isNetworkConnected()) {
+                            startActivity(intent);
+                            HomeActivity.this.finish();
                         }
                         else{
                             alertBox();

@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,6 +18,9 @@ import com.google.gson.Gson;
 
 import java.util.List;
 
+import io.intercom.android.sdk.Intercom;
+import io.intercom.android.sdk.identity.Registration;
+
 /**
  * Created by Aparna on 05-Apr-16.
  */
@@ -26,7 +30,6 @@ public class CardAdapter extends RecyclerView.Adapter<CardAdapter.CardViewHolder
     private LayoutInflater bInflator;
     private Context context;
     private int taskType;
-    private IntercomModel intercomModel;
 
     public CardAdapter(Context context, List<BorrowerData> data, int taskType) {
         this.bData     = data;
@@ -46,8 +49,6 @@ public class CardAdapter extends RecyclerView.Adapter<CardAdapter.CardViewHolder
     @Override
     public void onBindViewHolder(CardViewHolder holder, int position) {
         BorrowerData currentObj = bData.get(position);
-        intercomModel = new IntercomModel(currentObj);
-        intercomModel.sendData();
         holder.setData(currentObj, position);
     }
 
@@ -77,7 +78,7 @@ public class CardAdapter extends RecyclerView.Adapter<CardAdapter.CardViewHolder
                 itemView.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        if (taskType != 3) {
+                        if (taskType != 2) {
                             Bundle bundle = new Bundle();
                             bundle.putString("borrowerData", new Gson().toJson(current));
 

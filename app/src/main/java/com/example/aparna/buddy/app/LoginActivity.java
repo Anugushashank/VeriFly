@@ -28,6 +28,7 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import io.intercom.android.sdk.Intercom;
 import io.intercom.android.sdk.identity.Registration;
@@ -45,7 +46,6 @@ public class LoginActivity extends AppCompatActivity {
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
 
         Intercom.initialize((Application) getApplicationContext(), "android_sdk-a252775c0f9cdd6cd922b6420a558fd2eb3f89b0", "utga6z2r");
         SharedPreferences settings = getSharedPreferences(BuddyConstants.PREFS_FILE, 0);
@@ -58,12 +58,14 @@ public class LoginActivity extends AppCompatActivity {
                 alertBox();
                 return;
             }
+
             Intercom.client().registerIdentifiedUser(new Registration().withUserId(settings.getString("username","")));
             Intent intent = new Intent(this, com.example.aparna.buddy.app.HomeActivity.class);
             startActivity(intent);
             this.finish();
         }
 
+        setContentView(R.layout.activity_main);
         phone    = (EditText) findViewById(R.id.editText);
         password = (EditText) findViewById(R.id.editText2);
     }
@@ -120,7 +122,10 @@ public class LoginActivity extends AppCompatActivity {
                         throw new Exception();
                     }
 
-                    OkHttpClient client = new OkHttpClient();
+                    OkHttpClient client = new OkHttpClient.Builder()
+                            .connectTimeout(6, TimeUnit.SECONDS)
+                            .build();
+
                     JSONObject jsonObject = new JSONObject();
                     jsonObject.put("userid", phone);
                     jsonObject.put("password", password);
@@ -153,6 +158,10 @@ public class LoginActivity extends AppCompatActivity {
                 if (materialDialog.isShowing()) {
                     materialDialog.hide();
                 }
+                if(asyncException != null){
+                    materialDialog.dismiss();
+                    connectionTimeOut();
+                }
 
                 Type type = new TypeToken<Map<String, String>>(){}.getType();
                 Map<String, String> responseMap = new Gson().fromJson(apiResponse, type);
@@ -172,7 +181,7 @@ public class LoginActivity extends AppCompatActivity {
                     editor.putString("username", username);
                     successfulLogin(username);
                     // Commit the edits!
-                    editor.commit();
+                    editor.apply();
                     Intent intent = new Intent(LoginActivity.this , HomeActivity.class);
                     startActivity(intent);
                     LoginActivity.this.finish();
@@ -211,11 +220,35 @@ public class LoginActivity extends AppCompatActivity {
 
         });
     }
+    private void connectionTimeOut(){
+        alertDialog = new android.support.v7.app.AlertDialog.Builder(this)
+                .setTitle("Connection Time Out")
+                .setMessage("Try connecting again")
+                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        Intent intent=new Intent(getApplicationContext(),LoginActivity.class);
+                        if(isNetworkConnected()) {
+                            startActivity(intent);
+                            finish();
+                        }
+                        else{
+                            alertBox();
+                        }
+                    }
+                })
+                .setIcon(android.R.drawable.ic_dialog_alert)
+                .show();
+        alertDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+            @Override
+            public void onCancel(DialogInterface dialog) {
+                finish();
+            }
+
+        });
+    }
 
     private void successfulLogin(String username){
-        // …
-        // Registering with Intercom is easy. For best results, use a unique
-        // user_id if you have one.
+
         Intercom.client().registerIdentifiedUser(new Registration().withUserId(username));
     }
 
