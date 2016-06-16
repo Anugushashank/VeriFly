@@ -61,6 +61,7 @@ public class HomeActivity extends AppCompatActivity {
     Intent intent;
     IntercomModel intercomModel;
     android.support.v7.app.AlertDialog alertDialog;
+    SharedPreferences settings;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,8 +75,11 @@ public class HomeActivity extends AppCompatActivity {
         intent = getIntent();
 
 
-        SharedPreferences settings = getSharedPreferences(BuddyConstants.PREFS_FILE, 0);
+        settings = getSharedPreferences(BuddyConstants.PREFS_FILE, 0);
         username = settings.getString("username", "");
+
+        SharedPreferences.Editor editor = settings.edit();
+
 
         // Earnings does not has an API now just setting some
         final TextView earnings = (TextView) toolBar.findViewById(R.id.earnings);
@@ -239,6 +243,7 @@ public class HomeActivity extends AppCompatActivity {
                 1st we add the PageChangeListener and pass a TabLayoutPageChangeListener so that Tabs Selection
                 changes when a viewpager page changes.
                 */
+                    viewPager.setCurrentItem(settings.getInt("tab",0),true);
                     viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
                     tabLayout.setOnTabSelectedListener(new TabLayout.ViewPagerOnTabSelectedListener(viewPager));
 
@@ -406,8 +411,9 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     @Override
-    public void onRestart(){
+    public void onRestart() {
         super.onRestart();
+
         finish();
         startActivity(intent);
     }

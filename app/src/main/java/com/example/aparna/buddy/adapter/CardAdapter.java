@@ -2,6 +2,7 @@ package com.example.aparna.buddy.adapter;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -13,6 +14,7 @@ import android.widget.TextView;
 import com.example.aparna.buddy.app.BorrowerDetailsActivity;
 import com.example.aparna.buddy.app.R;
 import com.example.aparna.buddy.model.BorrowerData;
+import com.example.aparna.buddy.model.BuddyConstants;
 import com.example.aparna.buddy.model.IntercomModel;
 import com.google.gson.Gson;
 
@@ -73,7 +75,7 @@ public class CardAdapter extends RecyclerView.Adapter<CardAdapter.CardViewHolder
             college = (TextView)itemView.findViewById(R.id.borrowerCollege);
             date = (TextView)itemView.findViewById(R.id.dueDate);
             tasktype = (TextView)itemView.findViewById(R.id.taskType);
-
+            final SharedPreferences settings = context.getSharedPreferences(BuddyConstants.PREFS_FILE, 0);
 
                 itemView.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -81,6 +83,10 @@ public class CardAdapter extends RecyclerView.Adapter<CardAdapter.CardViewHolder
                         if (taskType != 2) {
                             Bundle bundle = new Bundle();
                             bundle.putString("borrowerData", new Gson().toJson(current));
+
+                            SharedPreferences.Editor editor = settings.edit();
+                            editor.putInt("tab",taskType);
+                            editor.apply();
 
                             Intent i = new Intent(context, BorrowerDetailsActivity.class);
                             i.putExtras(bundle);
@@ -92,12 +98,17 @@ public class CardAdapter extends RecyclerView.Adapter<CardAdapter.CardViewHolder
         }
 
         public void setData(BorrowerData currentObj, int position){
-            this.name.setText(currentObj.getUploadDocModel().getName());
-            this.college.setText(currentObj.getUploadDocModel().getCollege());
-            this.date.setText(currentObj.getScheduleDate().substring(0,10));
-            this.tasktype.setText(currentObj.getTaskType());
-            this.position = position;
-            this.current = currentObj;
+            try {
+                this.name.setText(currentObj.getUploadDocModel().getName());
+                this.college.setText(currentObj.getUploadDocModel().getCollege());
+                this.date.setText(currentObj.getScheduleDate().substring(0, 10));
+                this.tasktype.setText(currentObj.getTaskType());
+                this.position = position;
+                this.current = currentObj;
+            }
+            catch(Exception e){
+
+            }
         }
     }
 }

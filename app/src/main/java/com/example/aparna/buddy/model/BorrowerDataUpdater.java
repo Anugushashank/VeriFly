@@ -33,237 +33,229 @@ public class BorrowerDataUpdater {
     String submit, username;
     int conformDocs = 0, conformVerify = 0;
 
+
+
     public BorrowerDataUpdater(BorrowerDetailsActivity activity, String submit) {
         this.activity = activity;
         this.submit = submit;
     }
 
     public void updateToApi() {
-
-        SharedPreferences settings = activity.getSharedPreferences(BuddyConstants.PREFS_FILE, 0);
-        username = settings.getString("username","");
-
-        String referenceIsGoodFriend =  activity.getGoodFriendsRadio();
-        final String phone = activity.getUploadDocModel().getPhone();
-        String referenceYear = activity.getRefYear();
-        String referenceDepartment = activity.getRefDept();
-        String punctualityInClass = activity.getSpinnerPunc();
-        String sincerityInStudies = activity.getSpinnerSincere();
-        String coCurricularParticipation = activity.getSpinnerCocurricular();
-        String financiallyResponsible = activity.getSpinnerFinRes();
-        String friendVerificationNotes = activity.getOtherNotes().toString();
-        String yearBackTrue = activity.getYearBackRadio();
-        String loanRepay = activity.getRepayBackLoan();
-        String transparentTrue = activity.getTransparentRadio();
-        String loanRepayTrue = activity.getGiveLoanRadio();
-        ArrayList<ImageBox> addressProofs = activity.getAddressProofs();
-        ArrayList<ImageBox> collegeIds = activity.getCollegeIDs();
-        ArrayList<ImageBox> bankProofs = activity.getBankProofs();
-        ArrayList<ImageBox> gradeSheets = activity.getGradeSheets();
+            SharedPreferences settings = activity.getSharedPreferences(BuddyConstants.PREFS_FILE, 0);
+            username = settings.getString("username", "");
 
 
+            String referenceIsGoodFriend = activity.getGoodFriendsRadio();
+            final String phone = activity.getUploadDocModel().getPhone();
+            String referenceYear = activity.getRefYear();
+            String referenceDepartment = activity.getRefDept();
+            String punctualityInClass = activity.getSpinnerPunc();
+            String sincerityInStudies = activity.getSpinnerSincere();
+            String coCurricularParticipation = activity.getSpinnerCocurricular();
+            String financiallyResponsible = activity.getSpinnerFinRes();
+            String friendVerificationNotes = activity.getOtherNotes().toString();
+            String yearBackTrue = activity.getYearBackRadio();
+            String loanRepay = activity.getRepayBackLoan();
+            String transparentTrue = activity.getTransparentRadio();
+            String loanRepayTrue = activity.getGiveLoanRadio();
+            ArrayList<ImageBox> addressProofs = activity.getAddressProofs();
+            ArrayList<ImageBox> collegeIds = activity.getCollegeIDs();
+            ArrayList<ImageBox> bankProofs = activity.getBankProofs();
+            ArrayList<ImageBox> gradeSheets = activity.getGradeSheets();
 
+        try{
+            verificationInfo = new VerificationInfo();
 
-
-
-        verificationInfo = new VerificationInfo();
-
-        if(referenceIsGoodFriend != null){
-            if(referenceIsGoodFriend.equals("true")){
-                verificationInfo.setReferenceIsGoodFriend(true);
-            }
-            else{
-                verificationInfo.setReferenceIsGoodFriend(false);
-            }
-            conformVerify++;
-        }
-
-        if(referenceYear != null){
-            verificationInfo.setReferenceYear(referenceYear);
-            conformVerify++;
-        }
-
-        if(referenceDepartment != null){
-            verificationInfo.setReferenceDepartment(referenceDepartment);
-            conformVerify++;
-        }
-
-        if(punctualityInClass != null){
-            verificationInfo.setPunctualityInClass(punctualityInClass);
-            conformVerify++;
-        }
-
-        if(sincerityInStudies != null){
-            verificationInfo.setSincerityInStudies(sincerityInStudies);
-            conformVerify++;
-        }
-
-        if(coCurricularParticipation != null){
-            verificationInfo.setCoCurricularParticipation(coCurricularParticipation);
-            conformVerify++;
-        }
-
-        if(financiallyResponsible != null){
-            verificationInfo.setFinanciallyResponsible(financiallyResponsible);
-            conformVerify++;
-        }
-
-        if(friendVerificationNotes != null){
-            verificationInfo.setFinalVerificationNotes(friendVerificationNotes);
-            conformVerify++;
-        }
-
-        if(yearBackTrue != null){
-            if(yearBackTrue.equals("true")){
-                verificationInfo.setHaveYearBack(true);
-            }
-            else{
-                verificationInfo.setHaveYearBack(false);
-            }
-            conformVerify++;
-        }
-
-        if(loanRepay != null){
-            verificationInfo.setRepayCapacity(loanRepay);
-            conformVerify++;
-        }
-
-        if(transparentTrue != null){
-            if(transparentTrue.equals("true")){
-                verificationInfo.setBorrowerIsLying(true);
-            }
-            else{
-                verificationInfo.setBorrowerIsLying(false);
-            }
-            conformVerify++;
-        }
-
-        if(loanRepayTrue != null){
-            if(loanRepayTrue.equals("true")){
-                verificationInfo.setGiveHimLoan(true);
-            }
-            else{
-                verificationInfo.setGiveHimLoan(false);
-            }
-            conformVerify++;
-        }
-
-        borrowerStateContainer = new BorrowerStateContainer(activity);
-
-        if(borrowerStateContainer.isCompleted()){
-            verificationInfo.setTaskStatus("completed");
-        }
-        else if(borrowerStateContainer.isOngoing()){
-            verificationInfo.setTaskStatus("ongoing");
-        }
-        else{
-            verificationInfo.setTaskStatus("new");
-        }
-       
-
-
-
-
-
-
-
-        uploadDocModel = new UploadDocModel();
-
-        uploadDocModel.setUserid(phone);
-
-        if(bankProofs.size() > 1) {
-
-            UploadDocModel.NonFrontAndBackDocs nonFrontAndBackDocsBankProof = uploadDocModel.new NonFrontAndBackDocs();
-
-            nonFrontAndBackDocsBankProof.setInvalidImgUrls(bankProofs);
-            nonFrontAndBackDocsBankProof.setValidImgUrls(bankProofs);
-            nonFrontAndBackDocsBankProof.setImgUrls(bankProofs);
-            nonFrontAndBackDocsBankProof.setVerifiedBy(username);
-            nonFrontAndBackDocsBankProof.setIsVerified(true);
-            uploadDocModel.setBankProof(nonFrontAndBackDocsBankProof);
-            conformDocs++;
-        }
-
-        if(gradeSheets.size() > 1) {
-
-            UploadDocModel.NonFrontAndBackDocs nonFrontAndBackDocsGradeSheet = uploadDocModel.new NonFrontAndBackDocs();
-
-            nonFrontAndBackDocsGradeSheet.setInvalidImgUrls(gradeSheets);
-            nonFrontAndBackDocsGradeSheet.setValidImgUrls(gradeSheets);
-            nonFrontAndBackDocsGradeSheet.setImgUrls(gradeSheets);
-            nonFrontAndBackDocsGradeSheet.setVerifiedBy(username);
-            nonFrontAndBackDocsGradeSheet.setIsVerified(true);
-            uploadDocModel.setGradeSheet(nonFrontAndBackDocsGradeSheet);
-            conformDocs++;
-        }
-
-        if(collegeIds.size() > 1) {
-
-            UploadDocModel.FrontAndBackDocs frontAndBackDocsCollegeId = uploadDocModel.new FrontAndBackDocs();
-
-            UploadDocModel.FrontBackImage frontBackImageFront = uploadDocModel.new FrontBackImage();
-
-            UploadDocModel.FrontBackImage frontBackImageBack = uploadDocModel.new FrontBackImage();
-
-            if(activity.getBackImageCollegeId() != null) {
-                for(int i=0 ; i < collegeIds.size() ; i++){
-                    if(collegeIds.get(i).getMatch().equals("back")){
-                        frontBackImageBack.setIsVerified(collegeIds.get(i).getIsVerified());
-                        break;
-                    }
+            if (referenceIsGoodFriend != null) {
+                if (referenceIsGoodFriend.equals("true")) {
+                    verificationInfo.setReferenceIsGoodFriend(true);
+                } else {
+                    verificationInfo.setReferenceIsGoodFriend(false);
                 }
-                frontBackImageBack.setImgUrl(activity.getBackImageCollegeId());
-                frontBackImageBack.setVerifiedBy(username);
-                frontAndBackDocsCollegeId.setBack(frontBackImageBack);
+                conformVerify++;
             }
-            if(activity.getFrontImageCollegeId() != null) {
-                for(int i=0 ; i < collegeIds.size() ; i++){
-                    if(collegeIds.get(i).getMatch().equals("front")){
-                        frontBackImageFront.setIsVerified(collegeIds.get(i).getIsVerified());
-                        break;
-                    }
+
+            if (referenceYear != null) {
+                verificationInfo.setReferenceYear(referenceYear);
+                conformVerify++;
+            }
+
+            if (referenceDepartment != null) {
+                verificationInfo.setReferenceDepartment(referenceDepartment);
+                conformVerify++;
+            }
+
+            if (punctualityInClass != null) {
+                verificationInfo.setPunctualityInClass(punctualityInClass);
+                conformVerify++;
+            }
+
+            if (sincerityInStudies != null) {
+                verificationInfo.setSincerityInStudies(sincerityInStudies);
+                conformVerify++;
+            }
+
+            if (coCurricularParticipation != null) {
+                verificationInfo.setCoCurricularParticipation(coCurricularParticipation);
+                conformVerify++;
+            }
+
+            if (financiallyResponsible != null) {
+                verificationInfo.setFinanciallyResponsible(financiallyResponsible);
+                conformVerify++;
+            }
+
+            if (friendVerificationNotes != null) {
+                verificationInfo.setFinalVerificationNotes(friendVerificationNotes);
+                conformVerify++;
+            }
+
+            if (yearBackTrue != null) {
+                if (yearBackTrue.equals("true")) {
+                    verificationInfo.setHaveYearBack(true);
+                } else {
+                    verificationInfo.setHaveYearBack(false);
                 }
-                frontBackImageFront.setImgUrl(activity.getFrontImageCollegeId());
-                frontBackImageFront.setVerifiedBy(username);
-                frontAndBackDocsCollegeId.setFront(frontBackImageFront);
+                conformVerify++;
             }
-            frontAndBackDocsCollegeId.setImgUrls(collegeIds);
-            uploadDocModel.setCollegeID(frontAndBackDocsCollegeId);
-            conformDocs++;
+
+            if (loanRepay != null) {
+                verificationInfo.setRepayCapacity(loanRepay);
+                conformVerify++;
+            }
+
+            if (transparentTrue != null) {
+                if (transparentTrue.equals("true")) {
+                    verificationInfo.setBorrowerIsLying(true);
+                } else {
+                    verificationInfo.setBorrowerIsLying(false);
+                }
+                conformVerify++;
+            }
+
+            if (loanRepayTrue != null) {
+                if (loanRepayTrue.equals("true")) {
+                    verificationInfo.setGiveHimLoan(true);
+                } else {
+                    verificationInfo.setGiveHimLoan(false);
+                }
+                conformVerify++;
+            }
+
+            borrowerStateContainer = new BorrowerStateContainer(activity);
+
+            if (borrowerStateContainer.isCompleted()) {
+                verificationInfo.setTaskStatus("completed");
+            }
+            else if (borrowerStateContainer.isOngoing()) {
+                verificationInfo.setTaskStatus("ongoing");
+            }
+            else {
+                verificationInfo.setTaskStatus("new");
+            }
+
+
+            uploadDocModel = new UploadDocModel();
+
+            uploadDocModel.setUserid(phone);
+
+            if (bankProofs.size() > 1) {
+
+                UploadDocModel.NonFrontAndBackDocs nonFrontAndBackDocsBankProof = uploadDocModel.new NonFrontAndBackDocs();
+
+                nonFrontAndBackDocsBankProof.setInvalidImgUrls(bankProofs);
+                nonFrontAndBackDocsBankProof.setValidImgUrls(bankProofs);
+                nonFrontAndBackDocsBankProof.setImgUrls(bankProofs);
+                nonFrontAndBackDocsBankProof.setVerifiedBy(username);
+                nonFrontAndBackDocsBankProof.setIsVerified(true);
+                uploadDocModel.setBankProof(nonFrontAndBackDocsBankProof);
+                conformDocs++;
+            }
+
+            if (gradeSheets.size() > 1) {
+
+                UploadDocModel.NonFrontAndBackDocs nonFrontAndBackDocsGradeSheet = uploadDocModel.new NonFrontAndBackDocs();
+
+                nonFrontAndBackDocsGradeSheet.setInvalidImgUrls(gradeSheets);
+                nonFrontAndBackDocsGradeSheet.setValidImgUrls(gradeSheets);
+                nonFrontAndBackDocsGradeSheet.setImgUrls(gradeSheets);
+                nonFrontAndBackDocsGradeSheet.setVerifiedBy(username);
+                nonFrontAndBackDocsGradeSheet.setIsVerified(true);
+                uploadDocModel.setGradeSheet(nonFrontAndBackDocsGradeSheet);
+                conformDocs++;
+            }
+
+            if (collegeIds.size() > 1) {
+
+                UploadDocModel.FrontAndBackDocs frontAndBackDocsCollegeId = uploadDocModel.new FrontAndBackDocs();
+
+                UploadDocModel.FrontBackImage frontBackImageFront = uploadDocModel.new FrontBackImage();
+
+                UploadDocModel.FrontBackImage frontBackImageBack = uploadDocModel.new FrontBackImage();
+
+                if (activity.getBackImageCollegeId() != null) {
+                    for (int i = 0; i < collegeIds.size(); i++) {
+                        if (collegeIds.get(i).getMatch().equals("back")) {
+                            frontBackImageBack.setIsVerified(collegeIds.get(i).getIsVerified());
+                            break;
+                        }
+                    }
+                    frontBackImageBack.setImgUrl(activity.getBackImageCollegeId());
+                    frontBackImageBack.setVerifiedBy(username);
+                    frontAndBackDocsCollegeId.setBack(frontBackImageBack);
+                }
+                if (activity.getFrontImageCollegeId() != null) {
+                    for (int i = 0; i < collegeIds.size(); i++) {
+                        if (collegeIds.get(i).getMatch().equals("front")) {
+                            frontBackImageFront.setIsVerified(collegeIds.get(i).getIsVerified());
+                            break;
+                        }
+                    }
+                    frontBackImageFront.setImgUrl(activity.getFrontImageCollegeId());
+                    frontBackImageFront.setVerifiedBy(username);
+                    frontAndBackDocsCollegeId.setFront(frontBackImageFront);
+                }
+                frontAndBackDocsCollegeId.setImgUrls(collegeIds);
+                uploadDocModel.setCollegeID(frontAndBackDocsCollegeId);
+                conformDocs++;
+            }
+
+            if (addressProofs != null) {
+
+                UploadDocModel.FrontAndBackDocs frontAndBackDocsAddressProof = uploadDocModel.new FrontAndBackDocs();
+
+                UploadDocModel.FrontBackImage frontBackImageFront = uploadDocModel.new FrontBackImage();
+
+                UploadDocModel.FrontBackImage frontBackImageBack = uploadDocModel.new FrontBackImage();
+
+                if (activity.getFrontImageAddressProof() != null) {
+                    for (int i = 0; i < addressProofs.size(); i++) {
+                        if (addressProofs.get(i).getMatch().equals("front")) {
+                            frontBackImageFront.setIsVerified(addressProofs.get(i).getIsVerified());
+                            break;
+                        }
+                    }
+                    frontBackImageFront.setImgUrl(activity.getFrontImageAddressProof());
+                    frontBackImageFront.setVerifiedBy(username);
+                    frontAndBackDocsAddressProof.setFront(frontBackImageFront);
+                }
+                if (activity.getBackImageAddressProof() != null) {
+                    for (int i = 0; i < addressProofs.size(); i++) {
+                        if (addressProofs.get(i).getMatch().equals("back")) {
+                            frontBackImageBack.setIsVerified(addressProofs.get(i).getIsVerified());
+                        }
+                    }
+                    frontBackImageBack.setImgUrl(activity.getBackImageAddressProof());
+                    frontBackImageBack.setVerifiedBy(username);
+                    frontAndBackDocsAddressProof.setBack(frontBackImageBack);
+                }
+                frontAndBackDocsAddressProof.setImgUrls(addressProofs);
+                uploadDocModel.setAddressProof(frontAndBackDocsAddressProof);
+                conformDocs++;
+            }
         }
+        catch(Exception e){
 
-        if(addressProofs != null) {
-
-            UploadDocModel.FrontAndBackDocs frontAndBackDocsAddressProof = uploadDocModel.new FrontAndBackDocs();
-
-            UploadDocModel.FrontBackImage frontBackImageFront = uploadDocModel.new FrontBackImage();
-
-            UploadDocModel.FrontBackImage frontBackImageBack = uploadDocModel.new FrontBackImage();
-
-            if(activity.getFrontImageAddressProof() != null) {
-                for(int i=0 ; i < addressProofs.size() ; i++){
-                    if(addressProofs.get(i).getMatch().equals("front")){
-                        frontBackImageFront.setIsVerified(addressProofs.get(i).getIsVerified());
-                        break;
-                    }
-                }
-                frontBackImageFront.setImgUrl(activity.getFrontImageAddressProof());
-                frontBackImageFront.setVerifiedBy(username);
-                frontAndBackDocsAddressProof.setFront(frontBackImageFront);
-            }
-            if(activity.getBackImageAddressProof() != null) {
-                for(int i=0 ; i < addressProofs.size() ; i++){
-                    if(addressProofs.get(i).getMatch().equals("back")){
-                        frontBackImageBack.setIsVerified(addressProofs.get(i).getIsVerified());
-                    }
-                }
-                frontBackImageBack.setImgUrl(activity.getBackImageAddressProof());
-                frontBackImageBack.setVerifiedBy(username);
-                frontAndBackDocsAddressProof.setBack(frontBackImageBack);
-            }
-            frontAndBackDocsAddressProof.setImgUrls(addressProofs);
-            uploadDocModel.setAddressProof(frontAndBackDocsAddressProof);
-            conformDocs++;
         }
 
 
@@ -303,7 +295,7 @@ public class BorrowerDataUpdater {
 
                         OkHttpClient client = new OkHttpClient();
                         String jsonString = new Gson().toJson(uploadDocModel);
-                        Log.i("sdhjfhdjfdf",jsonString.toString());
+                        Log.i("Updation",jsonString.toString());
 
                         HttpUrl url = new HttpUrl.Builder()
                                 .scheme("http")
@@ -341,11 +333,7 @@ public class BorrowerDataUpdater {
 
                     if (asyncException != null || !apiResponse1.getStatus().equals("success")) {
                         // here tell that login request has thrown exception and ask to try again
-                        CharSequence text = context.getResources().getString(R.string.upload_failed);
-                        int duration = Toast.LENGTH_SHORT;
 
-                        Toast toast = Toast.makeText(context, text, duration);
-                        toast.show();
                     } else {
                         if(submit.equals("back") || submit.equals("button")) {
                             activity.finish();
@@ -385,7 +373,7 @@ public class BorrowerDataUpdater {
 
                         OkHttpClient client = new OkHttpClient();
                         String jsonString = new Gson().toJson(verificationInfo);
-                        Log.i("ksjgfdsgf",jsonString.toString());
+                        Log.i("Updation",jsonString.toString());
 
                         HttpUrl url = new HttpUrl.Builder()
                                 .scheme("http")

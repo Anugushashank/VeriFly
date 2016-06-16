@@ -42,7 +42,7 @@
         <item name="colorControlNormal">@color/darkGray</item>
     </style>
 
-    <style name="DropDownTheme" parent="Base.Widget.AppCompat.Spinner">
+    <style name="DropDownTheme" parent="Base.Widget.AppCompat.DropDownItem.Spinner">
         <item name="colorControlNormal">@color/darkGray</item>
         <item name="colorControlActivated">@color/colorPrimary</item>
     </style>

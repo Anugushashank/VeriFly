@@ -43,10 +43,6 @@ public class UploadDocModel {
         return fbUserId;
     }
 
-    public String getDate() {
-        return "May 17";
-    }
-
     public void setUserid(String userid){ this.userid = userid; }
 
     public String getUserid() { return userid; }
