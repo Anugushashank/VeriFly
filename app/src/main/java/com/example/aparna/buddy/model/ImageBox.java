@@ -189,8 +189,8 @@ public class ImageBox {
                         if (item.getContent().equals(take_photo)) {
                             Intent intent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
                             editor.putInt("conform",getId());
-                            editor.putString("localPath",getCloudinaryId()+getPicNum());
-                            editor.commit();
+                            editor.putString("localPath",getCloudinaryId()+"-"+getPicNum());
+                            editor.apply();
                             dialog.dismiss();
                             if (ContextCompat.checkSelfPermission(activity, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED || ContextCompat.checkSelfPermission(activity, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
                                     ActivityCompat.requestPermissions(activity, new String[]{Manifest.permission.CAMERA,Manifest.permission.READ_EXTERNAL_STORAGE},1);
@@ -202,7 +202,7 @@ public class ImageBox {
                             Intent intent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
                             editor.putInt("conform",getId());
                             editor.putString("localPath",getCloudinaryId());
-                            editor.commit();
+                            editor.apply();
                             intent.setType("image/*");
                             dialog.dismiss();
                             if (ContextCompat.checkSelfPermission(activity, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {

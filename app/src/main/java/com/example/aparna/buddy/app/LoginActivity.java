@@ -110,7 +110,16 @@ public class LoginActivity extends AppCompatActivity {
                 materialDialog = new MaterialDialog.Builder(LoginActivity.this)
                                      .content(getResources().getString(R.string.login_dialogue))
                                      .progress(true, 0)
-                                     .show();
+                                      .canceledOnTouchOutside(false)
+                                      .show();
+
+                materialDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+                    @Override
+                    public void onCancel(DialogInterface dialog) {
+                        finish();
+                    }
+
+                });
             }
 
             @Override

@@ -23,6 +23,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.afollestad.materialdialogs.MaterialDialog;
@@ -62,6 +63,7 @@ public class HomeActivity extends AppCompatActivity {
     IntercomModel intercomModel;
     android.support.v7.app.AlertDialog alertDialog;
     SharedPreferences settings;
+    ImageView imageView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -78,7 +80,6 @@ public class HomeActivity extends AppCompatActivity {
         settings = getSharedPreferences(BuddyConstants.PREFS_FILE, 0);
         username = settings.getString("username", "");
 
-        SharedPreferences.Editor editor = settings.edit();
 
 
         // Earnings does not has an API now just setting some
@@ -96,7 +97,16 @@ public class HomeActivity extends AppCompatActivity {
                     materialDialog = new MaterialDialog.Builder(HomeActivity.this)
                             .content(getResources().getString(R.string.loading_tasks))
                             .progress(true, 0)
+                            .canceledOnTouchOutside(false)
                             .show();
+
+                    materialDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+                        @Override
+                        public void onCancel(DialogInterface dialog) {
+                            finish();
+                        }
+
+                    });
                 }
 
                 @Override
@@ -413,7 +423,6 @@ public class HomeActivity extends AppCompatActivity {
     @Override
     public void onRestart() {
         super.onRestart();
-
         finish();
         startActivity(intent);
     }

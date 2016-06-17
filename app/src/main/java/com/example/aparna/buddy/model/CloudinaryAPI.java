@@ -62,7 +62,7 @@ public class CloudinaryAPI {
 
                 Long tsLong     = System.currentTimeMillis() / 1000;
                 String ts       = tsLong.toString();
-                String publicId = borrowerData.getUploadDocModel().getPhone() + ts + localPath;
+                String publicId = borrowerData.getUploadDocModel().getPhone()+"-" + ts + "-" +localPath;
 
                 try {
                     cloudinary.uploader()
