@@ -43,6 +43,7 @@ public class CloudinaryAPI {
                 super.onPreExecute();
                 materialDialog = new MaterialDialog.Builder(activity)
                         .content(activity.getResources().getString(R.string.uploading_documents))
+                        .canceledOnTouchOutside(false)
                         .progress(true, 0)
                         .show();
             }

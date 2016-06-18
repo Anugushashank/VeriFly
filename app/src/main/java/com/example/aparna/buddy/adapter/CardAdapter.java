@@ -103,12 +103,11 @@ public class CardAdapter extends RecyclerView.Adapter<CardAdapter.CardViewHolder
                 this.college.setText(currentObj.getUploadDocModel().getCollege());
                 this.date.setText(currentObj.getScheduleDate().substring(0, 10));
                 this.tasktype.setText(currentObj.getTaskType());
-                this.position = position;
-                this.current = currentObj;
             }
             catch(Exception e){
-
             }
+            this.position = position;
+            this.current = currentObj;
         }
     }
 }

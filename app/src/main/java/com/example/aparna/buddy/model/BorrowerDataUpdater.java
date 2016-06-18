@@ -1,7 +1,6 @@
 package com.example.aparna.buddy.model;
 
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.util.Log;
@@ -9,7 +8,6 @@ import android.widget.Toast;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.example.aparna.buddy.app.BorrowerDetailsActivity;
-import com.example.aparna.buddy.app.HomeActivity;
 import com.example.aparna.buddy.app.R;
 import com.example.aparna.buddy.app.TokenService;
 import com.google.gson.Gson;
@@ -23,7 +21,7 @@ import okhttp3.RequestBody;
 import okhttp3.Response;
 
 /**
- * Created by Aparna on 1/5/16.
+ * Created by Shashank on 13/6/16.
  */
 public class BorrowerDataUpdater {
     BorrowerDetailsActivity activity;
@@ -34,17 +32,16 @@ public class BorrowerDataUpdater {
     int conformDocs = 0, conformVerify = 0;
 
 
-
     public BorrowerDataUpdater(BorrowerDetailsActivity activity, String submit) {
         this.activity = activity;
         this.submit = submit;
     }
 
     public void updateToApi() {
-            SharedPreferences settings = activity.getSharedPreferences(BuddyConstants.PREFS_FILE, 0);
-            username = settings.getString("username", "");
+        SharedPreferences settings = activity.getSharedPreferences(BuddyConstants.PREFS_FILE, 0);
+        username = settings.getString("username", "");
 
-
+        try {
             String referenceIsGoodFriend = activity.getGoodFriendsRadio();
             final String phone = activity.getUploadDocModel().getPhone();
             String referenceYear = activity.getRefYear();
@@ -53,7 +50,7 @@ public class BorrowerDataUpdater {
             String sincerityInStudies = activity.getSpinnerSincere();
             String coCurricularParticipation = activity.getSpinnerCocurricular();
             String financiallyResponsible = activity.getSpinnerFinRes();
-            String friendVerificationNotes = activity.getOtherNotes().toString();
+            String finalVerificationNotes = activity.getOtherNotes();
             String yearBackTrue = activity.getYearBackRadio();
             String loanRepay = activity.getRepayBackLoan();
             String transparentTrue = activity.getTransparentRadio();
@@ -63,7 +60,6 @@ public class BorrowerDataUpdater {
             ArrayList<ImageBox> bankProofs = activity.getBankProofs();
             ArrayList<ImageBox> gradeSheets = activity.getGradeSheets();
 
-        try{
             verificationInfo = new VerificationInfo();
 
             if (referenceIsGoodFriend != null) {
@@ -105,8 +101,8 @@ public class BorrowerDataUpdater {
                 conformVerify++;
             }
 
-            if (friendVerificationNotes != null) {
-                verificationInfo.setFinalVerificationNotes(friendVerificationNotes);
+            if (finalVerificationNotes != null) {
+                verificationInfo.setFinalVerificationNotes(finalVerificationNotes);
                 conformVerify++;
             }
 
@@ -120,7 +116,18 @@ public class BorrowerDataUpdater {
             }
 
             if (loanRepay != null) {
-                verificationInfo.setRepayCapacity(loanRepay);
+                if(loanRepay.equals("Up to 10K")) {
+                    verificationInfo.setRepayCapacity("10K");
+                }
+                else if(loanRepay.equals("Up to 30K")){
+                    verificationInfo.setRepayCapacity("30K");
+                }
+                else if(loanRepay.equals("Up to 40K")){
+                    verificationInfo.setRepayCapacity("40K");
+                }
+                else if(loanRepay.equals("No")){
+                    verificationInfo.setRepayCapacity("no");
+                }
                 conformVerify++;
             }
 
@@ -146,11 +153,9 @@ public class BorrowerDataUpdater {
 
             if (borrowerStateContainer.isCompleted()) {
                 verificationInfo.setTaskStatus("completed");
-            }
-            else if (borrowerStateContainer.isOngoing()) {
+            } else if (borrowerStateContainer.isOngoing()) {
                 verificationInfo.setTaskStatus("ongoing");
-            }
-            else {
+            } else {
                 verificationInfo.setTaskStatus("new");
             }
 
@@ -220,7 +225,7 @@ public class BorrowerDataUpdater {
                 conformDocs++;
             }
 
-            if (addressProofs != null) {
+            if (addressProofs.size() > 1) {
 
                 UploadDocModel.FrontAndBackDocs frontAndBackDocsAddressProof = uploadDocModel.new FrontAndBackDocs();
 
@@ -253,177 +258,170 @@ public class BorrowerDataUpdater {
                 uploadDocModel.setAddressProof(frontAndBackDocsAddressProof);
                 conformDocs++;
             }
-        }
-        catch(Exception e){
-
-        }
 
 
+            // Documents Upload
+            if (conformDocs > 0) {
+                new AsyncTask<Void, String, String>() {
+                    private Exception asyncException;
+                    private Context context = activity;
+                    MaterialDialog materialDialog;
 
-
-
-
-
-
-        // Documents Upload
-        if(conformDocs > 0) {
-            new AsyncTask<Void, String, String>() {
-                private Exception asyncException;
-                private Context context = activity;
-                MaterialDialog materialDialog;
-
-                @Override
-                protected void onPreExecute() {
-                    super.onPreExecute();
-                    if (submit.equals("button")) {
-                        materialDialog = new MaterialDialog.Builder(activity)
-                                .content(context.getResources().getString(R.string.uploading_documents))
-                                .progress(true, 0)
-                                .show();
-                    }
-                }
-
-                @Override
-                protected String doInBackground(Void... v) {
-                    try {
-                        String token = TokenService.getToken(context, activity);
-
-                        if (token == null) {
-                            throw new Exception();
-                        }
-
-
-                        OkHttpClient client = new OkHttpClient();
-                        String jsonString = new Gson().toJson(uploadDocModel);
-                        Log.i("Updation",jsonString.toString());
-
-                        HttpUrl url = new HttpUrl.Builder()
-                                .scheme("http")
-                                .host(context.getResources().getString(R.string.api_host))
-                                .addPathSegments(context.getResources().getString(R.string.uploadDoc_path))
-                                .build();
-
-                        Request request = new Request.Builder()
-                                .url(url)
-                                .header("x-access-token", token)
-                                .addHeader("content-type", "application/json")
-                                .post(RequestBody.create(BuddyConstants.MEDIA_TYPE_JSON, jsonString))
-                                .build();
-
-                        Response response = client.newCall(request).execute();
-                        if (!response.isSuccessful())
-                            throw new IOException("Unexpected code " + response);
-
-                        return response.body().string();
-                    } catch (Exception e) {
-                        asyncException = e;
-                        return "";
-                    }
-
-                }
-
-                @Override
-                protected void onPostExecute(String apiResponse) {
-                    if (submit.equals("button")) {
-                        if (materialDialog.isShowing()) {
-                            materialDialog.hide();
+                    @Override
+                    protected void onPreExecute() {
+                        super.onPreExecute();
+                        if (submit.equals("button")) {
+                            materialDialog = new MaterialDialog.Builder(activity)
+                                    .content(context.getResources().getString(R.string.uploading_documents))
+                                    .canceledOnTouchOutside(false)
+                                    .progress(true, 0)
+                                    .show();
                         }
                     }
-                    ApiResponse apiResponse1 = new Gson().fromJson(apiResponse, ApiResponse.class);
 
-                    if (asyncException != null || !apiResponse1.getStatus().equals("success")) {
-                        // here tell that login request has thrown exception and ask to try again
+                    @Override
+                    protected String doInBackground(Void... v) {
+                        try {
+                            String token = TokenService.getToken(context, activity);
 
-                    } else {
-                        if(submit.equals("back") || submit.equals("button")) {
-                            activity.finish();
-                        }
-                    }
-                }
-            }.execute();
-        }
+                            if (token == null) {
+                                throw new Exception();
+                            }
 
 
-        if(conformVerify > 0) {
-            new AsyncTask<Void, String, String>() {
-                private Exception asyncException;
-                private Context context = activity;
-                MaterialDialog materialDialog;
+                            OkHttpClient client = new OkHttpClient();
+                            String jsonString = new Gson().toJson(uploadDocModel);
 
-                @Override
-                protected void onPreExecute() {
-                    super.onPreExecute();
-                    if (submit.equals("button")) {
-                        materialDialog = new MaterialDialog.Builder(activity)
-                                .content(context.getResources().getString(R.string.uploading_documents))
-                                .progress(true, 0)
-                                .show();
-                    }
-                }
+                            HttpUrl url = new HttpUrl.Builder()
+                                    .scheme("http")
+                                    .host(context.getResources().getString(R.string.api_host))
+                                    .addPathSegments(context.getResources().getString(R.string.uploadDoc_path))
+                                    .build();
 
-                @Override
-                protected String doInBackground(Void... v) {
-                    try {
-                        String token = TokenService.getToken(context, activity);
+                            Request request = new Request.Builder()
+                                    .url(url)
+                                    .header("x-access-token", token)
+                                    .addHeader("content-type", "application/json")
+                                    .post(RequestBody.create(BuddyConstants.MEDIA_TYPE_JSON, jsonString))
+                                    .build();
 
-                        if (token == null) {
-                            throw new Exception();
+                            Response response = client.newCall(request).execute();
+                            if (!response.isSuccessful())
+                                throw new IOException("Unexpected code " + response);
+
+                            return response.body().string();
+                        } catch (Exception e) {
+                            asyncException = e;
+                            return "";
                         }
 
-
-                        OkHttpClient client = new OkHttpClient();
-                        String jsonString = new Gson().toJson(verificationInfo);
-                        Log.i("Updation",jsonString.toString());
-
-                        HttpUrl url = new HttpUrl.Builder()
-                                .scheme("http")
-                                .host(context.getResources().getString(R.string.api_host))
-                                .addPathSegments(context.getResources().getString(R.string.uploadVerify_path))
-                                .addQueryParameter("userid", phone)
-                                .build();
-
-                        Request request = new Request.Builder()
-                                .url(url)
-                                .header("x-access-token", token)
-                                .addHeader("content-type", "application/json")
-                                .put(RequestBody.create(BuddyConstants.MEDIA_TYPE_JSON, jsonString))
-                                .build();
-
-                        Response response = client.newCall(request).execute();
-                        if (!response.isSuccessful())
-                            throw new IOException("Unexpected code " + response);
-
-                        return response.body().string();
-                    } catch (Exception e) {
-                        asyncException = e;
-                        return "";
                     }
 
-                }
+                    @Override
+                    protected void onPostExecute(String apiResponse) {
+                        if (submit.equals("button")) {
+                            if (materialDialog.isShowing()) {
+                                materialDialog.dismiss();
+                            }
+                        }
+                        ApiResponse apiResponse1 = new Gson().fromJson(apiResponse, ApiResponse.class);
 
-                @Override
-                protected void onPostExecute(String apiResponse) {
-                    if (submit.equals("button")) {
-                        if (materialDialog.isShowing()) {
-                            materialDialog.hide();
+                        if (asyncException != null || !apiResponse1.getStatus().equals("success")) {
+                            // here tell that login request has thrown exception and ask to try again
+
+                        } else {
+                            if (submit.equals("back") || submit.equals("button")) {
+                                activity.finish();
+                            }
                         }
                     }
-                    ApiResponse apiResponse1 = new Gson().fromJson(apiResponse, ApiResponse.class);
+                }.execute();
+            }
 
-                    if (asyncException != null || !apiResponse1.getStatus().equals("success")) {
-                        // here tell that login request has thrown exception and ask to try again
-                        CharSequence text = context.getResources().getString(R.string.upload_failed);
-                        int duration = Toast.LENGTH_SHORT;
 
-                        Toast toast = Toast.makeText(context, text, duration);
-                        toast.show();
-                    } else {
-                        if(submit.equals("back") || submit.equals("button")) {
-                            activity.finish();
+            if (conformVerify > 0) {
+                new AsyncTask<Void, String, String>() {
+                    private Exception asyncException;
+                    private Context context = activity;
+                    MaterialDialog materialDialog;
+
+                    @Override
+                    protected void onPreExecute() {
+                        super.onPreExecute();
+                        if (submit.equals("button")) {
+                            materialDialog = new MaterialDialog.Builder(activity)
+                                    .content(context.getResources().getString(R.string.updating_data))
+                                    .progress(true, 0)
+                                    .canceledOnTouchOutside(false)
+                                    .show();
                         }
                     }
-                }
-            }.execute();
+
+                    @Override
+                    protected String doInBackground(Void... v) {
+                        try {
+                            String token = TokenService.getToken(context, activity);
+
+                            if (token == null) {
+                                throw new Exception();
+                            }
+
+
+                            OkHttpClient client = new OkHttpClient();
+                            String jsonString = new Gson().toJson(verificationInfo);
+
+                            HttpUrl url = new HttpUrl.Builder()
+                                    .scheme("http")
+                                    .host(context.getResources().getString(R.string.api_host))
+                                    .addPathSegments(context.getResources().getString(R.string.uploadVerify_path))
+                                    .addQueryParameter("userid", phone)
+                                    .build();
+
+                            Request request = new Request.Builder()
+                                    .url(url)
+                                    .header("x-access-token", token)
+                                    .addHeader("content-type", "application/json")
+                                    .put(RequestBody.create(BuddyConstants.MEDIA_TYPE_JSON, jsonString))
+                                    .build();
+
+                            Response response = client.newCall(request).execute();
+                            if (!response.isSuccessful())
+                                throw new IOException("Unexpected code " + response);
+
+                            return response.body().string();
+                        } catch (Exception e) {
+                            asyncException = e;
+                            return "";
+                        }
+
+                    }
+
+                    @Override
+                    protected void onPostExecute(String apiResponse) {
+                        if (submit.equals("button")) {
+                            if (materialDialog.isShowing()) {
+                                materialDialog.hide();
+                            }
+                        }
+                        ApiResponse apiResponse1 = new Gson().fromJson(apiResponse, ApiResponse.class);
+
+                        if (asyncException != null || !apiResponse1.getStatus().equals("success")) {
+                            // here tell that login request has thrown exception and ask to try again
+                            CharSequence text = context.getResources().getString(R.string.upload_failed);
+                            int duration = Toast.LENGTH_SHORT;
+
+                            Toast toast = Toast.makeText(context, text, duration);
+                            toast.show();
+                        } else {
+                            if (submit.equals("back") || submit.equals("button")) {
+                                activity.finish();
+                            }
+                        }
+                    }
+                }.execute();
+            }
+        } catch (Exception e) {
+
         }
     }
 }

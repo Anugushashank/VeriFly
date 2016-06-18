@@ -6,7 +6,7 @@ import android.view.View;
 import com.example.aparna.buddy.app.BorrowerDetailsActivity;
 
 /**
- * Created by Aparna on 1/5/16.
+ * Created by Shashank on 11/6/16.
  */
 public class BorrowerStateContainer {
     private BorrowerDetailsActivity activity;
@@ -16,13 +16,25 @@ public class BorrowerStateContainer {
     }
 
     public Boolean isCompleted() {
-        if(!activity.getFrontImageCollegeId().equals("")  && !activity.getBackImageCollegeId().equals("") && checkBankProofs() &&  checkGradeSheets()&&
-                !activity.getGoodFriendsRadio().equals("")
-                && !activity.getYearBackRadio().equals("") && !activity.getRefDept().equals("")  && !activity.getRefYear().equals("") &&
-                !activity.getRepayBackLoan().equals("") && !activity.getTransparentRadio().equals("") && !activity.getGiveLoanRadio().equals("") &&
-                !activity.getSpinnerCocurricular().equals("") && !activity.getSpinnerFinRes().equals("")  && !activity.getSpinnerPunc().equals("")
-                && !activity.getSpinnerSincere().equals("") && !activity.getSpinnerLoanRepay().equals("")  && activity.getNumBankProofs() > 0
-                && activity.getNumGradeSheets() > 0 ){
+        if(activity.getFrontImageCollegeId() != null && !activity.getFrontImageCollegeId().isEmpty()
+                && activity.getCollegeIDs().get(0).getIsVerified()
+                && activity.getBackImageCollegeId() != null && !activity.getBackImageCollegeId().isEmpty()
+                && activity.getCollegeIDs().get(1).getIsVerified()
+                && checkBankProofs() &&  checkGradeSheets()
+                && activity.getGoodFriendsRadio() != null && !activity.getGoodFriendsRadio().isEmpty()
+                && activity.getYearBackRadio() != null && !activity.getYearBackRadio().isEmpty()
+                && activity.getRefDept() != null  && !activity.getRefDept().isEmpty()
+                && activity.getRefYear() != null && !activity.getRefYear().isEmpty()
+                && activity.getRepayBackLoan() != null && !activity.getRepayBackLoan().isEmpty()
+                && activity.getTransparentRadio() != null && !activity.getTransparentRadio().isEmpty()
+                && activity.getGiveLoanRadio() != null && !activity.getGiveLoanRadio().isEmpty()
+                && activity.getSpinnerCocurricular() != null && !activity.getSpinnerCocurricular().isEmpty()
+                && activity.getSpinnerFinRes() != null  && !activity.getSpinnerFinRes().isEmpty()
+                && activity.getSpinnerPunc() != null && !activity.getSpinnerPunc().isEmpty()
+                && activity.getSpinnerSincere() != null && !activity.getSpinnerSincere().isEmpty()
+                && activity.getSpinnerLoanRepay() != null  && !activity.getSpinnerLoanRepay().isEmpty()
+                && activity.getNumBankProofs() > 0 && activity.getNumGradeSheets() > 0 ){
+
             return true;
         }
         else{
@@ -31,10 +43,18 @@ public class BorrowerStateContainer {
     }
 
     public Boolean isOngoing() {
-        if( !activity.getGoodFriendsRadio().equals("") || !activity.getYearBackRadio().equals("") || !activity.getRefDept().equals("")
-                || !activity.getRefYear().equals("") || !activity.getRepayBackLoan().equals("") || !activity.getTransparentRadio().equals("")
-                || !activity.getGiveLoanRadio().equals("") || !activity.getSpinnerCocurricular().equals("") || !activity.getSpinnerFinRes().equals("")
-                || !activity.getSpinnerPunc().equals("") || !activity.getSpinnerSincere().equals("") || !activity.getSpinnerLoanRepay().equals("")
+        if( (activity.getGoodFriendsRadio() != null && !activity.getGoodFriendsRadio().isEmpty())
+                || (activity.getYearBackRadio() != null && !activity.getYearBackRadio().isEmpty())
+                || (activity.getRefDept() != null && !activity.getRefDept().isEmpty())
+                || (activity.getRefYear() != null && !activity.getRefYear().isEmpty())
+                || (activity.getRepayBackLoan() != null && !activity.getRepayBackLoan().isEmpty())
+                || (activity.getTransparentRadio() != null && !activity.getTransparentRadio().isEmpty())
+                || (activity.getGiveLoanRadio() != null && !activity.getGiveLoanRadio().isEmpty())
+                || (activity.getSpinnerCocurricular() != null && !activity.getSpinnerCocurricular().isEmpty())
+                || (activity.getSpinnerFinRes() != null && !activity.getSpinnerFinRes().isEmpty())
+                || (activity.getSpinnerPunc() != null && !activity.getSpinnerPunc().isEmpty())
+                || (activity.getSpinnerSincere() != null && !activity.getSpinnerSincere().isEmpty())
+                || (activity.getSpinnerLoanRepay() != null && !activity.getSpinnerLoanRepay().isEmpty())
                 || activity.getNumBankProofs() > 0 || activity.getNumGradeSheets() > 0     ){
 
             return true;

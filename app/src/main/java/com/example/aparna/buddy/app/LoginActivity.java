@@ -1,6 +1,6 @@
 package com.example.aparna.buddy.app;
 
-import android.app.Activity;
+
 import android.app.Application;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -12,8 +12,6 @@ import android.os.AsyncTask;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
-import android.view.KeyEvent;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -47,7 +45,12 @@ public class LoginActivity extends AppCompatActivity {
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        Intercom.initialize((Application) getApplicationContext(), "android_sdk-a252775c0f9cdd6cd922b6420a558fd2eb3f89b0", "utga6z2r");
+        try {
+            Intercom.initialize((Application) getApplicationContext(), "android_sdk-a252775c0f9cdd6cd922b6420a558fd2eb3f89b0", "utga6z2r");
+        }
+        catch(Exception e){
+
+        }
         SharedPreferences settings = getSharedPreferences(BuddyConstants.PREFS_FILE, 0);
 
         //Get "hasLoggedIn" value. If the value doesn't exist yet false is returned
@@ -58,13 +61,16 @@ public class LoginActivity extends AppCompatActivity {
                 alertBox();
                 return;
             }
+            try {
+                Intercom.client().registerIdentifiedUser(new Registration().withUserId(settings.getString("username", "")));
+            }
+            catch (Exception e){
 
-            Intercom.client().registerIdentifiedUser(new Registration().withUserId(settings.getString("username","")));
+            }
             Intent intent = new Intent(this, com.example.aparna.buddy.app.HomeActivity.class);
             startActivity(intent);
             this.finish();
         }
-
         setContentView(R.layout.activity_main);
         phone    = (EditText) findViewById(R.id.editText);
         password = (EditText) findViewById(R.id.editText2);
@@ -132,7 +138,8 @@ public class LoginActivity extends AppCompatActivity {
                     }
 
                     OkHttpClient client = new OkHttpClient.Builder()
-                            .connectTimeout(6, TimeUnit.SECONDS)
+                            .connectTimeout(10, TimeUnit.SECONDS)
+                            .readTimeout(10, TimeUnit.SECONDS)
                             .build();
 
                     JSONObject jsonObject = new JSONObject();
@@ -165,11 +172,11 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             protected void onPostExecute(String apiResponse) {
                 if (materialDialog.isShowing()) {
-                    materialDialog.hide();
+                    materialDialog.dismiss();
                 }
                 if(asyncException != null){
-                    materialDialog.dismiss();
                     connectionTimeOut();
+                    return;
                 }
 
                 Type type = new TypeToken<Map<String, String>>(){}.getType();
@@ -221,6 +228,7 @@ public class LoginActivity extends AppCompatActivity {
                 })
                 .setIcon(android.R.drawable.ic_dialog_alert)
                 .show();
+        alertDialog.setCanceledOnTouchOutside(false);
         alertDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
             @Override
             public void onCancel(DialogInterface dialog) {
@@ -231,7 +239,7 @@ public class LoginActivity extends AppCompatActivity {
     }
     private void connectionTimeOut(){
         alertDialog = new android.support.v7.app.AlertDialog.Builder(this)
-                .setTitle("Connection Time Out")
+                .setTitle("Unable to Connect")
                 .setMessage("Try connecting again")
                 .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
@@ -247,6 +255,7 @@ public class LoginActivity extends AppCompatActivity {
                 })
                 .setIcon(android.R.drawable.ic_dialog_alert)
                 .show();
+        alertDialog.setCanceledOnTouchOutside(false);
         alertDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
             @Override
             public void onCancel(DialogInterface dialog) {
@@ -257,8 +266,12 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void successfulLogin(String username){
+        try {
+            Intercom.client().registerIdentifiedUser(new Registration().withUserId(username));
+        }
+        catch(Exception e){
 
-        Intercom.client().registerIdentifiedUser(new Registration().withUserId(username));
+        }
     }
 
 }

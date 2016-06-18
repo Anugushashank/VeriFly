@@ -23,7 +23,6 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.afollestad.materialdialogs.MaterialDialog;
@@ -44,7 +43,6 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import io.intercom.android.sdk.Intercom;
-import io.intercom.android.sdk.identity.Registration;
 import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -63,7 +61,6 @@ public class HomeActivity extends AppCompatActivity {
     IntercomModel intercomModel;
     android.support.v7.app.AlertDialog alertDialog;
     SharedPreferences settings;
-    ImageView imageView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,7 +72,6 @@ public class HomeActivity extends AppCompatActivity {
         viewPager = (ViewPager) findViewById(R.id.viewpager);
         context = getApplicationContext();
         intent = getIntent();
-
 
         settings = getSharedPreferences(BuddyConstants.PREFS_FILE, 0);
         username = settings.getString("username", "");
@@ -125,8 +121,8 @@ public class HomeActivity extends AppCompatActivity {
                         }
 
                         OkHttpClient client = new OkHttpClient.Builder()
-                                .connectTimeout(5, TimeUnit.SECONDS)
-                                .readTimeout(5, TimeUnit.SECONDS)
+                                .connectTimeout(10, TimeUnit.SECONDS)
+                                .readTimeout(10, TimeUnit.SECONDS)
                                 .build();
 
                         int position = 0;
@@ -184,12 +180,11 @@ public class HomeActivity extends AppCompatActivity {
                 @Override
                 protected void onPostExecute(String s) {
                     if (materialDialog.isShowing()) {
-                        materialDialog.hide();
+                        materialDialog.dismiss();
                     }
 
                     if (apiException != null) {
                         // something went wrote, maybe reload the activity
-                        materialDialog.dismiss();
                         connectionTimeOut();
                         return;
                     }
@@ -200,8 +195,6 @@ public class HomeActivity extends AppCompatActivity {
                 the default action bar thus making the toolbar work like a normal
                 action bar.
                 */
-                    intercomModel = new IntercomModel();
-                    intercomModel.sendData(allTabsData);
 
                     ViewPagerAdapter viewPagerAdapter = new ViewPagerAdapter(getSupportFragmentManager(), HomeActivity.this, allTabsData);
                     viewPager.setAdapter(viewPagerAdapter);
@@ -253,9 +246,37 @@ public class HomeActivity extends AppCompatActivity {
                 1st we add the PageChangeListener and pass a TabLayoutPageChangeListener so that Tabs Selection
                 changes when a viewpager page changes.
                 */
-                    viewPager.setCurrentItem(settings.getInt("tab",0),true);
+                    viewPager.setCurrentItem(settings.getInt("tab",0));
                     viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
                     tabLayout.setOnTabSelectedListener(new TabLayout.ViewPagerOnTabSelectedListener(viewPager));
+
+
+                }
+            }.execute();
+
+            new AsyncTask<String, String, String>() {
+                Exception apiException;
+                @Override
+                protected void onPreExecute() {
+                    super.onPreExecute();
+
+                }
+                @Override
+                protected String doInBackground(String... params) {
+
+                    try{
+                        intercomModel = new IntercomModel(HomeActivity.this);
+                        intercomModel.sendData(allTabsData);
+                    }
+                    catch (Exception e) {
+                        apiException = e;
+                    }
+
+                    return null;
+                }
+
+                @Override
+                protected void onPostExecute(String s) {
 
                 }
             }.execute();
@@ -281,8 +302,6 @@ public class HomeActivity extends AppCompatActivity {
 
         //noinspection SimplifiableIfStatement
         final Intent intent = new Intent(this,LoginActivity.class);
-
-        Exception exception;
 
         if (id == R.id.logouticon) {
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -315,7 +334,7 @@ public class HomeActivity extends AppCompatActivity {
             try {
                 Intercom.client().displayMessageComposer();
             } catch (Exception e) {
-                exception = e;
+
             }
         }
 
@@ -379,6 +398,7 @@ public class HomeActivity extends AppCompatActivity {
                 })
                 .setIcon(android.R.drawable.ic_dialog_alert)
                 .show();
+        alertDialog.setCanceledOnTouchOutside(false);
         alertDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
             @Override
             public void onCancel(DialogInterface dialog) {
@@ -405,6 +425,7 @@ public class HomeActivity extends AppCompatActivity {
                 })
                 .setIcon(android.R.drawable.ic_dialog_alert)
                 .show();
+        alertDialog.setCanceledOnTouchOutside(false);
         alertDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
             @Override
             public void onCancel(DialogInterface dialog) {
@@ -426,6 +447,8 @@ public class HomeActivity extends AppCompatActivity {
         finish();
         startActivity(intent);
     }
+
+
 }
 
 

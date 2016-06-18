@@ -29,9 +29,9 @@
     <string name="loan_repay">Do you think he will repay back the loan? If yes, how much?</string>
     <string name="choose">Choose</string>
     <string-array name="loan_items">
-        <item>Upto 10k</item>
-        <item>Upto 30k</item>
-        <item>Upto 40k</item>
+        <item>Up to 10K</item>
+        <item>Up to 30K</item>
+        <item>Up to 40K</item>
         <item>No</item>
     </string-array>
     <string name="intern_choice">If it was your money, would you give him a loan?</string>
@@ -59,6 +59,7 @@
     <string name="login_dialogue">Logging In&#8230;</string>
     <string name="loading_tasks">Loading Tasks&#8230;</string>
     <string name="uploading_documents">Uploading Documents&#8230;\nPlease Do not Press Back\nOr Anywhere in the Screen</string>
+    <string name="updating_data">Uploading Data&#8230;\nPlease Do not Press Back\nOr Anywhere in the Screen</string>
     <string name="upload_failed">Data Updation failed</string>
     <string name="upload_success">Documents Uploaded Successfully</string>
     <string name="invalid_creds">Incorrect username or password!</string>
@@ -69,6 +70,20 @@
     <!-- PopUp Texts -->
     <string name="college_popup">Mark Front or Back if the document matches. Mark invalid if it matches with none</string>
     <string name="address_popup">Upload only if Front and Back are not present</string>
-    <string name="grade_popup">Upload GradeSheet if not present. <b >Mark every image as valid or invalid based on their validation</b></string>
-    <string name="bank_popup">Upload BankProof if not present. <b >Mark every image as valid or invalid based on their validation</b></string>
+    <string name="grade_popup">Upload GradeSheet if not present. <b>Mark every image as valid or invalid based on their validation</b></string>
+    <string name="bank_popup">Upload BankProof if not present. <b>Mark every image as valid or invalid based on their validation</b></string>
+
+    <!-- Change Passwords -->
+    <string name="enter_password">Enter a password</string>
+    <string name="password_length">Password should be more than 4 alphanumeric characters</string>
+    <string name="please_confirm_password">Please confirm the password</string>
+    <string name="do_not_match">Passwords do not match</string>
+    <string name="change_password">Change Password</string>
+    <string name="confirm_password">Confirm Password</string>
+    <string name="new_password">New Password</string>
+
+
+
+
+
 </resources>
