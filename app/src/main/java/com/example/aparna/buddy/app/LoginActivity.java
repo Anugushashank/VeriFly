@@ -12,7 +12,6 @@ import android.os.AsyncTask;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,12 +22,11 @@ import com.afollestad.materialdialogs.MaterialDialog;
 import com.example.aparna.buddy.model.ApiResponse;
 import com.example.aparna.buddy.model.BuddyConstants;
 import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 
 import org.json.JSONObject;
 
 import java.io.IOException;
-import java.lang.reflect.Type;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
@@ -64,12 +62,6 @@ public class LoginActivity extends AppCompatActivity {
             if (!isNetworkConnected()) {
                 alertBox();
                 return;
-            }
-            try {
-                Intercom.client().registerIdentifiedUser(new Registration().withUserId(settings.getString("phoneEmail", "")));
-            }
-            catch (Exception e){
-
             }
 
             String phoneEmailString = settings.getString("phoneEmail","");
@@ -113,9 +105,10 @@ public class LoginActivity extends AppCompatActivity {
 
     public void resetPassword(View view){
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        AlertDialog.Builder builder = new AlertDialog.Builder(this,R.style.DialogStyle);
         builder.setTitle("Reset Password");
-        builder.setMessage("Enter your Phone number. Email will be sent to the email address corresponding to this phone number.");
+        builder.setMessage("Enter your Phone number.Email will be sent to the email address corresponding to this phone number for " +
+                "resetting the password.");
 
         View viewInflated = LayoutInflater.from(this).inflate(R.layout.reset_password,(ViewGroup)findViewById(android.R.id.content), false);
 
@@ -128,7 +121,20 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 dialog.dismiss();
+                if(input.getText() != null && input.getText().length() == 10 ) {
 
+                    alertDialog = new AlertDialog.Builder(LoginActivity.this,R.style.DialogStyle)
+                            .setTitle("Take me to Gmail")
+                            .setMessage("Email has been sent to your mail address.")
+                            .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int which) {
+                                    Intent intent = getPackageManager().getLaunchIntentForPackage("com.google.android.gm");
+                                    startActivity(intent);
+
+                                }
+                            })
+                            .show();
+                }
             }
         });
         builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
@@ -230,7 +236,8 @@ public class LoginActivity extends AppCompatActivity {
                     toast.show();
                 }
                 else if(!apiResponse.getData().getIsActive()){
-                    alertDialog = new android.support.v7.app.AlertDialog.Builder(LoginActivity.this)
+                    successfulLogin(phoneEmail,"inactive");
+                    alertDialog = new android.support.v7.app.AlertDialog.Builder(LoginActivity.this,R.style.DialogStyle)
                             .setMessage("You have been deactivated :( . Please contact Buddy.")
                             .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int which) {
@@ -239,20 +246,6 @@ public class LoginActivity extends AppCompatActivity {
                             })
                             .show();
                 }
-                else if(!apiResponse.getData().getForcePasswordChange()){
-                    SharedPreferences.Editor editor = settings.edit();
-
-                    editor.putBoolean("hasLoggedIn", true);
-                    editor.putString("userid", apiResponse.getData().getUserid());
-                    editor.putString("password",password);
-                    editor.putString("phoneEmail",phoneEmail);
-                    successfulLogin(phoneEmail);
-
-                    editor.apply();
-                    Intent intent = new Intent(LoginActivity.this , ChangePassword.class);
-                    startActivity(intent);
-                    LoginActivity.this.finish();
-                }
                 else {
                     SharedPreferences.Editor editor = settings.edit();
 
@@ -260,7 +253,7 @@ public class LoginActivity extends AppCompatActivity {
                     editor.putString("userid", apiResponse.getData().getUserid());
                     editor.putString("password",password);
                     editor.putString("phoneEmail",phoneEmail);
-                    successfulLogin(phoneEmail);
+                    successfulLogin(phoneEmail,"active");
 
                     editor.apply();
                     Intent intent = new Intent(LoginActivity.this , HomeActivity.class);
@@ -277,7 +270,7 @@ public class LoginActivity extends AppCompatActivity {
         return cm.getActiveNetworkInfo() != null;
     }
     private void alertBox(){
-        alertDialog = new AlertDialog.Builder(this)
+        alertDialog = new AlertDialog.Builder(this,R.style.DialogStyle)
                 .setTitle("Check your Network Connection")
                 .setMessage("Try connecting again")
                 .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
@@ -304,7 +297,7 @@ public class LoginActivity extends AppCompatActivity {
         });
     }
     private void connectionTimeOut(){
-        alertDialog = new android.support.v7.app.AlertDialog.Builder(this)
+        alertDialog = new android.support.v7.app.AlertDialog.Builder(this,R.style.DialogStyle)
                 .setTitle("Unable to Connect")
                 .setMessage("Try connecting again")
                 .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
@@ -331,9 +324,18 @@ public class LoginActivity extends AppCompatActivity {
         });
     }
 
-    private void successfulLogin(String username){
+    private void successfulLogin(String username, String state){
         try {
             Intercom.client().registerIdentifiedUser(new Registration().withUserId(username));
+
+            Map userMap = new HashMap();
+
+            Map customAttributes = new HashMap();
+            customAttributes.put("verifly_user_status", state);
+
+            userMap.put("custom_attributes", customAttributes);
+
+            Intercom.client().updateUser(userMap);
         }
         catch(Exception e){
 

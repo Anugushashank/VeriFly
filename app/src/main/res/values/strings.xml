@@ -72,6 +72,7 @@
     <string name="choose_photo">Choose a Photo</string>
     <string name="please_wait">Please wait&#8230;</string>
     <string name="invalid_token">URL is not valid</string>
+    <string name="take_me_to_gmail">Email has been sent to your mail Address.Take me to Gmail.</string>
 
     <!-- PopUp Texts -->
     <string name="college_popup">Mark Front or Back if the document matches. Mark invalid if it matches with none</string>

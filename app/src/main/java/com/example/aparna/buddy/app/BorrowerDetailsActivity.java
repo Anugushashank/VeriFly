@@ -1108,7 +1108,6 @@ public class BorrowerDetailsActivity extends AppCompatActivity implements Adapte
             popupWindow.setWidth(ListPopupWindow.WRAP_CONTENT);
             popupWindow.setHeight(ListPopupWindow.WRAP_CONTENT);
             popupWindow.showAtLocation(layout, Gravity.CENTER, 0, 0);
-            popupWindow.wait(1000);
 
             close = (TextView) layout.findViewById(R.id.close);
             mainText = (TextView) layout.findViewById(R.id.mainText);

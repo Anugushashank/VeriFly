@@ -26,7 +26,7 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.afollestad.materialdialogs.MaterialDialog;
-import com.example.aparna.buddy.model.ApiResponse;
+import com.example.aparna.buddy.model.ApiResponseTask;
 import com.example.aparna.buddy.model.BuddyConstants;
 import com.example.aparna.buddy.model.IntercomModel;
 import com.google.gson.Gson;
@@ -150,7 +150,9 @@ public class HomeActivity extends AppCompatActivity {
                                 }
                                 apiResponse = response.body().string();
 
-                                ApiResponse apiResponse1 = new Gson().fromJson(apiResponse, ApiResponse.class);
+
+                                ApiResponseTask apiResponse1 = new Gson().fromJson(apiResponse, ApiResponseTask.class);
+
 
                                 if (apiResponse1.getStatus().equals("error")) {
 
@@ -166,6 +168,7 @@ public class HomeActivity extends AppCompatActivity {
                                     position++;
                                 }
                             } catch (Exception e) {
+                                Log.i("shashank","jchjdcgc");
                                 apiException = e;
                                 break;
                             }
@@ -304,7 +307,7 @@ public class HomeActivity extends AppCompatActivity {
         final Intent intent = new Intent(this,LoginActivity.class);
 
         if (id == R.id.logouticon) {
-            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            AlertDialog.Builder builder = new AlertDialog.Builder(this,R.style.DialogStyle);
             builder.setMessage("Are you sure you want to log out?")
                     .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int which) {
@@ -381,7 +384,7 @@ public class HomeActivity extends AppCompatActivity {
         return cm.getActiveNetworkInfo() != null;
     }
     private void alertBox(){
-        alertDialog = new android.support.v7.app.AlertDialog.Builder(this)
+        alertDialog = new android.support.v7.app.AlertDialog.Builder(this,R.style.DialogStyle)
                 .setTitle("Check your Network Connection")
                 .setMessage("Try connecting again")
                 .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
@@ -408,7 +411,7 @@ public class HomeActivity extends AppCompatActivity {
         });
     }
     private void connectionTimeOut(){
-        alertDialog = new android.support.v7.app.AlertDialog.Builder(this)
+        alertDialog = new android.support.v7.app.AlertDialog.Builder(this,R.style.DialogStyle)
                 .setTitle("Connection Time Out")
                 .setMessage("Try connecting again")
                 .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {

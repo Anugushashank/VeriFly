@@ -17,12 +17,11 @@ public class ApiResponse {
     public class Response{
 
         String userid;
-        Boolean isActive, forcePasswordChange;
+        Boolean isActive;
 
         public String getUserid(){ return userid; }
 
         public Boolean getIsActive() { return isActive; }
 
-        public Boolean getForcePasswordChange() { return forcePasswordChange; }
     }
 }

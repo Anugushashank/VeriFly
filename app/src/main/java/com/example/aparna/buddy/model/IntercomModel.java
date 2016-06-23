@@ -1,7 +1,6 @@
 package com.example.aparna.buddy.model;
 
 import android.content.SharedPreferences;
-import android.util.Log;
 
 import com.example.aparna.buddy.app.HomeActivity;
 import com.google.gson.Gson;

@@ -1,14 +1,11 @@
 package com.example.aparna.buddy.app;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.net.ConnectivityManager;
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -42,7 +39,6 @@ public class ChangePassword extends AppCompatActivity {
     Intent intent;
     String urlToken, userid;
     android.support.v7.app.AlertDialog alertDialog;
-    Uri data;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -93,7 +89,7 @@ public class ChangePassword extends AppCompatActivity {
         }
         else{
             textView.setVisibility(View.INVISIBLE);
-            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            AlertDialog.Builder builder = new AlertDialog.Builder(this,R.style.DialogStyle);
             builder.setMessage("You cannot change your password later.Are you sure you want to keep this password?")
                     .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int which) {
@@ -297,7 +293,7 @@ public class ChangePassword extends AppCompatActivity {
                         toast.show();
                     } else {
 
-                        alertDialog = new android.support.v7.app.AlertDialog.Builder(ChangePassword.this)
+                        alertDialog = new android.support.v7.app.AlertDialog.Builder(ChangePassword.this,R.style.DialogStyle)
                                 .setMessage("Password Changed Successfully.")
                                 .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                                     public void onClick(DialogInterface dialog, int which) {
@@ -338,7 +334,7 @@ public class ChangePassword extends AppCompatActivity {
     }
 
     private void alertBox(){
-        alertDialog = new android.support.v7.app.AlertDialog.Builder(this)
+        alertDialog = new android.support.v7.app.AlertDialog.Builder(this,R.style.DialogStyle)
                 .setTitle("Check your Network Connection")
                 .setMessage("Try connecting again")
                 .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
@@ -366,7 +362,7 @@ public class ChangePassword extends AppCompatActivity {
         });
     }
     private void connectionTimeOut(){
-        alertDialog = new android.support.v7.app.AlertDialog.Builder(this)
+        alertDialog = new android.support.v7.app.AlertDialog.Builder(this,R.style.DialogStyle)
                 .setTitle("Unable to Connect")
                 .setMessage("Try connecting again")
                 .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
