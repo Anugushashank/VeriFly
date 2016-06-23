@@ -39,7 +39,7 @@ public class BorrowerDataUpdater {
 
     public void updateToApi() {
         SharedPreferences settings = activity.getSharedPreferences(BuddyConstants.PREFS_FILE, 0);
-        username = settings.getString("username", "");
+        username = settings.getString("phoneEmail", "");
 
         try {
             String referenceIsGoodFriend = activity.getGoodFriendsRadio();

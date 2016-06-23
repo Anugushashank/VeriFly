@@ -1,6 +1,7 @@
 package com.example.aparna.buddy.model;
 
 import android.content.SharedPreferences;
+import android.util.Log;
 
 import com.example.aparna.buddy.app.HomeActivity;
 import com.google.gson.Gson;
@@ -33,7 +34,7 @@ public class IntercomModel {
 
     public void sendData(Map<Integer, String> allTabsData){
         settings = activity.getSharedPreferences(BuddyConstants.PREFS_FILE, 0);
-        username = settings.getString("username", "");
+        username = settings.getString("phoneEmail", "");
         numUsers = settings.getInt("numUsers",0);
 
         for(int i = 0 ; i < 3 ; i++){
@@ -63,6 +64,7 @@ public class IntercomModel {
                         borrowerData = allUsersData.get(i);
 
                         Intercom.client().registerIdentifiedUser(new Registration().withUserId(borrowerData.getUserId()));
+
 
                         Map userMap = new HashMap();
 
@@ -96,7 +98,7 @@ public class IntercomModel {
                         Intercom.client().reset();
                     }
                     catch(Exception e){
-
+                        Intercom.client().reset();
                     }
                 }
                 try {

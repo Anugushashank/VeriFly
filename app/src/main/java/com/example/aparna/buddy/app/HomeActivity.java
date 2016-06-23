@@ -51,7 +51,7 @@ import okhttp3.Response;
 public class HomeActivity extends AppCompatActivity {
 
     private Toolbar toolBar;
-    private String username;
+    private String userid;
     private TabLayout tabLayout;
     private ViewPager viewPager;
     private final Map<Integer, String> allTabsData = new HashMap<>();
@@ -74,7 +74,7 @@ public class HomeActivity extends AppCompatActivity {
         intent = getIntent();
 
         settings = getSharedPreferences(BuddyConstants.PREFS_FILE, 0);
-        username = settings.getString("username", "");
+        userid = settings.getString("userid", "");
 
 
 
@@ -133,7 +133,7 @@ public class HomeActivity extends AppCompatActivity {
                                     .scheme("http")
                                     .host(context.getResources().getString(R.string.api_host))
                                     .addPathSegments(context.getResources().getString(R.string.tasks_path))
-                                    .addQueryParameter("assignedTo", username)
+                                    .addQueryParameter("assignedTo", userid)
                                     .addQueryParameter("taskStatus", task)
                                     .build();
 
@@ -386,7 +386,7 @@ public class HomeActivity extends AppCompatActivity {
                 .setMessage("Try connecting again")
                 .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
-                        Intent intent=new Intent(getApplicationContext(),LoginActivity.class);
+                        Intent intent=new Intent(getApplicationContext(),HomeActivity.class);
                         if(isNetworkConnected()) {
                             startActivity(intent);
                             HomeActivity.this.finish();
@@ -413,7 +413,7 @@ public class HomeActivity extends AppCompatActivity {
                 .setMessage("Try connecting again")
                 .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
-                        Intent intent=new Intent(getApplicationContext(),LoginActivity.class);
+                        Intent intent=new Intent(getApplicationContext(),HomeActivity.class);
                         if(isNetworkConnected()) {
                             startActivity(intent);
                             HomeActivity.this.finish();

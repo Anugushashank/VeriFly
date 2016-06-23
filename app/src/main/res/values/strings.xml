@@ -44,6 +44,7 @@
     <string name="unverified_status_icon">unverified_status_icon</string>
     <string name="verified_status_icon">verified_status_icon</string>
     <string name="invalid_status_icon">invalid_status_icon</string>
+
     <!-- URLs and HTTP data -->
     <string name="base_auth_token">Basic YnVkZHlhcGlhZG1pbjptZW1vbmdvc2gx</string>
     <string name="protocol_scheme">http</string>
@@ -53,6 +54,8 @@
     <string name="tasks_path">api/user/verify/tasks</string>
     <string name="uploadDoc_path">api/v1/user/profile/docs/verify</string>
     <string name="uploadVerify_path">api/user/verify</string>
+    <string name="password_token">api/auth/intern/passwd/token</string>
+    <string name="password_set">api/auth/intern/passwd</string>
 
 
     <!-- Dialog Box Texts -->
@@ -63,9 +66,12 @@
     <string name="upload_failed">Data Updation failed</string>
     <string name="upload_success">Documents Uploaded Successfully</string>
     <string name="invalid_creds">Incorrect username or password!</string>
+    <string name="not_active">You have been freed.</string>
     <string name="no_internet_connection">No Internet Connection</string>
     <string name="take_photo">Take a Photo</string>
     <string name="choose_photo">Choose a Photo</string>
+    <string name="please_wait">Please wait&#8230;</string>
+    <string name="invalid_token">URL is not valid</string>
 
     <!-- PopUp Texts -->
     <string name="college_popup">Mark Front or Back if the document matches. Mark invalid if it matches with none</string>
@@ -80,7 +86,7 @@
     <string name="do_not_match">Passwords do not match</string>
     <string name="change_password">Change Password</string>
     <string name="confirm_password">Confirm Password</string>
-    <string name="new_password">New Password</string>
+    <string name="new_password">Password</string>
 
 
 

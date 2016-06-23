@@ -143,16 +143,21 @@ public class BorrowerDetailsActivity extends AppCompatActivity implements Adapte
             Picasso.with(this)
                     .load("https://graph.facebook.com/" + userId + "/picture?type=large").placeholder(R.drawable.loading_image)
                     .into(profilePic);
+            if(uploadDocModel.getName() != null) {
+                name.setText(uploadDocModel.getName());
+            }
 
-            name.setText(uploadDocModel.getName());
 
-            college.setTextSize(18 - (uploadDocModel.getCollege().length()) / 8);
-            college.setText(uploadDocModel.getCollege());
+            if(uploadDocModel.getCollege() != null && !uploadDocModel.getCollege().equals("")) {
+                college.setTextSize(18 - (uploadDocModel.getCollege().length()) / 8);
+                college.setText(uploadDocModel.getCollege());
+            }
 
             linearLayout = (RelativeLayout) findViewById(R.id.rootLayoutMain);
 
-
-            phoneNum.setText(uploadDocModel.getPhone());
+            if(uploadDocModel.getPhone() != null) {
+                phoneNum.setText(uploadDocModel.getPhone());
+            }
             phoneNum.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -1103,6 +1108,7 @@ public class BorrowerDetailsActivity extends AppCompatActivity implements Adapte
             popupWindow.setWidth(ListPopupWindow.WRAP_CONTENT);
             popupWindow.setHeight(ListPopupWindow.WRAP_CONTENT);
             popupWindow.showAtLocation(layout, Gravity.CENTER, 0, 0);
+            popupWindow.wait(1000);
 
             close = (TextView) layout.findViewById(R.id.close);
             mainText = (TextView) layout.findViewById(R.id.mainText);

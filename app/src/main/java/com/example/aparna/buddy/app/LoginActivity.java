@@ -12,11 +12,15 @@ import android.os.AsyncTask;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.Toast;
 
 import com.afollestad.materialdialogs.MaterialDialog;
+import com.example.aparna.buddy.model.ApiResponse;
 import com.example.aparna.buddy.model.BuddyConstants;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -37,8 +41,8 @@ import okhttp3.RequestBody;
 import okhttp3.Response;
 
 public class LoginActivity extends AppCompatActivity {
-    EditText phone, password;
-    String username;
+    EditText phoneEmail, password;
+    String userid;
     AlertDialog alertDialog;
 
     @Override
@@ -62,29 +66,34 @@ public class LoginActivity extends AppCompatActivity {
                 return;
             }
             try {
-                Intercom.client().registerIdentifiedUser(new Registration().withUserId(settings.getString("username", "")));
+                Intercom.client().registerIdentifiedUser(new Registration().withUserId(settings.getString("phoneEmail", "")));
             }
             catch (Exception e){
 
             }
-            Intent intent = new Intent(this, com.example.aparna.buddy.app.HomeActivity.class);
-            startActivity(intent);
-            this.finish();
+
+            String phoneEmailString = settings.getString("phoneEmail","");
+            String passwordString = settings.getString("password","");
+
+            doLogin(phoneEmailString, passwordString);
         }
+
         setContentView(R.layout.activity_main);
-        phone    = (EditText) findViewById(R.id.editText);
+
+        phoneEmail    = (EditText) findViewById(R.id.editText);
         password = (EditText) findViewById(R.id.editText2);
     }
 
     public void onClick(View v) {
-        String phoneString = phone.getText().toString();
 
-        username          = phoneString;
+        String phoneEmailString = phoneEmail.getText().toString();
+
+        userid          = phoneEmailString;
         String passString = password.getText().toString();
 
-        if (phoneString.isEmpty() || phoneString.length() != 10) {
-            phone.setText("");
-            phone.setHintTextColor(Color.RED);
+        if (phoneEmailString.isEmpty() || phoneEmailString.length() != 10) {
+            phoneEmail.setText("");
+            phoneEmail.setHintTextColor(Color.RED);
         } else if (passString.isEmpty()) {
             password.setHintTextColor(Color.RED);
         } else {
@@ -98,11 +107,41 @@ public class LoginActivity extends AppCompatActivity {
                 return;
             }
 
-            doLogin(phoneString, passString);
+            doLogin(phoneEmailString, passString);
         }
     }
 
-    private void doLogin(final String phone, final String password) {
+    public void resetPassword(View view){
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Reset Password");
+        builder.setMessage("Enter your Phone number. Email will be sent to the email address corresponding to this phone number.");
+
+        View viewInflated = LayoutInflater.from(this).inflate(R.layout.reset_password,(ViewGroup)findViewById(android.R.id.content), false);
+
+        final EditText input = (EditText) viewInflated.findViewById(R.id.input);
+
+        builder.setView(viewInflated);
+
+
+        builder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+
+            }
+        });
+        builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+
+        builder.show();
+    }
+
+    private void doLogin(final String phoneEmail, final String password) {
         final SharedPreferences settings = getSharedPreferences(BuddyConstants.PREFS_FILE, 0); // 0 - for private mode
 
         new AsyncTask<Void, String, String>() {
@@ -143,7 +182,7 @@ public class LoginActivity extends AppCompatActivity {
                             .build();
 
                     JSONObject jsonObject = new JSONObject();
-                    jsonObject.put("userid", phone);
+                    jsonObject.put("userid", phoneEmail);
                     jsonObject.put("password", password);
 
                     HttpUrl url = new HttpUrl.Builder()
@@ -170,7 +209,7 @@ public class LoginActivity extends AppCompatActivity {
             }
 
             @Override
-            protected void onPostExecute(String apiResponse) {
+            protected void onPostExecute(String apiResponseString) {
                 if (materialDialog.isShowing()) {
                     materialDialog.dismiss();
                 }
@@ -179,24 +218,50 @@ public class LoginActivity extends AppCompatActivity {
                     return;
                 }
 
-                Type type = new TypeToken<Map<String, String>>(){}.getType();
-                Map<String, String> responseMap = new Gson().fromJson(apiResponse, type);
+                ApiResponse apiResponse = new Gson().fromJson(apiResponseString, ApiResponse.class);
 
-                if (asyncException != null || !responseMap.get("status").equals("success")) {
-                    // here tell that login request has thrown exception and ask to try again
+
+                if (asyncException != null || !apiResponse.getStatus().equals("success")) {
+
                     CharSequence text = getResources().getString(R.string.invalid_creds);
                     int duration = Toast.LENGTH_SHORT;
 
                     Toast toast = Toast.makeText(context, text, duration);
                     toast.show();
-                } else {
+                }
+                else if(!apiResponse.getData().getIsActive()){
+                    alertDialog = new android.support.v7.app.AlertDialog.Builder(LoginActivity.this)
+                            .setMessage("You have been deactivated :( . Please contact Buddy.")
+                            .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int which) {
+
+                                }
+                            })
+                            .show();
+                }
+                else if(!apiResponse.getData().getForcePasswordChange()){
                     SharedPreferences.Editor editor = settings.edit();
 
-                    //Set "hasLoggedIn" to true and set username
                     editor.putBoolean("hasLoggedIn", true);
-                    editor.putString("username", username);
-                    successfulLogin(username);
-                    // Commit the edits!
+                    editor.putString("userid", apiResponse.getData().getUserid());
+                    editor.putString("password",password);
+                    editor.putString("phoneEmail",phoneEmail);
+                    successfulLogin(phoneEmail);
+
+                    editor.apply();
+                    Intent intent = new Intent(LoginActivity.this , ChangePassword.class);
+                    startActivity(intent);
+                    LoginActivity.this.finish();
+                }
+                else {
+                    SharedPreferences.Editor editor = settings.edit();
+
+                    editor.putBoolean("hasLoggedIn", true);
+                    editor.putString("userid", apiResponse.getData().getUserid());
+                    editor.putString("password",password);
+                    editor.putString("phoneEmail",phoneEmail);
+                    successfulLogin(phoneEmail);
+
                     editor.apply();
                     Intent intent = new Intent(LoginActivity.this , HomeActivity.class);
                     startActivity(intent);
@@ -204,6 +269,7 @@ public class LoginActivity extends AppCompatActivity {
                 }
             }
         }.execute();
+
     }
 
     private boolean isNetworkConnected() {
