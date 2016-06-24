@@ -6,6 +6,8 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.os.AsyncTask;
@@ -47,12 +49,6 @@ public class LoginActivity extends AppCompatActivity {
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        try {
-            Intercom.initialize((Application) getApplicationContext(), "android_sdk-a252775c0f9cdd6cd922b6420a558fd2eb3f89b0", "utga6z2r");
-        }
-        catch(Exception e){
-
-        }
         SharedPreferences settings = getSharedPreferences(BuddyConstants.PREFS_FILE, 0);
 
         //Get "hasLoggedIn" value. If the value doesn't exist yet false is returned
@@ -67,14 +63,22 @@ public class LoginActivity extends AppCompatActivity {
             String phoneEmailString = settings.getString("phoneEmail","");
             String passwordString = settings.getString("password","");
 
-            doLogin(phoneEmailString, passwordString);
+            if(phoneEmailString != null && !phoneEmailString.isEmpty() && passwordString != null && !passwordString.isEmpty()) {
+                doLogin(phoneEmailString, passwordString);
+            }
         }
-        else {
 
-            setContentView(R.layout.activity_main);
-        }
+        setContentView(R.layout.activity_main);
+
         phoneEmail    = (EditText) findViewById(R.id.editText);
         password = (EditText) findViewById(R.id.editText2);
+
+        try {
+            Intercom.initialize((Application) getApplicationContext(), "android_sdk-a252775c0f9cdd6cd922b6420a558fd2eb3f89b0", "utga6z2r");
+        }
+        catch(Exception e){
+
+        }
     }
 
     public void onClick(View v) {

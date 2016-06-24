@@ -60,6 +60,7 @@ public class GridViewAdapter extends BaseAdapter{
         imageBox.setCloudinaryId(imageBoxArrayList.get(position).getCloudinaryId());
         imageBox.setId(imageBoxArrayList.get(position).getId());
         imageBox.setMatch(imageBoxArrayList.get(position).getMatch());
+        imageBox.setPath(imageBoxArrayList.get(position).getPath());
         imageBox.setIsVerified(imageBoxArrayList.get(position).getIsVerified());
 
         if(imageBoxArrayList.get(position).getIsVerified() && imageBoxArrayList.get(position).getId()!=2) {

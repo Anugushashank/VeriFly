@@ -182,6 +182,7 @@ public class BorrowerDetailsActivity extends AppCompatActivity implements Adapte
                     ib.setPicType("College ID");
                     ib.setCloudinaryId("collegeId");
                     ib.setId(1);
+                    ib.setPath("server");
                     ib.setMatch("front");
                     ib.setIsVerified(uploadDocModel.getCollegeID().getFront().getIsVerified());
                     numCollegeID++;
@@ -195,12 +196,14 @@ public class BorrowerDetailsActivity extends AppCompatActivity implements Adapte
                     ib.setPicType("College ID");
                     ib.setCloudinaryId("collegeId");
                     ib.setId(1);
+                    ib.setPath("server");
                     ib.setMatch("back");
                     ib.setIsVerified(uploadDocModel.getCollegeID().getBack().getIsVerified());
                     numCollegeID++;
                     insertCollegeImageBox(ib);
                 }
-                if (uploadDocModel.getCollegeID().getFront() == null || uploadDocModel.getCollegeID().getBack() == null) {
+                if (uploadDocModel.getCollegeID().getFront() == null || uploadDocModel.getCollegeID().getBack() == null ||
+                        !uploadDocModel.getCollegeID().getBack().getIsVerified() || !uploadDocModel.getCollegeID().getFront().getIsVerified()) {
                     if (uploadDocModel.getCollegeID().getImgUrls() != null) {
                         for (i = 0; i < uploadDocModel.getCollegeID().getImgUrls().size(); i++) {
                             ImageBox ib = new ImageBox(imageLayout, BorrowerDetailsActivity.this);
@@ -209,6 +212,7 @@ public class BorrowerDetailsActivity extends AppCompatActivity implements Adapte
                             ib.setPicType("College ID");
                             ib.setCloudinaryId("collegeId");
                             ib.setId(1);
+                            ib.setPath("server");
                             ib.setMatch("img");
                             ib.setIsVerified(false);
                             numCollegeID++;
@@ -222,6 +226,7 @@ public class BorrowerDetailsActivity extends AppCompatActivity implements Adapte
                     ibx.setPicType("College ID");
                     ibx.setCloudinaryId("collegeId");
                     ibx.setId(1);
+                    ibx.setPath("server");
                     ibx.setMatch("plus");
                     ibx.setIsVerified(false);
                     insertCollegeImageBox(ibx);
@@ -233,6 +238,7 @@ public class BorrowerDetailsActivity extends AppCompatActivity implements Adapte
                 ibx.setPicType("College ID");
                 ibx.setCloudinaryId("collegeId");
                 ibx.setId(1);
+                ibx.setPath("server");
                 ibx.setMatch("plus");
                 ibx.setIsVerified(false);
                 insertCollegeImageBox(ibx);
@@ -253,6 +259,7 @@ public class BorrowerDetailsActivity extends AppCompatActivity implements Adapte
                     ib.setPicType("Permanent Address Proof");
                     ib.setCloudinaryId("addressProof");
                     ib.setId(2);
+                    ib.setPath("server");
                     ib.setMatch("front");
                     ib.setIsVerified(uploadDocModel.getAddressProof().getFront().getIsVerified());
                     numAddressProof++;
@@ -266,6 +273,7 @@ public class BorrowerDetailsActivity extends AppCompatActivity implements Adapte
                     ib.setPicType("Permanent Address Proof");
                     ib.setCloudinaryId("addressProof");
                     ib.setId(2);
+                    ib.setPath("server");
                     ib.setMatch("back");
                     ib.setIsVerified(uploadDocModel.getAddressProof().getBack().getIsVerified());
                     numAddressProof++;
@@ -280,6 +288,7 @@ public class BorrowerDetailsActivity extends AppCompatActivity implements Adapte
                             ib.setPicType("Permanent Address Proof");
                             ib.setCloudinaryId("addressProof");
                             ib.setId(2);
+                            ib.setPath("server");
                             ib.setMatch("img");
                             ib.setIsVerified(false);
                             numAddressProof++;
@@ -293,6 +302,7 @@ public class BorrowerDetailsActivity extends AppCompatActivity implements Adapte
                     ibx.setPicType("Permanent Address Proof");
                     ibx.setCloudinaryId("addressProof");
                     ibx.setId(2);
+                    ibx.setPath("server");
                     ibx.setMatch("plus");
                     ibx.setIsVerified(false);
                     insertAddressProofImageBox(ibx);
@@ -304,6 +314,7 @@ public class BorrowerDetailsActivity extends AppCompatActivity implements Adapte
                 ibx.setPicType("Permanent Address Proof");
                 ibx.setCloudinaryId("addressProof");
                 ibx.setId(2);
+                ibx.setPath("server");
                 ibx.setMatch("plus");
                 ibx.setIsVerified(false);
                 insertAddressProofImageBox(ibx);
@@ -323,6 +334,7 @@ public class BorrowerDetailsActivity extends AppCompatActivity implements Adapte
                         ib.setPicType("Grade Sheet");
                         ib.setCloudinaryId("gradeSheet");
                         ib.setId(3);
+                        ib.setPath("server");
                         ib.setMatch("valid");
                         ib.setIsVerified(true);
                         numGradeSheet++;
@@ -338,6 +350,7 @@ public class BorrowerDetailsActivity extends AppCompatActivity implements Adapte
                         ib.setPicType("Grade Sheet");
                         ib.setCloudinaryId("gradeSheet");
                         ib.setId(3);
+                        ib.setPath("server");
                         ib.setMatch("invalid");
                         ib.setIsVerified(true);
                         numGradeSheet++;
@@ -353,6 +366,7 @@ public class BorrowerDetailsActivity extends AppCompatActivity implements Adapte
                         ib.setPicType("Grade Sheet");
                         ib.setCloudinaryId("gradeSheet");
                         ib.setId(3);
+                        ib.setPath("server");
                         ib.setMatch("img");
                         ib.setIsVerified(false);
                         numGradeSheet++;
@@ -367,6 +381,7 @@ public class BorrowerDetailsActivity extends AppCompatActivity implements Adapte
             ibx.setPicType("Grade Sheet");
             ibx.setCloudinaryId("gradeSheet");
             ibx.setId(3);
+            ibx.setPath("server");
             ibx.setMatch("plus");
             ibx.setIsVerified(false);
             insertGradeSheetImageBox(ibx);
@@ -385,6 +400,7 @@ public class BorrowerDetailsActivity extends AppCompatActivity implements Adapte
                         ib.setPicType("Bank Proof");
                         ib.setCloudinaryId("bankProof");
                         ib.setId(4);
+                        ib.setPath("server");
                         ib.setMatch("valid");
                         ib.setIsVerified(true);
                         numBankProof++;
@@ -400,6 +416,7 @@ public class BorrowerDetailsActivity extends AppCompatActivity implements Adapte
                         ib.setPicType("Bank Proof");
                         ib.setCloudinaryId("bankProof");
                         ib.setId(4);
+                        ib.setPath("server");
                         ib.setMatch("invalid");
                         ib.setIsVerified(true);
                         numBankProof++;
@@ -415,6 +432,7 @@ public class BorrowerDetailsActivity extends AppCompatActivity implements Adapte
                         ib.setPicType("Bank Proof");
                         ib.setCloudinaryId("bankProof");
                         ib.setId(4);
+                        ib.setPath("server");
                         ib.setMatch("img");
                         ib.setIsVerified(false);
                         numBankProof++;
@@ -429,6 +447,7 @@ public class BorrowerDetailsActivity extends AppCompatActivity implements Adapte
             ibx.setPicType("Bank Proof");
             ibx.setCloudinaryId("bankProof");
             ibx.setId(4);
+            ibx.setPath("server");
             ibx.setMatch("plus");
             ibx.setIsVerified(false);
             insertBankProofImageBox(ibx);
@@ -747,6 +766,7 @@ public class BorrowerDetailsActivity extends AppCompatActivity implements Adapte
                                     imageBox1.setPicNum(1);
                                     imageBox2.setPicNum(0);
                                     imageBox2.setMatch("front");
+                                    imageBox2.setPath("local");
                                     imageBox2.setIsVerified(true);
                                     imageBox1.setMatch("invalid");
                                     imageBox1.setIsVerified(false);
@@ -761,6 +781,7 @@ public class BorrowerDetailsActivity extends AppCompatActivity implements Adapte
                                     imageBox1.setPicNum(picNum);
                                     imageBox2.setPicNum(0);
                                     imageBox2.setMatch("front");
+                                    imageBox2.setPath("local");
                                     imageBox2.setIsVerified(true);
                                     imageBox1.setMatch("invalid");
                                     imageBox1.setIsVerified(false);
@@ -771,6 +792,7 @@ public class BorrowerDetailsActivity extends AppCompatActivity implements Adapte
                                 if (picNum == 0) {
                                     imageBox1 = collegeID.get(0);
                                     imageBox1.setMatch("front");
+                                    imageBox1.setPath("local");
                                     imageBox1.setIsVerified(true);
                                     backImageCollegeId = null;
                                 } else if (picNum == 1) {
@@ -779,6 +801,7 @@ public class BorrowerDetailsActivity extends AppCompatActivity implements Adapte
                                     imageBox1.setPicNum(picNum);
                                     imageBox2.setPicNum(0);
                                     imageBox2.setMatch("front");
+                                    imageBox2.setPath("local");
                                     imageBox2.setIsVerified(true);
                                     imageBox1.setMatch("back");
                                     imageBox1.setIsVerified(true);
@@ -792,6 +815,7 @@ public class BorrowerDetailsActivity extends AppCompatActivity implements Adapte
                                     imageBox2.setPicNum(0);
                                     imageBox3.setPicNum(picNum);
                                     imageBox2.setMatch("front");
+                                    imageBox2.setPath("local");
                                     imageBox2.setIsVerified(true);
                                     imageBox1.setMatch("back");
                                     imageBox1.setIsVerified(collegeID.get(0).getIsVerified());
@@ -809,6 +833,7 @@ public class BorrowerDetailsActivity extends AppCompatActivity implements Adapte
                                 imageBox1.setMatch("invalid");
                                 imageBox1.setIsVerified(collegeID.get(0).getIsVerified());
                                 imageBox2.setMatch("front");
+                                imageBox2.setPath("local");
                                 imageBox2.setIsVerified(true);
                                 collegeID.set(picNum, imageBox1);
                                 collegeID.set(0, imageBox2);
@@ -821,6 +846,7 @@ public class BorrowerDetailsActivity extends AppCompatActivity implements Adapte
                                     imageBox1 = collegeID.get(0);
                                     imageBox2 = collegeID.get(1);
                                     imageBox1.setMatch("back");
+                                    imageBox1.setPath("local");
                                     imageBox1.setIsVerified(true);
                                     imageBox2.setMatch("invalid");
                                     imageBox2.setIsVerified(false);
@@ -836,6 +862,7 @@ public class BorrowerDetailsActivity extends AppCompatActivity implements Adapte
                                     imageBox1.setMatch("invalid");
                                     imageBox1.setIsVerified(false);
                                     imageBox2.setMatch("back");
+                                    imageBox2.setPath("local");
                                     imageBox2.setIsVerified(true);
                                     collegeID.set(picNum, imageBox1);
                                     collegeID.set(1, imageBox2);
@@ -844,11 +871,13 @@ public class BorrowerDetailsActivity extends AppCompatActivity implements Adapte
                                 if (picNum == 0) {
                                     imageBox1 = collegeID.get(0);
                                     imageBox1.setMatch("back");
+                                    imageBox1.setPath("local");
                                     imageBox1.setIsVerified(true);
                                     frontImageCollegeId = null;
                                 } else if (picNum == 1) {
                                     imageBox1 = collegeID.get(1);
                                     imageBox1.setMatch("back");
+                                    imageBox1.setPath("local");
                                     imageBox1.setIsVerified(true);
                                 } else {
                                     imageBox1 = collegeID.get(1);
@@ -856,6 +885,7 @@ public class BorrowerDetailsActivity extends AppCompatActivity implements Adapte
                                     imageBox1.setPicNum(picNum);
                                     imageBox2.setPicNum(1);
                                     imageBox2.setMatch("back");
+                                    imageBox2.setPath("local");
                                     imageBox2.setIsVerified(true);
                                     imageBox1.setMatch("invalid");
                                     imageBox1.setIsVerified(collegeID.get(1).getIsVerified());
@@ -870,6 +900,7 @@ public class BorrowerDetailsActivity extends AppCompatActivity implements Adapte
                                 imageBox1.setMatch("invalid");
                                 imageBox1.setIsVerified(collegeID.get(0).getIsVerified());
                                 imageBox2.setMatch("back");
+                                imageBox2.setPath("local");
                                 imageBox2.setIsVerified(true);
                                 collegeID.set(picNum, imageBox1);
                                 collegeID.set(0, imageBox2);
@@ -881,6 +912,7 @@ public class BorrowerDetailsActivity extends AppCompatActivity implements Adapte
                                     imageBox1 = collegeID.get(0);
                                     imageBox2 = collegeID.get(1);
                                     imageBox1.setMatch("invalid");
+                                    imageBox1.setPath("local");
                                     imageBox1.setIsVerified(true);
                                     collegeID.set(0, imageBox2);
                                     collegeID.set(1, imageBox1);
@@ -888,22 +920,26 @@ public class BorrowerDetailsActivity extends AppCompatActivity implements Adapte
                                 } else if (picNum == 1) {
                                     imageBox1 = collegeID.get(1);
                                     imageBox1.setMatch("invalid");
+                                    imageBox1.setPath("local");
                                     imageBox1.setIsVerified(true);
                                     backImageCollegeId = null;
                                 } else {
                                     imageBox1 = collegeID.get(picNum);
                                     imageBox1.setMatch("invalid");
+                                    imageBox1.setPath("local");
                                     imageBox1.setIsVerified(true);
                                 }
                             } else if (frontImageCollegeId != null) {
                                 if (picNum == 0) {
                                     imageBox1 = collegeID.get(0);
                                     imageBox1.setMatch("invalid");
+                                    imageBox1.setPath("local");
                                     imageBox1.setIsVerified(true);
                                     frontImageCollegeId = null;
                                 } else {
                                     imageBox1 = collegeID.get(picNum);
                                     imageBox1.setMatch("invalid");
+                                    imageBox1.setPath("local");
                                     imageBox1.setIsVerified(true);
                                 }
 
@@ -911,16 +947,19 @@ public class BorrowerDetailsActivity extends AppCompatActivity implements Adapte
                                 if (picNum == 0) {
                                     imageBox1 = collegeID.get(0);
                                     imageBox1.setMatch("invalid");
+                                    imageBox1.setPath("local");
                                     imageBox1.setIsVerified(true);
                                     backImageCollegeId = null;
                                 } else {
                                     imageBox1 = collegeID.get(picNum);
                                     imageBox1.setMatch("invalid");
+                                    imageBox1.setPath("local");
                                     imageBox1.setIsVerified(true);
                                 }
                             } else {
                                 imageBox2 = collegeID.get(picNum);
                                 imageBox2.setMatch("invalid");
+                                imageBox2.setPath("local");
                                 imageBox2.setIsVerified(true);
                             }
                         }
@@ -1042,10 +1081,12 @@ public class BorrowerDetailsActivity extends AppCompatActivity implements Adapte
                         if (check.equals("valid")) {
                             imageBox1 = gradeSheet.get(picNum);
                             imageBox1.setMatch("valid");
+                            imageBox1.setPath("local");
                             imageBox1.setIsVerified(true);
                         } else if (check.equals("invalid")) {
                             imageBox1 = gradeSheet.get(picNum);
                             imageBox1.setMatch("invalid");
+                            imageBox1.setPath("local");
                             imageBox1.setIsVerified(true);
                         }
                         createGradeSheetsLayout();
@@ -1053,10 +1094,12 @@ public class BorrowerDetailsActivity extends AppCompatActivity implements Adapte
                         if (check.equals("valid")) {
                             imageBox1 = bankProof.get(picNum);
                             imageBox1.setMatch("valid");
+                            imageBox1.setPath("local");
                             imageBox1.setIsVerified(true);
                         } else if (check.equals("invalid")) {
                             imageBox1 = bankProof.get(picNum);
                             imageBox1.setMatch("invalid");
+                            imageBox1.setPath("local");
                             imageBox1.setIsVerified(true);
                         }
                         createBankProofsLayout();
@@ -1316,6 +1359,7 @@ public class BorrowerDetailsActivity extends AppCompatActivity implements Adapte
                 imageBox.setCloudinaryId("collegeId");
                 imageBox.setImageUrl(imageurl);
                 imageBox.setMatch("img");
+                imageBox.setPath("local");
                 imageBox.setIsVerified(false);
                 numCollegeID++;
                 removeCollegeImageBox();
@@ -1325,6 +1369,7 @@ public class BorrowerDetailsActivity extends AppCompatActivity implements Adapte
                 imageBoxtemp.setCloudinaryId("collegeId");
                 imageBoxtemp.setImageUrl(null);
                 imageBoxtemp.setMatch("plus");
+                imageBoxtemp.setPath("server");
                 imageBoxtemp.setIsVerified(false);
                 imageBoxtemp.setPicNum(collegeID.size());
                 insertCollegeImageBox(imageBoxtemp);
@@ -1334,6 +1379,7 @@ public class BorrowerDetailsActivity extends AppCompatActivity implements Adapte
                 imageBox.setCloudinaryId("addressProof");
                 imageBox.setImageUrl(imageurl);
                 imageBox.setMatch("img");
+                imageBox.setPath("local");
                 imageBox.setIsVerified(false);
                 numAddressProof++;
                 removeAddressProofImageBox();
@@ -1343,6 +1389,7 @@ public class BorrowerDetailsActivity extends AppCompatActivity implements Adapte
                 imageBoxtemp.setCloudinaryId("addressProof");
                 imageBoxtemp.setImageUrl(null);
                 imageBoxtemp.setMatch("plus");
+                imageBoxtemp.setPath("server");
                 imageBoxtemp.setIsVerified(false);
                 imageBoxtemp.setPicNum(addressProof.size());
                 insertAddressProofImageBox(imageBoxtemp);
@@ -1352,6 +1399,7 @@ public class BorrowerDetailsActivity extends AppCompatActivity implements Adapte
                 imageBox.setCloudinaryId("gradeSheet");
                 imageBox.setImageUrl(imageurl);
                 imageBox.setMatch("img");
+                imageBox.setPath("local");
                 imageBox.setIsVerified(false);
                 numGradeSheet++;
                 removeGradeSheetImageBox();
@@ -1361,6 +1409,7 @@ public class BorrowerDetailsActivity extends AppCompatActivity implements Adapte
                 imageBoxtemp.setCloudinaryId("gradeSheet");
                 imageBoxtemp.setImageUrl(null);
                 imageBoxtemp.setMatch("plus");
+                imageBoxtemp.setPath("server");
                 imageBoxtemp.setIsVerified(false);
                 imageBoxtemp.setPicNum(gradeSheet.size());
                 insertGradeSheetImageBox(imageBoxtemp);
@@ -1370,6 +1419,7 @@ public class BorrowerDetailsActivity extends AppCompatActivity implements Adapte
                 imageBox.setCloudinaryId("bankProof");
                 imageBox.setImageUrl(imageurl);
                 imageBox.setMatch("img");
+                imageBox.setPath("local");
                 imageBox.setIsVerified(false);
                 numBankProof++;
                 removeBankProofImageBox();
@@ -1379,6 +1429,7 @@ public class BorrowerDetailsActivity extends AppCompatActivity implements Adapte
                 imageBoxtemp.setCloudinaryId("bankProof");
                 imageBoxtemp.setImageUrl(null);
                 imageBoxtemp.setMatch("plus");
+                imageBoxtemp.setPath("server");
                 imageBoxtemp.setIsVerified(false);
                 imageBoxtemp.setPicNum(bankProof.size());
                 insertBankProofImageBox(imageBoxtemp);

@@ -8,6 +8,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
 import android.os.AsyncTask;
 import android.support.design.widget.TabLayout;
@@ -19,6 +20,7 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -34,6 +36,7 @@ import com.google.gson.Gson;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -309,15 +312,20 @@ public class HomeActivity extends AppCompatActivity {
                     .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int which) {
                             //Yes button clicked, do something
+
+                            Intercom.client().reset();
+
                             SharedPreferences settings = getSharedPreferences(BuddyConstants.PREFS_FILE, 0); // 0 - for private mode
                             SharedPreferences.Editor editor = settings.edit();
 
                             //Set "hasLoggedIn" to false
                             editor.putBoolean("hasLoggedIn", false);
-                            Intercom.client().reset();
-
-                            // Commit the edits!
                             editor.apply();
+
+                            File deleteFile = new File("/data/data/com.example.aparna.buddy/shared_prefs/BuddyPrefsFile.xml");
+                            deleteFile.delete();
+
+
                             startActivity(intent);
                             HomeActivity.this.finish();
 

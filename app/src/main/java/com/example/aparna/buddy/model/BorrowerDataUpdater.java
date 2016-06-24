@@ -3,6 +3,7 @@ package com.example.aparna.buddy.model;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.afollestad.materialdialogs.MaterialDialog;
@@ -26,6 +27,7 @@ public class BorrowerDataUpdater {
     BorrowerDetailsActivity activity;
     UploadDocModel uploadDocModel;
     VerificationInfo verificationInfo;
+    BorrowerData borrowerData;
     BorrowerStateContainer borrowerStateContainer;
     String submit, username;
     int conformDocs = 0, conformVerify = 0;
@@ -43,6 +45,7 @@ public class BorrowerDataUpdater {
         try {
             String referenceIsGoodFriend = activity.getGoodFriendsRadio();
             final String phone = activity.getUploadDocModel().getPhone();
+            borrowerData = activity.getBorrowerData();
             String referenceYear = activity.getRefYear();
             String referenceDepartment = activity.getRefDept();
             String punctualityInClass = activity.getSpinnerPunc();
@@ -152,7 +155,7 @@ public class BorrowerDataUpdater {
 
             if (borrowerStateContainer.isCompleted()) {
                 verificationInfo.setTaskStatus("completed");
-            } else if (borrowerStateContainer.isOngoing()) {
+            } else if (borrowerStateContainer.isOngoing() || borrowerData.getTaskStatus().equals("ongoing")) {
                 verificationInfo.setTaskStatus("ongoing");
             } else {
                 verificationInfo.setTaskStatus("new");

@@ -33,7 +33,7 @@ public class ImageBox {
     private RoundedImageView roundedImageView;
     private ImageView plusIcon, unverifiedIcon, verifiedIcon;
     private String imageUrl, roundedImageViewTag, plusIconTag, unverifiedIconTag, verifiedIconTag;
-    private String match;
+    private String match, path;
     private Boolean isVerified;
 
     public ImageBox(FrameLayout view, BorrowerDetailsActivity activity) {
@@ -228,6 +228,10 @@ public class ImageBox {
     public void setMatch(String match) { this.match = match; }
 
     public String getMatch() { return match; }
+
+    public void setPath(String path){ this.path = path; }
+
+    public String getPath(){ return path; }
 
 
 }

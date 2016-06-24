@@ -3,6 +3,8 @@ package com.example.aparna.buddy.model;
 
 import com.example.aparna.buddy.app.BorrowerDetailsActivity;
 
+import java.util.ArrayList;
+
 /**
  * Created by Shashank on 11/6/16.
  */
@@ -53,7 +55,10 @@ public class BorrowerStateContainer {
                 || (activity.getSpinnerPunc() != null && !activity.getSpinnerPunc().isEmpty())
                 || (activity.getSpinnerSincere() != null && !activity.getSpinnerSincere().isEmpty())
                 || (activity.getSpinnerLoanRepay() != null && !activity.getSpinnerLoanRepay().isEmpty())
-                || activity.getNumBankProofs() > 0 || activity.getNumGradeSheets() > 0     ){
+                || (activity.getOtherNotes() != null && !activity.getOtherNotes().isEmpty())
+                || activity.getNumBankProofs() > 0 || activity.getNumGradeSheets() > 0
+                || checkIfUploaded(activity.getCollegeIDs()) || checkIfUploaded(activity.getAddressProofs())
+                || checkIfUploaded(activity.getBankProofs()) || checkIfUploaded(activity.getGradeSheets())){
 
             return true;
         }
@@ -78,5 +83,14 @@ public class BorrowerStateContainer {
             }
         }
         return true;
+    }
+
+    public Boolean checkIfUploaded(ArrayList<ImageBox> arrayList) {
+        for(int i = 0 ; i < arrayList.size() ; i++){
+            if(arrayList.get(i).getPath().equals("local")){
+                return true;
+            }
+        }
+        return false;
     }
 }
