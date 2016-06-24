@@ -1,29 +1,20 @@
 package com.example.aparna.buddy.app;
 
-import android.content.Context;
+
 import android.content.Intent;
-import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.AppCompatRadioButton;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.View;
-import android.view.ViewTreeObserver;
-import android.widget.CompoundButton;
 import android.widget.FrameLayout;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RadioGroup;
-import android.widget.Switch;
 import android.widget.TextView;
 
-import com.example.aparna.buddy.model.ImageBox;
 import com.example.aparna.buddy.model.TouchImageView;
 import com.squareup.picasso.Picasso;
 
-import java.util.ArrayList;
 
 public class ImageViewActivity extends AppCompatActivity {
     Toolbar toolBar;

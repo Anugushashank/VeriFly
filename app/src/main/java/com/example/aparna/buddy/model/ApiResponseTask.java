@@ -12,6 +12,5 @@ public class ApiResponseTask {
 
     public String getStatus(){ return status; }
 
-    public String getMsg() { return msg; }
 
 }

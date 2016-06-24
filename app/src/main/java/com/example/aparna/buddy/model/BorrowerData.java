@@ -37,10 +37,6 @@ public class BorrowerData {
 
     public String getAssignedToCollege() { return assignedToCollege; }
 
-    public String getUserCollege() { return userCollege; }
-
-    public String getUserName() { return userName; }
-
     public String getDistanceBwColleges() { return distanceBwColleges; }
 
     public String getTaskStatus() { return taskStatus; }

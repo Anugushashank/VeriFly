@@ -1,7 +1,5 @@
 package com.example.aparna.buddy.model;
 
-import android.util.Log;
-import android.view.View;
 
 import com.example.aparna.buddy.app.BorrowerDetailsActivity;
 

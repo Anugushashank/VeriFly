@@ -69,9 +69,10 @@ public class LoginActivity extends AppCompatActivity {
 
             doLogin(phoneEmailString, passwordString);
         }
+        else {
 
-        setContentView(R.layout.activity_main);
-
+            setContentView(R.layout.activity_main);
+        }
         phoneEmail    = (EditText) findViewById(R.id.editText);
         password = (EditText) findViewById(R.id.editText2);
     }

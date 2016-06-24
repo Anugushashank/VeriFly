@@ -9,7 +9,6 @@ import android.net.ConnectivityManager;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -42,7 +41,6 @@ public class ChangePassword extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_change_password);
 
         newPassword = (EditText)findViewById(R.id.password);
         confirmPassword = (EditText)findViewById(R.id.confirmPassword);
@@ -57,7 +55,7 @@ public class ChangePassword extends AppCompatActivity {
 
         sendToken(urlToken);
 
-
+        setContentView(R.layout.activity_change_password);
     }
 
     public void onClick(View view){
@@ -180,7 +178,7 @@ public class ChangePassword extends AppCompatActivity {
 
                     ApiResponse apiResponse = new Gson().fromJson(apiResponseString, ApiResponse.class);
 
-                    Log.i("token",apiResponse.getStatus());
+
                     if (asyncException != null || !apiResponse.getStatus().equals("success")) {
 
                         CharSequence text = getResources().getString(R.string.invalid_token);
@@ -283,7 +281,7 @@ public class ChangePassword extends AppCompatActivity {
                     ApiResponse apiResponse = new Gson().fromJson(apiResponseString, ApiResponse.class);
 
 
-                    Log.i("token",apiResponse.toString());
+
                     if (asyncException != null || !apiResponse.getStatus().equals("success")) {
 
                         CharSequence text = getResources().getString(R.string.invalid_creds);

@@ -10,8 +10,6 @@ public class ApiResponse {
 
     public String getStatus(){ return status; }
 
-    public String getMsg() { return msg; }
-
     public Response getData() { return data; }
 
     public class Response{
