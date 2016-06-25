@@ -320,10 +320,8 @@ public class HomeActivity extends AppCompatActivity {
 
                             //Set "hasLoggedIn" to false
                             editor.putBoolean("hasLoggedIn", false);
+                            editor.clear();
                             editor.apply();
-
-                            File deleteFile = new File("/data/data/com.example.aparna.buddy/shared_prefs/BuddyPrefsFile.xml");
-                            deleteFile.delete();
 
 
                             startActivity(intent);

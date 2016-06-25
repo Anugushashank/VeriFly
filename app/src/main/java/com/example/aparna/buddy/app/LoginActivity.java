@@ -63,12 +63,16 @@ public class LoginActivity extends AppCompatActivity {
             String phoneEmailString = settings.getString("phoneEmail","");
             String passwordString = settings.getString("password","");
 
-            if(phoneEmailString != null && !phoneEmailString.isEmpty() && passwordString != null && !passwordString.isEmpty()) {
+            if(!phoneEmailString.isEmpty() && !passwordString.isEmpty()) {
                 doLogin(phoneEmailString, passwordString);
             }
+            else{
+                setContentView(R.layout.activity_main);
+            }
         }
-
-        setContentView(R.layout.activity_main);
+        else {
+            setContentView(R.layout.activity_main);
+        }
 
         phoneEmail    = (EditText) findViewById(R.id.editText);
         password = (EditText) findViewById(R.id.editText2);
