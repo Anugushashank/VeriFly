@@ -8,7 +8,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
 import android.os.AsyncTask;
 import android.support.design.widget.TabLayout;
@@ -20,7 +19,6 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -36,7 +34,6 @@ import com.google.gson.Gson;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -402,7 +399,7 @@ public class HomeActivity extends AppCompatActivity {
                         }
                     }
                 })
-                .setIcon(android.R.drawable.ic_dialog_alert)
+                .setIcon(R.drawable.dialog_alert)
                 .show();
         alertDialog.setCanceledOnTouchOutside(false);
         alertDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
@@ -429,7 +426,7 @@ public class HomeActivity extends AppCompatActivity {
                         }
                     }
                 })
-                .setIcon(android.R.drawable.ic_dialog_alert)
+                .setIcon(R.drawable.dialog_alert)
                 .show();
         alertDialog.setCanceledOnTouchOutside(false);
         alertDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {

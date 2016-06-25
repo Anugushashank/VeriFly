@@ -88,7 +88,7 @@ public class ChangePassword extends AppCompatActivity {
         else{
             textView.setVisibility(View.INVISIBLE);
             AlertDialog.Builder builder = new AlertDialog.Builder(this,R.style.DialogStyle);
-            builder.setMessage("You cannot change your password later.Are you sure you want to keep this password?")
+            builder.setMessage("Are you sure you want to keep this password?")
                     .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int which) {
 
@@ -348,7 +348,7 @@ public class ChangePassword extends AppCompatActivity {
                         }
                     }
                 })
-                .setIcon(android.R.drawable.ic_dialog_alert)
+                .setIcon(R.drawable.dialog_alert)
                 .show();
         alertDialog.setCanceledOnTouchOutside(false);
         alertDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
@@ -376,7 +376,7 @@ public class ChangePassword extends AppCompatActivity {
                         }
                     }
                 })
-                .setIcon(android.R.drawable.ic_dialog_alert)
+                .setIcon(R.drawable.dialog_alert)
                 .show();
         alertDialog.setCanceledOnTouchOutside(false);
         alertDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {

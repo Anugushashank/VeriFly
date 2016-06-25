@@ -294,7 +294,7 @@ public class LoginActivity extends AppCompatActivity {
                         }
                     }
                 })
-                .setIcon(android.R.drawable.ic_dialog_alert)
+                .setIcon(R.drawable.dialog_alert)
                 .show();
         alertDialog.setCanceledOnTouchOutside(false);
         alertDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
@@ -321,7 +321,7 @@ public class LoginActivity extends AppCompatActivity {
                         }
                     }
                 })
-                .setIcon(android.R.drawable.ic_dialog_alert)
+                .setIcon(R.drawable.dialog_alert)
                 .show();
         alertDialog.setCanceledOnTouchOutside(false);
         alertDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
