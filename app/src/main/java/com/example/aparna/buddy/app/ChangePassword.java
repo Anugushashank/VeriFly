@@ -284,7 +284,7 @@ public class ChangePassword extends AppCompatActivity {
 
                     if (asyncException != null || !apiResponse.getStatus().equals("success")) {
 
-                        CharSequence text = getResources().getString(R.string.invalid_creds);
+                        CharSequence text = "something went wrong. Please try again.";
                         int duration = Toast.LENGTH_LONG;
 
                         Toast toast = Toast.makeText(context, text, duration);

@@ -75,10 +75,11 @@
     <string name="take_me_to_gmail">Email has been sent to your mail Address.Take me to Gmail.</string>
 
     <!-- PopUp Texts -->
-    <string name="college_popup">Mark Front or Back if the document matches. Mark invalid if it matches with none</string>
-    <string name="address_popup">Upload only if Front and Back are not present</string>
-    <string name="grade_popup">Upload GradeSheet if not present. <b>Mark every image as valid or invalid based on their validation</b></string>
-    <string name="bank_popup">Upload BankProof if not present. <b>Mark every image as valid or invalid based on their validation</b></string>
+    <string name="college_popup">Mark Front or Back if the document matches. Mark invalid if it matches with none.
+        Both Front and Back images should be uploaded if the verification has to be completed.</string>
+    <string name="address_popup">Upload only if Front and Back are not present. No marking is required.</string>
+    <string name="grade_popup">Upload GradeSheet if not present. <i >Mark every image as valid or invalid based on their validation.</i></string>
+    <string name="bank_popup">Upload BankProof if not present. <i>Mark every image as valid or invalid based on their validation.</i></string>
 
     <!-- Change Passwords -->
     <string name="enter_password">Enter a password</string>

@@ -96,8 +96,20 @@ public class CardAdapter extends RecyclerView.Adapter<CardAdapter.CardViewHolder
         public void setData(BorrowerData currentObj, int position){
             try {
                 this.name.setText(currentObj.getUploadDocModel().getName());
+            }
+            catch(Exception e){
+            }
+            try {
                 this.college.setText(currentObj.getUploadDocModel().getCollege());
+            }
+            catch(Exception e){
+            }
+            try {
                 this.date.setText(currentObj.getScheduleDate().substring(0, 10));
+            }
+            catch(Exception e){
+            }
+            try {
                 this.tasktype.setText(currentObj.getTaskType());
             }
             catch(Exception e){
