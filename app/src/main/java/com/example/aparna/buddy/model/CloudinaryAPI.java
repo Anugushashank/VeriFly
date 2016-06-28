@@ -1,9 +1,12 @@
 package com.example.aparna.buddy.model;
 
 import android.app.Activity;
+import android.content.Context;
 import android.graphics.Bitmap;
+import android.net.ConnectivityManager;
 import android.os.AsyncTask;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.cloudinary.Cloudinary;
@@ -74,7 +77,7 @@ public class CloudinaryAPI {
                 } catch (Exception e) {
                     Log.e("Cloudinary API", e.getLocalizedMessage());
                     exception = e;
-                    return url;
+                    return null;
                 }
 
                 return url;
@@ -85,9 +88,27 @@ public class CloudinaryAPI {
             protected void onPostExecute(String url) {
                 super.onPostExecute(url);
                 if (materialDialog.isShowing()) {
-                    materialDialog.hide();
+                    materialDialog.dismiss();
                 }
-                uploadCallBack.methodToCallBack(url);
+                if(exception != null){
+                    if(!isNetworkConnected()) {
+                        CharSequence text = "No Internet connection.";
+                        int duration = Toast.LENGTH_SHORT;
+
+                        Toast toast = Toast.makeText(activity.getApplicationContext(), text, duration);
+                        toast.show();
+                    }
+                    else {
+                        CharSequence text = "Something went wrong. Please try again.";
+                        int duration = Toast.LENGTH_SHORT;
+
+                        Toast toast = Toast.makeText(activity.getApplicationContext(), text, duration);
+                        toast.show();
+                    }
+                }
+                if(url != null) {
+                    uploadCallBack.methodToCallBack(url);
+                }
             }
         }.execute();
 
@@ -95,6 +116,11 @@ public class CloudinaryAPI {
 
   public  interface UploadCallBack {
         void methodToCallBack(String imageUrl);
+    }
+
+    private boolean isNetworkConnected() {
+        ConnectivityManager cm = (ConnectivityManager) activity.getSystemService(Context.CONNECTIVITY_SERVICE);
+        return cm.getActiveNetworkInfo() != null;
     }
 
 }

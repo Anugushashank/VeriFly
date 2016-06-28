@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.os.AsyncTask;
@@ -11,6 +12,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -38,13 +40,11 @@ public class ChangePassword extends AppCompatActivity {
     Intent intent;
     String urlToken, userid;
     android.support.v7.app.AlertDialog alertDialog;
+    RelativeLayout relativeLayout;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        newPassword = (EditText)findViewById(R.id.password);
-        confirmPassword = (EditText)findViewById(R.id.confirmPassword);
-        textView = (TextView)findViewById(R.id.doNotMatch);
 
         intent = getIntent();
         urlToken = intent.getStringExtra("token");
@@ -56,11 +56,15 @@ public class ChangePassword extends AppCompatActivity {
         sendToken(urlToken);
 
         setContentView(R.layout.activity_change_password);
+
+        newPassword = (EditText)findViewById(R.id.password);
+        confirmPassword = (EditText)findViewById(R.id.confirmPassword);
+        textView = (TextView)findViewById(R.id.doNotMatch);
     }
 
     public void onClick(View view){
-        stringConfirmPassword = confirmPassword.getText().toString();
         stringPassword = newPassword.getText().toString();
+        stringConfirmPassword = confirmPassword.getText().toString();
         if(stringPassword.isEmpty() ){
             newPassword.setText("");
             newPassword.setHintTextColor(Color.RED);
@@ -190,6 +194,9 @@ public class ChangePassword extends AppCompatActivity {
 
                     } else {
 
+                        relativeLayout = (RelativeLayout)findViewById(R.id.password_layout);
+                        relativeLayout.setVisibility(View.VISIBLE);
+
                         userid = apiResponse.getData().getUserid();
                     }
                 }
@@ -295,15 +302,17 @@ public class ChangePassword extends AppCompatActivity {
                                 .setMessage("Password Changed Successfully.")
                                 .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                                     public void onClick(DialogInterface dialog, int which) {
-                                        if(isNetworkConnected()) {
+
+                                            SharedPreferences settings = getSharedPreferences(BuddyConstants.PREFS_FILE, 0); // 0 - for private mode
+                                            SharedPreferences.Editor editor = settings.edit();
+
+                                            editor.clear();
+                                            editor.apply();
+
                                             Intent intent=new Intent(getApplicationContext(),LoginActivity.class);
                                             startActivity(intent);
 
                                             ChangePassword.this.finish();
-                                        }
-                                        else{
-                                            alertBox();
-                                        }
                                     }
                                 })
                                 .show();

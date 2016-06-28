@@ -328,13 +328,12 @@ public class BorrowerDataUpdater {
                         }
                         ApiResponse apiResponse1 = new Gson().fromJson(apiResponse, ApiResponse.class);
 
-                        if (asyncException != null || !apiResponse1.getStatus().equals("success")) {
-                            // here tell that login request has thrown exception and ask to try again
+                        if (asyncException == null && apiResponse1.getStatus().equals("success")) {
 
-                        } else {
                             if (submit.equals("back") || submit.equals("button")) {
                                 activity.finish();
                             }
+
                         }
                     }
                 }.execute();
@@ -407,17 +406,12 @@ public class BorrowerDataUpdater {
                         }
                         ApiResponse apiResponse1 = new Gson().fromJson(apiResponse, ApiResponse.class);
 
-                        if (asyncException != null || !apiResponse1.getStatus().equals("success")) {
-                            // here tell that login request has thrown exception and ask to try again
-                            CharSequence text = context.getResources().getString(R.string.upload_failed);
-                            int duration = Toast.LENGTH_SHORT;
+                        if (asyncException == null && apiResponse1.getStatus().equals("success")) {
 
-                            Toast toast = Toast.makeText(context, text, duration);
-                            toast.show();
-                        } else {
                             if (submit.equals("back") || submit.equals("button")) {
                                 activity.finish();
                             }
+
                         }
                     }
                 }.execute();

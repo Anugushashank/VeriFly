@@ -89,6 +89,12 @@
     <string name="change_password">Change Password</string>
     <string name="confirm_password">Confirm Password</string>
     <string name="new_password">Password</string>
+    <string name="phone">Phone</string>
+    <string name="password">Password</string>
+    <string name="login">LOGIN</string>
+    <string name="forgot_password">Forgot your Password?</string>
+    <string name="create_password">Create a Password</string>
+    <string name="done">Done</string>
 
 
 

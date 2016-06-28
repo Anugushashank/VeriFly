@@ -18,6 +18,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.afollestad.materialdialogs.MaterialDialog;
@@ -44,10 +45,13 @@ public class LoginActivity extends AppCompatActivity {
     EditText phoneEmail, password;
     String userid;
     AlertDialog alertDialog;
+    RelativeLayout relativeLayout;
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        setContentView(R.layout.activity_main);
 
         SharedPreferences settings = getSharedPreferences(BuddyConstants.PREFS_FILE, 0);
 
@@ -67,11 +71,13 @@ public class LoginActivity extends AppCompatActivity {
                 doLogin(phoneEmailString, passwordString);
             }
             else{
-                setContentView(R.layout.activity_main);
+                relativeLayout = (RelativeLayout)findViewById(R.id.login_layout);
+                relativeLayout.setVisibility(View.VISIBLE);
             }
         }
         else {
-            setContentView(R.layout.activity_main);
+            relativeLayout = (RelativeLayout)findViewById(R.id.login_layout);
+            relativeLayout.setVisibility(View.VISIBLE);
         }
 
         phoneEmail    = (EditText) findViewById(R.id.editText);
@@ -116,7 +122,7 @@ public class LoginActivity extends AppCompatActivity {
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this,R.style.DialogStyle);
         builder.setTitle("Reset Password");
-        builder.setMessage("Enter your Phone number.Email will be sent to the email address corresponding to this phone number for " +
+        builder.setMessage("Enter your Phone number. Email will be sent to the email address corresponding to this phone number for " +
                 "resetting the password.");
 
         View viewInflated = LayoutInflater.from(this).inflate(R.layout.reset_password,(ViewGroup)findViewById(android.R.id.content), false);
@@ -251,6 +257,14 @@ public class LoginActivity extends AppCompatActivity {
                             .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int which) {
 
+                                    SharedPreferences settings = getSharedPreferences(BuddyConstants.PREFS_FILE, 0); // 0 - for private mode
+                                    SharedPreferences.Editor editor = settings.edit();
+
+                                    editor.clear();
+                                    editor.apply();
+
+                                    relativeLayout = (RelativeLayout)findViewById(R.id.login_layout);
+                                    relativeLayout.setVisibility(View.VISIBLE);
                                 }
                             })
                             .show();

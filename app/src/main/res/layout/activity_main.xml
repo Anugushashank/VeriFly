@@ -11,7 +11,11 @@
     android:background="@color/colorPrimary"
      >
 
-
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="invisible"
+        android:id="@+id/login_layout">
     <ImageView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -25,7 +29,7 @@
         android:layout_width="250sp"
         android:layout_height="50sp"
         android:id="@+id/editText"
-        android:hint="Phone"
+        android:hint="@string/phone"
         android:textColorHint="#FFFFFF"
         android:inputType="number"
         android:layout_centerVertical="true"
@@ -38,7 +42,7 @@
         android:layout_width="250sp"
         android:layout_height="50sp"
         android:inputType="textPassword"
-        android:hint="Password"
+        android:hint="@string/password"
         android:textColorHint="#FFFFFF"
         android:ems="10"
         android:id="@+id/editText2"
@@ -51,7 +55,7 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="LOGIN"
+        android:text="@string/login"
         android:id="@+id/textView"
         android:layout_below="@+id/editText2"
         android:layout_centerHorizontal="true"
@@ -63,7 +67,7 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Forgot your Password?"
+        android:text="@string/forgot_password"
         android:id="@+id/forgotPassword"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
@@ -72,6 +76,7 @@
         android:layout_marginBottom="20dp"
         android:onClick="resetPassword"
         android:clickable="true" />
+        </RelativeLayout>
 
 
     <!--android:textColorHint="#FFFFFF"-->

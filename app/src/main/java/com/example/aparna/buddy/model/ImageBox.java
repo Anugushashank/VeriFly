@@ -152,10 +152,15 @@ public class ImageBox {
     }
 
     public void loadImage(RoundedImageView view, String imageUrl) {
-        Picasso.with(activity)
-               .load(imageUrl).placeholder(R.drawable.loading_image)
-               .fit()
-               .into(view);
+        try {
+            Picasso.with(activity)
+                    .load(imageUrl).placeholder(R.drawable.loading_image)
+                    .fit()
+                    .into(view);
+        }
+        catch(Exception e){
+
+        }
     }
 
     public void loadImagePrompt() {

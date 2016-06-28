@@ -81,7 +81,7 @@ public class IntercomModel {
                         customAttributes.put("completionDate", borrowerData.getCompletionDate());
                         customAttributes.put("fbUserId", borrowerData.getUploadDocModel().getFbUserId());
                         customAttributes.put("taskStatus", borrowerData.getTaskStatus());
-                        customAttributes.put("assignedTo", borrowerData.getAssignedTo());
+                        customAttributes.put("assignedTo", username);
                         customAttributes.put("assignedToName", borrowerData.getAssignedToName());
                         customAttributes.put("assignedToCollege", borrowerData.getAssignedToCollege());
                         customAttributes.put("taskType", borrowerData.getTaskType());

@@ -685,7 +685,7 @@ public class BorrowerDetailsActivity extends AppCompatActivity implements Adapte
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        String photoPath = "";
+        String photoPath ;
         CloudinaryAPI cloudinary = new CloudinaryAPI(BorrowerDetailsActivity.this);
         Bitmap bp;
         Uri uri;
@@ -695,19 +695,7 @@ public class BorrowerDetailsActivity extends AppCompatActivity implements Adapte
             if(requestCode == 1){
 
                 bp = (Bitmap) data.getExtras().get("data");
-                try {
-                    Cursor cursor = getContentResolver().query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, new String[]{MediaStore.Images.Media.DATA, MediaStore.Images.Media.DATE_ADDED, MediaStore.Images.ImageColumns.ORIENTATION}, MediaStore.Images.Media.DATE_ADDED, null, "date_added ASC");
-                    if (cursor != null && cursor.moveToFirst()) {
-                        do {
-                            uri = Uri.parse(cursor.getString(cursor.getColumnIndex(MediaStore.Images.Media.DATA)));
-                            photoPath = uri.toString();
-                        } while (cursor.moveToNext());
-                        cursor.close();
-                    }
-                }
-                catch(Exception e){
 
-                }
                 cloudinary.uploadImage(bp, localPath, borrowerData,this);
 
             } else if (requestCode == 2) {
@@ -1347,6 +1335,9 @@ public class BorrowerDetailsActivity extends AppCompatActivity implements Adapte
     public void methodToCallBack(String imageUrl) {
         try {
             imageurl = imageUrl;
+            if(imageUrl == null){
+                return;
+            }
             int id;
             SharedPreferences settings = getSharedPreferences(BuddyConstants.PREFS_FILE, 0);
             imageBox = new ImageBox(imageLayout, BorrowerDetailsActivity.this);
