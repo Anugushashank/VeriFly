@@ -16,10 +16,13 @@ public class ApiResponse {
 
         String userid;
         Boolean isActive;
+        int earning;
 
         public String getUserid(){ return userid; }
 
         public Boolean getIsActive() { return isActive; }
+
+        public int getEarning() { return earning; }
 
     }
 }

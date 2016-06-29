@@ -25,6 +25,7 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.afollestad.materialdialogs.MaterialDialog;
+import com.example.aparna.buddy.model.ApiResponse;
 import com.example.aparna.buddy.model.ApiResponseTask;
 import com.example.aparna.buddy.model.BuddyConstants;
 import com.example.aparna.buddy.model.IntercomModel;
@@ -60,6 +61,7 @@ public class HomeActivity extends AppCompatActivity {
     IntercomModel intercomModel;
     android.support.v7.app.AlertDialog alertDialog;
     SharedPreferences settings;
+    String earning;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,7 +81,7 @@ public class HomeActivity extends AppCompatActivity {
 
         // Earnings does not has an API now just setting some
         final TextView earnings = (TextView) toolBar.findViewById(R.id.earnings);
-        final String earns = "Earnings ".concat(getString(R.string.Rs)).concat("3200");
+
 
         if (isNetworkConnected()) {
             new AsyncTask<String, String, String>() {
@@ -170,6 +172,38 @@ public class HomeActivity extends AppCompatActivity {
                                 break;
                             }
                         }
+
+                        url = new HttpUrl.Builder()
+                                .scheme("http")
+                                .host(context.getResources().getString(R.string.api_host))
+                                .addPathSegments(context.getResources().getString(R.string.earnings_path))
+                                .addQueryParameter("assignedTo", userid)
+                                .build();
+
+                        request = new Request.Builder()
+                                .url(url)
+                                .get()
+                                .addHeader("x-access-token", token)
+                                .addHeader("content-type", "application/json")
+                                .build();
+
+                        try {
+                            response = client.newCall(request).execute();
+                            if (!response.isSuccessful()) {
+                                throw new IOException("Unexpected code " + response);
+                            }
+                            apiResponse = response.body().string();
+
+                            ApiResponse apiResponse1 = new Gson().fromJson(apiResponse, ApiResponse.class);
+
+                            if(apiResponse1.getStatus().equals("success")){
+
+                                earning = "Earnings  ".concat(getString(R.string.Rs)).concat(Integer.toString(apiResponse1.getData().getEarning()));
+                            }
+
+                        } catch (Exception e) {
+                            apiException = e;
+                        }
                     }
                     catch (Exception e) {
                         apiException = e;
@@ -200,9 +234,10 @@ public class HomeActivity extends AppCompatActivity {
                     viewPager.setAdapter(viewPagerAdapter);
                     setSupportActionBar(toolBar);
                     if (earnings != null) {
-                        earnings.setText(earns);
+                        earnings.setText(earning);
                         earnings.setVisibility(View.VISIBLE);
                     }
+
                     toolBar.setLogo(R.drawable.buddylogosmall);
 
                     if (getSupportActionBar() != null) {
