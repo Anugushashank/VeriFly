@@ -78,8 +78,6 @@ public class HomeActivity extends AppCompatActivity {
         userid = settings.getString("userid", "");
 
 
-
-        // Earnings does not has an API now just setting some
         final TextView earnings = (TextView) toolBar.findViewById(R.id.earnings);
 
 
@@ -230,8 +228,6 @@ public class HomeActivity extends AppCompatActivity {
                 action bar.
                 */
 
-                    ViewPagerAdapter viewPagerAdapter = new ViewPagerAdapter(getSupportFragmentManager(), HomeActivity.this, allTabsData);
-                    viewPager.setAdapter(viewPagerAdapter);
                     setSupportActionBar(toolBar);
                     if (earnings != null) {
                         earnings.setText(earning);
@@ -281,10 +277,13 @@ public class HomeActivity extends AppCompatActivity {
                 1st we add the PageChangeListener and pass a TabLayoutPageChangeListener so that Tabs Selection
                 changes when a viewpager page changes.
                 */
-                    viewPager.setCurrentItem(settings.getInt("tab",0));
+
                     viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
                     tabLayout.setOnTabSelectedListener(new TabLayout.ViewPagerOnTabSelectedListener(viewPager));
 
+                    ViewPagerAdapter viewPagerAdapter = new ViewPagerAdapter(getSupportFragmentManager(), HomeActivity.this, allTabsData);
+                    viewPager.setAdapter(viewPagerAdapter);
+                    viewPager.setCurrentItem(settings.getInt("tab",0));
 
                 }
             }.execute();
@@ -447,7 +446,7 @@ public class HomeActivity extends AppCompatActivity {
     }
     private void connectionTimeOut(){
         alertDialog = new android.support.v7.app.AlertDialog.Builder(this,R.style.DialogStyle)
-                .setTitle("Connection Time Out")
+                .setTitle("Something went wrong")
                 .setMessage("Try connecting again")
                 .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {

@@ -14,13 +14,13 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:visibility="invisible"
+        android:visibility="visible"
         android:id="@+id/login_layout">
     <ImageView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/imageView"
-        android:layout_marginTop="118dp"
+        android:layout_marginTop="50dp"
         android:src="@drawable/buddylogo"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true" />
@@ -32,7 +32,8 @@
         android:hint="@string/phone"
         android:textColorHint="#FFFFFF"
         android:inputType="number"
-        android:layout_centerVertical="true"
+        android:layout_below="@+id/imageView"
+        android:layout_marginTop="40dp"
         android:layout_centerHorizontal="true"
         android:maxLength="10"
 
@@ -48,7 +49,7 @@
         android:id="@+id/editText2"
         android:layout_below="@+id/editText"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="47dp"
+        android:layout_marginTop="20dp"
 
         />
 
@@ -69,11 +70,12 @@
         android:layout_height="wrap_content"
         android:text="@string/forgot_password"
         android:id="@+id/forgotPassword"
-        android:layout_alignParentBottom="true"
+        android:layout_below="@+id/textView"
         android:layout_centerHorizontal="true"
         android:textColor="@color/red"
         android:textSize="15sp"
-        android:layout_marginBottom="20dp"
+        android:visibility="invisible"
+        android:layout_marginTop="20dp"
         android:onClick="resetPassword"
         android:clickable="true" />
         </RelativeLayout>

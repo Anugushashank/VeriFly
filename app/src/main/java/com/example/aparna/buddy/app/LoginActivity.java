@@ -6,8 +6,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.os.AsyncTask;
@@ -19,6 +17,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.afollestad.materialdialogs.MaterialDialog;
@@ -46,6 +45,7 @@ public class LoginActivity extends AppCompatActivity {
     String userid;
     AlertDialog alertDialog;
     RelativeLayout relativeLayout;
+    TextView textView;
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
@@ -57,6 +57,9 @@ public class LoginActivity extends AppCompatActivity {
 
         //Get "hasLoggedIn" value. If the value doesn't exist yet false is returned
         boolean hasLoggedIn = settings.getBoolean("hasLoggedIn", false);
+
+        relativeLayout = (RelativeLayout)findViewById(R.id.login_layout);
+
 
         if (hasLoggedIn) {
             if (!isNetworkConnected()) {
@@ -71,13 +74,15 @@ public class LoginActivity extends AppCompatActivity {
                 doLogin(phoneEmailString, passwordString);
             }
             else{
-                relativeLayout = (RelativeLayout)findViewById(R.id.login_layout);
+
                 relativeLayout.setVisibility(View.VISIBLE);
+                textView = (TextView) findViewById(R.id.forgotPassword);
             }
         }
         else {
-            relativeLayout = (RelativeLayout)findViewById(R.id.login_layout);
+
             relativeLayout.setVisibility(View.VISIBLE);
+            textView = (TextView) findViewById(R.id.forgotPassword);
         }
 
         phoneEmail    = (EditText) findViewById(R.id.editText);
@@ -249,6 +254,8 @@ public class LoginActivity extends AppCompatActivity {
 
                     Toast toast = Toast.makeText(context, text, duration);
                     toast.show();
+
+                    textView.setVisibility(View.VISIBLE);
                 }
                 else if(!apiResponse.getData().getIsActive()){
                     successfulLogin(phoneEmail,"inactive");
