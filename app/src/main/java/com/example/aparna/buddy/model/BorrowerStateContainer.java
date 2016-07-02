@@ -33,7 +33,7 @@ public class BorrowerStateContainer {
                 && activity.getSpinnerPunc() != null && !activity.getSpinnerPunc().isEmpty()
                 && activity.getSpinnerSincere() != null && !activity.getSpinnerSincere().isEmpty()
                 && activity.getSpinnerLoanRepay() != null  && !activity.getSpinnerLoanRepay().isEmpty()
-                && activity.getNumBankProofs() > 0 && activity.getNumGradeSheets() > 0 ){
+                && activity.getNumGradeSheets() > 0 ){
 
             return true;
         }

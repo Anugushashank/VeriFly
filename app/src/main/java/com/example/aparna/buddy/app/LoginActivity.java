@@ -12,6 +12,7 @@ import android.os.AsyncTask;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -59,7 +60,7 @@ public class LoginActivity extends AppCompatActivity {
         boolean hasLoggedIn = settings.getBoolean("hasLoggedIn", false);
 
         relativeLayout = (RelativeLayout)findViewById(R.id.login_layout);
-
+        textView = (TextView) findViewById(R.id.forgotPassword);
 
         if (hasLoggedIn) {
             if (!isNetworkConnected()) {
@@ -76,13 +77,11 @@ public class LoginActivity extends AppCompatActivity {
             else{
 
                 relativeLayout.setVisibility(View.VISIBLE);
-                textView = (TextView) findViewById(R.id.forgotPassword);
             }
         }
         else {
 
             relativeLayout.setVisibility(View.VISIBLE);
-            textView = (TextView) findViewById(R.id.forgotPassword);
         }
 
         phoneEmail    = (EditText) findViewById(R.id.editText);
@@ -127,8 +126,7 @@ public class LoginActivity extends AppCompatActivity {
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this,R.style.DialogStyle);
         builder.setTitle("Reset Password");
-        builder.setMessage("Enter your Phone number. Email will be sent to the email address corresponding to this phone number for " +
-                "resetting the password.");
+        builder.setMessage("Enter your Phone number. OTP will be sent to this number.");
 
         View viewInflated = LayoutInflater.from(this).inflate(R.layout.reset_password,(ViewGroup)findViewById(android.R.id.content), false);
 
@@ -136,35 +134,24 @@ public class LoginActivity extends AppCompatActivity {
 
         builder.setView(viewInflated);
 
-
         builder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 dialog.dismiss();
                 if(input.getText() != null && input.getText().length() == 10 ) {
-
-                    alertDialog = new AlertDialog.Builder(LoginActivity.this,R.style.DialogStyle)
-                            .setTitle("Take me to Gmail")
-                            .setMessage("Email has been sent to your mail address.")
-                            .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog, int which) {
-                                    Intent intent = getPackageManager().getLaunchIntentForPackage("com.google.android.gm");
-                                    startActivity(intent);
-
-                                }
-                            })
-                            .show();
+                    sendOTP(input.getText().toString());
                 }
             }
         });
         builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                dialog.cancel();
+                dialog.dismiss();
             }
         });
 
         builder.show();
+
     }
 
     private void doLogin(final String phoneEmail, final String password) {
@@ -255,6 +242,7 @@ public class LoginActivity extends AppCompatActivity {
                     Toast toast = Toast.makeText(context, text, duration);
                     toast.show();
 
+                    relativeLayout.setVisibility(View.VISIBLE);
                     textView.setVisibility(View.VISIBLE);
                 }
                 else if(!apiResponse.getData().getIsActive()){
@@ -352,6 +340,251 @@ public class LoginActivity extends AppCompatActivity {
             }
 
         });
+    }
+
+    private void enterOTP(final String phoneNumber){
+        final AlertDialog builder = new AlertDialog.Builder(this,R.style.DialogStyle).create();
+
+        View viewInflated = LayoutInflater.from(this).inflate(R.layout.enter_otp,(ViewGroup)findViewById(android.R.id.content), false);
+
+        final EditText input = (EditText) viewInflated.findViewById(R.id.input);
+
+        builder.setView(viewInflated);
+        builder.setMessage("Enter the OTP you have received.");
+        builder.setButton(AlertDialog.BUTTON_POSITIVE,"OK", new DialogInterface.OnClickListener(){
+            public void onClick(DialogInterface dialog, int which) {
+
+            }
+        });
+
+        builder.setButton(AlertDialog.BUTTON_NEUTRAL,"Resend OTP", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
+                sendOTP(phoneNumber);
+            }
+        });
+
+        builder.show();
+        builder.setCanceledOnTouchOutside(false);
+
+        builder.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v) {
+
+                if(input.getText() != null && input.getText().length() == 4){
+                    builder.cancel();
+                    verifyOTP(input.getText().toString(),phoneNumber);
+                }
+                else{
+
+                }
+            }
+        });
+    }
+
+    private void sendOTP(final String phoneNumber){
+        new AsyncTask<Void, String, String>() {
+            private Exception asyncException;
+            private Context context = getApplicationContext();
+            MaterialDialog materialDialog;
+
+            @Override
+            protected void onPreExecute() {
+                super.onPreExecute();
+                materialDialog = new MaterialDialog.Builder(LoginActivity.this)
+                        .content(getResources().getString(R.string.please_wait))
+                        .progress(true, 0)
+                        .canceledOnTouchOutside(false)
+                        .show();
+
+                materialDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+                    @Override
+                    public void onCancel(DialogInterface dialog) {
+                        finish();
+                    }
+
+                });
+            }
+
+            @Override
+            protected String doInBackground(Void... v) {
+                try {
+                    String token = TokenService.getToken(getApplicationContext(), LoginActivity.this);
+
+                    if (token == null) {
+                        throw new Exception();
+                    }
+
+                    OkHttpClient client = new OkHttpClient.Builder()
+                            .connectTimeout(10, TimeUnit.SECONDS)
+                            .readTimeout(10, TimeUnit.SECONDS)
+                            .build();
+
+                    JSONObject jsonObject = new JSONObject();
+
+                    HttpUrl url = new HttpUrl.Builder()
+                            .scheme("http")
+                            .host(getResources().getString(R.string.api_host))
+                            .addPathSegments(getResources().getString(R.string.send_otp))
+                            .addQueryParameter("phone",phoneNumber)
+                            .build();
+
+                    Request request = new Request.Builder()
+                            .url(url)
+                            .header("x-access-token", token)
+                            .post(RequestBody.create(BuddyConstants.MEDIA_TYPE_JSON, jsonObject.toString()))
+                            .build();
+
+                    Response response = client.newCall(request).execute();
+                    if (!response.isSuccessful()) throw new IOException("Unexpected code " + response);
+
+                    return response.body().string();
+                } catch (Exception e) {
+                    asyncException = e;
+                    return "";
+                }
+
+            }
+
+            @Override
+            protected void onPostExecute(String apiResponseString) {
+                if (materialDialog.isShowing()) {
+                    materialDialog.dismiss();
+                }
+
+                ApiResponse apiResponse = new Gson().fromJson(apiResponseString, ApiResponse.class);
+
+
+                if (asyncException != null || !apiResponse.getStatus().equals("success")) {
+
+                    if(!isNetworkConnected()) {
+                        CharSequence text = getResources().getString(R.string.no_internet_connection);
+                        int duration = Toast.LENGTH_SHORT;
+
+                        Toast toast = Toast.makeText(context, text, duration);
+                        toast.show();
+                    }
+                    else{
+                        CharSequence text = "Something went wrong. Please try again.";
+                        int duration = Toast.LENGTH_SHORT;
+
+                        Toast toast = Toast.makeText(context, text, duration);
+                        toast.show();
+                    }
+
+                }
+                else{
+                    enterOTP(phoneNumber);
+                }
+
+            }
+        }.execute();
+    }
+
+    private void verifyOTP(final String otp, final String phoneNumber){
+        new AsyncTask<Void, String, String>() {
+            private Exception asyncException;
+            private Context context = getApplicationContext();
+            MaterialDialog materialDialog;
+
+            @Override
+            protected void onPreExecute() {
+                super.onPreExecute();
+                materialDialog = new MaterialDialog.Builder(LoginActivity.this)
+                        .content(getResources().getString(R.string.please_wait))
+                        .progress(true, 0)
+                        .canceledOnTouchOutside(false)
+                        .show();
+
+                materialDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+                    @Override
+                    public void onCancel(DialogInterface dialog) {
+                        finish();
+                    }
+
+                });
+
+            }
+
+            @Override
+            protected String doInBackground(Void... v) {
+                try {
+                    String token = TokenService.getToken(getApplicationContext(), LoginActivity.this);
+
+                    if (token == null) {
+                        throw new Exception();
+                    }
+
+                    OkHttpClient client = new OkHttpClient.Builder()
+                            .connectTimeout(10, TimeUnit.SECONDS)
+                            .readTimeout(10, TimeUnit.SECONDS)
+                            .build();
+
+                    JSONObject jsonObject = new JSONObject();
+                    jsonObject.put("phone",phoneNumber);
+                    jsonObject.put("otp",otp);
+
+                    HttpUrl url = new HttpUrl.Builder()
+                            .scheme("http")
+                            .host(getResources().getString(R.string.api_host))
+                            .addPathSegments(getResources().getString(R.string.verify_otp))
+                            .build();
+
+                    Request request = new Request.Builder()
+                            .url(url)
+                            .header("x-access-token", token)
+                            .post(RequestBody.create(BuddyConstants.MEDIA_TYPE_JSON, jsonObject.toString()))
+                            .build();
+
+                    Response response = client.newCall(request).execute();
+                    if (!response.isSuccessful()) throw new IOException("Unexpected code " + response);
+
+                    return response.body().string();
+                } catch (Exception e) {
+                    asyncException = e;
+                    return "";
+                }
+
+            }
+
+            @Override
+            protected void onPostExecute(String apiResponseString) {
+                if (materialDialog.isShowing()) {
+                    materialDialog.dismiss();
+                }
+
+                ApiResponse apiResponse = new Gson().fromJson(apiResponseString, ApiResponse.class);
+
+
+                if (asyncException != null || !apiResponse.getStatus().equals("success")) {
+
+                    if(!isNetworkConnected()) {
+                        CharSequence text = getResources().getString(R.string.no_internet_connection);
+                        int duration = Toast.LENGTH_SHORT;
+
+                        Toast toast = Toast.makeText(context, text, duration);
+                        toast.show();
+                    }
+                    else{
+                        int duration = Toast.LENGTH_SHORT;
+
+                        Toast toast = Toast.makeText(context, apiResponse.getMsg(), duration);
+                        toast.show();
+                        enterOTP(phoneNumber);
+                    }
+
+                }
+                else if(apiResponse.getStatus().equals("success")){
+
+                    Intent intent = new Intent(LoginActivity.this , ChangePassword.class);
+                    intent.putExtra("reset","yes");
+                    intent.putExtra("userid",apiResponse.getData().getUserid());
+                    startActivity(intent);
+                    LoginActivity.this.finish();
+                }
+
+            }
+        }.execute();
     }
 
     private void successfulLogin(String username, String state){

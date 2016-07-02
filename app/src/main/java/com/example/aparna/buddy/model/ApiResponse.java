@@ -12,6 +12,8 @@ public class ApiResponse {
 
     public Response getData() { return data; }
 
+    public String getMsg() { return msg; }
+
     public class Response{
 
         String userid;

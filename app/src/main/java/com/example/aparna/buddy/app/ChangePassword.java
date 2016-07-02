@@ -10,6 +10,7 @@ import android.net.ConnectivityManager;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.RelativeLayout;
@@ -38,6 +39,7 @@ public class ChangePassword extends AppCompatActivity {
     String stringPassword, stringConfirmPassword;
     TextView textView;
     Intent intent;
+    Bundle extras;
     String urlToken, userid;
     android.support.v7.app.AlertDialog alertDialog;
     RelativeLayout relativeLayout;
@@ -46,17 +48,27 @@ public class ChangePassword extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+
         intent = getIntent();
-        urlToken = intent.getStringExtra("token");
+        extras = intent.getExtras();
+        if(!extras.getString("reset").equals("yes")) {
+            urlToken = intent.getStringExtra("token");
 
-        if(urlToken == null){
-            urlToken = intent.getData().getQueryParameter("token");
+            if (urlToken == null) {
+                urlToken = intent.getData().getQueryParameter("token");
+            }
+
+            sendToken(urlToken);
         }
-
-        sendToken(urlToken);
 
         setContentView(R.layout.activity_change_password);
 
+        if(extras.getString("reset").equals("yes")){
+            relativeLayout = (RelativeLayout)findViewById(R.id.password_layout);
+            relativeLayout.setVisibility(View.VISIBLE);
+
+            userid = extras.getString("userid");
+        }
         newPassword = (EditText)findViewById(R.id.password);
         confirmPassword = (EditText)findViewById(R.id.confirmPassword);
         textView = (TextView)findViewById(R.id.doNotMatch);

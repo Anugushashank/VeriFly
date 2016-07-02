@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_centerHorizontal="true"
+    android:layout_centerVertical="true">
+
+    <android.support.design.widget.TextInputLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <AutoCompleteTextView
+            android:id="@+id/input"
+            android:layout_width="80dp"
+            android:layout_height="50sp"
+            android:theme="@style/TextViewThemeUse"
+            android:hint="Phone"
+            android:ems="10"
+            android:maxLength="4"
+            android:layout_gravity="center_horizontal"
+            android:imeOptions="actionDone"
+            android:inputType="number" />
+
+    </android.support.design.widget.TextInputLayout>
+</FrameLayout>

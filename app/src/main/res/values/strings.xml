@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Verifly</string>
+    <string name="app_name">VeriFly</string>
     <string name="title_activity_home">Home Activity</string>
     <string name="action_settings">Settings</string>
     <string name="borrower_activity_title">Borrower Details</string>
@@ -57,6 +57,8 @@
     <string name="password_token">api/auth/intern/passwd/token</string>
     <string name="password_set">api/auth/intern/passwd</string>
     <string name="earnings_path">api/getinternearning</string>
+    <string name="send_otp">api/auth/intern/sendotp</string>
+    <string name="verify_otp">api/auth/intern/verifyotp</string>
 
 
     <!-- Dialog Box Texts -->

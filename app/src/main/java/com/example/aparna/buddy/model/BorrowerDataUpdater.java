@@ -371,6 +371,7 @@ public class BorrowerDataUpdater {
                             OkHttpClient client = new OkHttpClient();
                             String jsonString = new Gson().toJson(verificationInfo);
 
+
                             HttpUrl url = new HttpUrl.Builder()
                                     .scheme("http")
                                     .host(context.getResources().getString(R.string.api_host))
