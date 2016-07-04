@@ -50,9 +50,17 @@
         android:layout_below="@+id/editText"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="20dp"
-
         />
-
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/do_not_match"
+            android:layout_alignStart="@+id/editText2"
+            android:layout_alignLeft="@+id/editText2"
+            android:layout_below="@+id/editText2"
+            android:visibility="invisible"
+            android:textColor="@color/red"
+            android:id="@+id/invalidPhone"/>
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -60,7 +68,7 @@
         android:id="@+id/textView"
         android:layout_below="@+id/editText2"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="40dp"
+        android:layout_marginTop="50dp"
         android:textColor="#FFFFFF"
         android:textSize="20sp"
         android:onClick="onClick"

@@ -13,8 +13,8 @@
 
     <!-- Layout -->
     <string name="Rs">\u20B9</string>
-    <string name="front_side">Front Side</string>
-    <string name="back_side">Back Side</string>
+    <string name="front_side">FrontSide</string>
+    <string name="back_side">BackSide</string>
     <string name="upload_college_id">Upload College ID</string>
     <string name="upload_address_proof">Upload Permanent Address Proof</string>
     <string name="upload_mark_sheet">Upload Mark Sheet</string>
@@ -56,7 +56,7 @@
     <string name="uploadVerify_path">api/user/verify</string>
     <string name="password_token">api/auth/intern/passwd/token</string>
     <string name="password_set">api/auth/intern/passwd</string>
-    <string name="earnings_path">api/getinternearning</string>
+    <string name="earnings_path">api/intern/ops/earning</string>
     <string name="send_otp">api/auth/intern/sendotp</string>
     <string name="verify_otp">api/auth/intern/verifyotp</string>
 
@@ -75,7 +75,11 @@
     <string name="choose_photo">Choose a Photo</string>
     <string name="please_wait">Please wait&#8230;</string>
     <string name="invalid_token">URL is not valid</string>
-    <string name="take_me_to_gmail">Email has been sent to your mail Address.Take me to Gmail.</string>
+    <string name="went_wrong">Something went wrong. Please try again.</string>
+    <string name="not_registered">Not a registered user.</string>
+    <string name="fill_all_details">Fill all the details (or) Mark every image.</string>
+    <string name="logout">Logout</string>
+    <string name="onlineChat">OnlineChat</string>
 
     <!-- PopUp Texts -->
     <string name="college_popup">Mark Front or Back if the document matches. Mark invalid if it matches with none.
@@ -98,6 +102,12 @@
     <string name="forgot_password">Forgot your Password?</string>
     <string name="create_password">Create a Password</string>
     <string name="done">Done</string>
+
+    <!-- Login Page -->
+
+    <string name="enter_phone">Enter a phone number</string>
+    <string name="not_phone">Enter a 10 digit valid phone number</string>
+    <string name="enter_pass">Enter the password</string>
 
 
 

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.aparna.buddy.app">
+    package="com.interns.verifly.buddy.app">
 
     <uses-sdk
         android:minSdkVersion="15"
@@ -39,7 +39,7 @@
         android:supportsRtl="true"
         android:theme="@style/MateralThemeNewNoActionBar">
         <activity
-            android:name=".LoginActivity"
+            android:name="com.interns.verifly.buddy.app.LoginActivity"
             android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -48,21 +48,21 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".HomeActivity"
+            android:name="com.interns.verifly.buddy.app.HomeActivity"
             android:screenOrientation="portrait"/>
         <activity
-            android:name=".BorrowerDetailsActivity"
+            android:name="com.interns.verifly.buddy.app.BorrowerDetailsActivity"
             android:exported="true"
             android:screenOrientation="portrait">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".HomeActivity" />
+                android:value="com.interns.verifly.buddy.app.HomeActivity" />
         </activity>
         <activity
-            android:name=".ImageViewActivity"
+            android:name="com.interns.verifly.buddy.app.ImageViewActivity"
             android:theme="@style/FullImageTheme"
             android:screenOrientation="portrait"/>
-        <activity android:name=".ChangePassword"
+        <activity android:name="com.interns.verifly.buddy.app.ChangePassword"
             android:screenOrientation="portrait">
         <intent-filter>
             <action android:name="android.intent.action.VIEW" />

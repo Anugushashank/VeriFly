@@ -2,17 +2,17 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context="com.example.aparna.buddy.app.HomeActivity">
+    tools:context="com.interns.verifly.buddy.app.HomeActivity">
     <item
         android:id="@+id/intercom"
         android:icon="@drawable/intercom"
-        android:title="Logout"
+        android:title="@string/onlineChat"
         app:showAsAction="always"
         />
     <item
         android:id="@+id/logouticon"
         android:icon="@drawable/logout"
-        android:title="Logout"
+        android:title="@string/logout"
         app:showAsAction="always"
         />
 
