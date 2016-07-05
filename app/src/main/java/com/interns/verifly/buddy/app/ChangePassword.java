@@ -98,7 +98,6 @@ public class ChangePassword extends AppCompatActivity {
                 textView.setText(getResources().getString(R.string.enter_password));
                 textView.setVisibility(View.VISIBLE);
             } else if (stringPassword.length() < 4) {
-                newPassword.setText("");
                 newPassword.setHintTextColor(ContextCompat.getColor(getApplicationContext(), R.color.red));
                 textView.setText(getResources().getString(R.string.password_length));
                 textView.setVisibility(View.VISIBLE);
@@ -108,7 +107,6 @@ public class ChangePassword extends AppCompatActivity {
                 textView.setText(getResources().getString(R.string.please_confirm_password));
                 textView.setVisibility(View.VISIBLE);
             } else if (!stringPassword.equals(stringConfirmPassword)) {
-                confirmPassword.setText("");
                 confirmPassword.setHintTextColor(ContextCompat.getColor(getApplicationContext(), R.color.red));
                 textView.setText(getResources().getString(R.string.do_not_match));
                 textView.setVisibility(View.VISIBLE);

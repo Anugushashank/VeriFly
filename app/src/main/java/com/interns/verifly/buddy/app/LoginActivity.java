@@ -6,7 +6,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.os.AsyncTask;
 import android.support.v4.content.ContextCompat;
@@ -107,7 +106,6 @@ public class LoginActivity extends AppCompatActivity {
                 textView1.setText(getResources().getString(R.string.enter_phone));
                 textView1.setVisibility(View.VISIBLE);
             } else if (phoneEmailString.length() < 10) {
-                phoneEmail.setText("");
                 phoneEmail.setHintTextColor(ContextCompat.getColor(getApplicationContext(), R.color.red));
                 textView1.setText(getResources().getString(R.string.not_phone));
                 textView1.setVisibility(View.VISIBLE);

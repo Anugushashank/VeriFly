@@ -110,6 +110,14 @@
     <string name="enter_pass">Enter the password</string>
 
 
+    <!-- ImageView page -->
+
+    <string name="valid_document">Is this a valid document?</string>
+    <string name="invalid">Invalid</string>
+    <string name="valid">Valid</string>
+    <string name="front_match">Matches Front Side</string>
+    <string name="back_match">Matches Back Side</string>
+
 
 
 

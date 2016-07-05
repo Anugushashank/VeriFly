@@ -55,7 +55,7 @@
                 <RadioButton
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Invalid"
+                    android:text="@string/invalid"
                     android:textSize="16sp"
                     android:buttonTint="@color/white"
                     android:id="@+id/matchInvalid"
@@ -63,7 +63,7 @@
                 <RadioButton
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Matches Front Side"
+                    android:text="@string/front_match"
                     android:textSize="16sp"
                     android:buttonTint="@color/white"
                     android:id="@+id/matchFront"
@@ -71,7 +71,7 @@
                 <RadioButton
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Matches Back Side"
+                    android:text="@string/back_match"
                     android:textSize="16sp"
                     android:buttonTint="@color/white"
                     android:id="@+id/matchBack"
@@ -87,7 +87,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Is this a valid document?"
+                android:text="@string/valid_document"
                 android:textColor="#FFFFFF"
                 android:textSize="16sp"
                 android:layout_marginRight="40dp"
@@ -103,7 +103,7 @@
                 <RadioButton
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Valid"
+                    android:text="@string/valid"
                     android:textSize="16sp"
                     android:buttonTint="@color/white"
                     android:id="@+id/valid"
@@ -111,7 +111,7 @@
                 <RadioButton
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Invalid"
+                    android:text="@string/invalid"
                     android:textSize="16sp"
                     android:buttonTint="@color/white"
                     android:id="@+id/invalid"
