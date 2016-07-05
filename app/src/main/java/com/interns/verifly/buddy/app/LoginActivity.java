@@ -638,8 +638,8 @@ public class LoginActivity extends AppCompatActivity {
 
                             Toast toast = Toast.makeText(context, apiResponse.getMsg(), duration);
                             toast.show();
-                            enterOTP(phoneNumber);
                         }
+                        enterOTP(phoneNumber);
 
                     } else if (apiResponse.getStatus().equals("success")) {
 

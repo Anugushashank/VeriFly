@@ -114,8 +114,18 @@ public class CardAdapter extends RecyclerView.Adapter<CardAdapter.CardViewHolder
             }
             catch(Exception e){
             }
-            this.position = position;
-            this.current = currentObj;
+            try {
+                this.position = position;
+            }
+            catch(Exception e){
+
+            }
+            try {
+                this.current = currentObj;
+            }
+            catch (Exception e){
+
+            }
         }
     }
 }

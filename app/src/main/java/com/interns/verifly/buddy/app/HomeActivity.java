@@ -1,8 +1,5 @@
 package com.interns.verifly.buddy.app;
 
-/**
- * Created by Aparna on 05-Apr-16.
- */
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;

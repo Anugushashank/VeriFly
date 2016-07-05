@@ -7,7 +7,7 @@
         <item>Good</item>
         <item>Bad</item>
         <item>Average</item>
-        <item>Don\'t Know</item>
+        <item>Don\'t know</item>
     </string-array>
     <string name="prefs_file">buddyPrefsFile</string>
 
@@ -48,7 +48,7 @@
     <!-- URLs and HTTP data -->
     <string name="base_auth_token">Basic YnVkZHlhcGlhZG1pbjptZW1vbmdvc2gx</string>
     <string name="protocol_scheme">http</string>
-    <string name="api_host">ssl.hellobuddy.in</string>
+    <string name="api_host">ninja.hellobuddy.in</string>
     <string name="login_path">api/auth/login/intern</string>
     <string name="authenticate_path">authenticate</string>
     <string name="tasks_path">api/user/verify/tasks</string>

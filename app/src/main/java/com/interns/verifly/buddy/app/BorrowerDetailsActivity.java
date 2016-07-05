@@ -137,10 +137,18 @@ public class BorrowerDetailsActivity extends AppCompatActivity implements Adapte
     public void autoFill(){
 
         if(uploadDocModel != null) {
-            String userId = uploadDocModel.getFbUserId();
-            Picasso.with(this)
-                    .load("https://graph.facebook.com/" + userId + "/picture?type=large").placeholder(R.drawable.loading_image)
-                    .into(profilePic);
+            if(uploadDocModel.getFbUserId() != null) {
+                String userId = uploadDocModel.getFbUserId();
+                try {
+                    Picasso.with(this)
+                            .load("https://graph.facebook.com/" + userId + "/picture?type=large")
+                            .placeholder(R.drawable.loading_image)
+                            .into(profilePic);
+                }
+                catch(Exception e){
+
+                }
+            }
             if(uploadDocModel.getName() != null) {
                 name.setText(uploadDocModel.getName());
             }
@@ -721,16 +729,21 @@ public class BorrowerDetailsActivity extends AppCompatActivity implements Adapte
         if(resultCode == RESULT_OK){
             if(requestCode == 1){
 
-                bp = (Bitmap) data.getExtras().get("data");
+                try {
+                    bp = (Bitmap) data.getExtras().get("data");
 
-                cloudinary.uploadImage(bp, localPath, borrowerData,this);
+                    cloudinary.uploadImage(bp, localPath, borrowerData, this);
+                }
+                catch(Exception e){
+
+                }
 
             } else if (requestCode == 2) {
-
-                Uri selectedImageUri = data.getData();
+                try {
+                    Uri selectedImageUri = data.getData();
 
                     Cursor cursor = getContentResolver().query(selectedImageUri, null, null, null, null);
-                try{
+
                     cursor.moveToFirst();
                     photoPath = cursor.getString(0);
                     photoPath = photoPath.substring(photoPath.lastIndexOf(":") + 1);
@@ -740,27 +753,28 @@ public class BorrowerDetailsActivity extends AppCompatActivity implements Adapte
                             android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
                             null, MediaStore.Images.Media._ID + " = ? ", new String[]{photoPath}, null);
                     cursor.moveToFirst();
+
+
+                    String path = cursor.getString(cursor.getColumnIndex(MediaStore.Images.Media.DATA));
+                    cursor.close();
+
+                    BitmapFactory.Options options = new BitmapFactory.Options();
+                    options.inJustDecodeBounds = true;
+                    BitmapFactory.decodeFile(path, options);
+                    final int REQUIRED_SIZE = 200;
+                    int scale = 1;
+                    while (options.outWidth / scale / 2 >= REQUIRED_SIZE
+                            && options.outHeight / scale / 2 >= REQUIRED_SIZE)
+                        scale *= 2;
+                    options.inSampleSize = scale;
+                    options.inJustDecodeBounds = false;
+                    bp = BitmapFactory.decodeFile(path, options);
+
+                    cloudinary.uploadImage(bp, localPath, borrowerData, this);
                 }
                 catch(Exception e){
 
                 }
-
-                String path = cursor.getString(cursor.getColumnIndex(MediaStore.Images.Media.DATA));
-                cursor.close();
-
-                BitmapFactory.Options options = new BitmapFactory.Options();
-                options.inJustDecodeBounds = true;
-                BitmapFactory.decodeFile(path, options);
-                final int REQUIRED_SIZE = 200;
-                int scale = 1;
-                while (options.outWidth / scale / 2 >= REQUIRED_SIZE
-                        && options.outHeight / scale / 2 >= REQUIRED_SIZE)
-                    scale *= 2;
-                options.inSampleSize = scale;
-                options.inJustDecodeBounds = false;
-                bp = BitmapFactory.decodeFile(path, options);
-
-                cloudinary.uploadImage(bp, localPath, borrowerData,this);
 
             } else if (requestCode == 3) {
                 try {
@@ -1254,23 +1268,43 @@ public class BorrowerDetailsActivity extends AppCompatActivity implements Adapte
     }
 
     public void createCollegeIdLayout(){
-        ExpandableHeightGridView gridView = (ExpandableHeightGridView) findViewById(R.id.collegeIdImages);
-        gridView.setAdapter(new GridViewAdapter(this,collegeID));
+        try {
+            ExpandableHeightGridView gridView = (ExpandableHeightGridView) findViewById(R.id.collegeIdImages);
+            gridView.setAdapter(new GridViewAdapter(this, collegeID));
+        }
+        catch(Exception e){
+
+        }
     }
 
     public void createAddressProofLayout(){
-        ExpandableHeightGridView gridView = (ExpandableHeightGridView) findViewById(R.id.permanentAddressProofImages);
-        gridView.setAdapter(new GridViewAdapter(this,addressProof));
+        try {
+            ExpandableHeightGridView gridView = (ExpandableHeightGridView) findViewById(R.id.permanentAddressProofImages);
+            gridView.setAdapter(new GridViewAdapter(this, addressProof));
+        }
+        catch(Exception e){
+
+        }
     }
 
     public void createGradeSheetsLayout(){
-        ExpandableHeightGridView gridView = (ExpandableHeightGridView) findViewById(R.id.gradeSheetImages);
-        gridView.setAdapter(new GridViewAdapter(this,gradeSheet));
+        try {
+            ExpandableHeightGridView gridView = (ExpandableHeightGridView) findViewById(R.id.gradeSheetImages);
+            gridView.setAdapter(new GridViewAdapter(this, gradeSheet));
+        }
+        catch(Exception e){
+
+        }
     }
 
     public void createBankProofsLayout(){
-        ExpandableHeightGridView gridView = (ExpandableHeightGridView) findViewById(R.id.bankProofImages);
-        gridView.setAdapter(new GridViewAdapter(this,bankProof));
+        try {
+            ExpandableHeightGridView gridView = (ExpandableHeightGridView) findViewById(R.id.bankProofImages);
+            gridView.setAdapter(new GridViewAdapter(this, bankProof));
+        }
+        catch(Exception e){
+
+        }
     }
 
     public String getFrontImageCollegeId() { return frontImageCollegeId; }
